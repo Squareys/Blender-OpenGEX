@@ -22,13 +22,13 @@ __author__ = 'aullik'
 
 
 bl_info = {
-	"name": "OpenGEX format (.ogex)",
-	"description": "Terathon Software OpenGEX Exporter",
-	"author": "Eric Lengyel",
-	"version": (1, 1, 2, 3),
-	"location": "File > Import-Export",
-	"wiki_url": "http://opengex.org/",
-	"category": "Import-Export"}
+    "name": "OpenGEX format (.ogex)",
+    "description": "Terathon Software OpenGEX Exporter",
+    "author": "Eric Lengyel",
+    "version": (1, 1, 2, 3),
+    "location": "File > Import-Export",
+    "wiki_url": "http://opengex.org/",
+    "category": "Import-Export"}
 
 
 import bpy
@@ -61,15 +61,15 @@ axisName = [B"x", B"y", B"z"]
 
 
 def menu_func(self, context):
-	self.layout.operator(OpenGexExporter.bl_idname, text = "OpenGEX (.ogex)")
+    self.layout.operator(OpenGexExporter.bl_idname, text = "OpenGEX (.ogex)")
 
 def register():
-	bpy.utils.register_class(OpenGexExporter)
-	bpy.types.INFO_MT_file_export.append(menu_func)
+    bpy.utils.register_class(OpenGexExporter)
+    bpy.types.INFO_MT_file_export.append(menu_func)
 
 def unregister():
-	bpy.types.INFO_MT_file_export.remove(menu_func)
-	bpy.utils.unregister_class(OpenGexExporter)
+    bpy.types.INFO_MT_file_export.remove(menu_func)
+    bpy.utils.unregister_class(OpenGexExporter)
 
 if __name__ == "__main__":
-	register()
+    register()
