@@ -6,6 +6,29 @@ import math
 from bpy_extras.io_utils import ExportHelper
 
 
+kNodeTypeNode = 0
+kNodeTypeBone = 1
+kNodeTypeGeometry = 2
+kNodeTypeLight = 3
+kNodeTypeCamera = 4
+
+kAnimationSampled = 0
+kAnimationLinear = 1
+kAnimationBezier = 2
+
+kExportEpsilon = 1.0e-6
+
+structIdentifier = [B"Node $", B"BoneNode $", B"GeometryNode $", B"LightNode $", B"CameraNode $"]
+
+subtranslationName = [B"xpos", B"ypos", B"zpos"]
+subrotationName = [B"xrot", B"yrot", B"zrot"]
+subscaleName = [B"xscl", B"yscl", B"zscl"]
+deltaSubtranslationName = [B"dxpos", B"dypos", B"dzpos"]
+deltaSubrotationName = [B"dxrot", B"dyrot", B"dzrot"]
+deltaSubscaleName = [B"dxscl", B"dyscl", B"dzscl"]
+axisName = [B"x", B"y", B"z"]
+
+
 class OpenGexExporter(bpy.types.Operator, ExportHelper):
     """Export to OpenGEX format"""
     bl_idname = "export_scene.ogex"
