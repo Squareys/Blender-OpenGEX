@@ -22,7 +22,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.file.write(text)
 
     def IndentWrite(self, text, extra=0, newline=False):
-        if (newline):
+        if newline:
             self.file.write(B"\n")
         for i in range(self.indentLevel + extra):
             self.file.write(B"\t")
@@ -32,7 +32,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.file.write(bytes(str(i), "UTF-8"))
 
     def WriteFloat(self, f):
-        if ((math.isinf(f)) or (math.isnan(f))):
+        if (math.isinf(f)) or (math.isnan(f)):
             self.file.write(B"0.0")
         else:
             self.file.write(bytes(str(f), "UTF-8"))
@@ -124,8 +124,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteFileName(self, filename):
         length = len(filename)
-        if (length != 0):
-            if ((length > 2) and (filename[1] == ":")):
+        if length != 0:
+            if (length > 2) and (filename[1] == ":"):
                 self.Write(B"//")
                 self.Write(bytes(filename[0], "UTF-8"))
                 self.Write(bytes(filename[2:length].replace("\\", "/"), "UTF-8"))
@@ -147,13 +147,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.WriteInt(valueArray[k])
             k += 1
 
-            if (i * 64 < count - 64):
+            if i * 64 < count - 64:
                 self.Write(B",\n")
             else:
                 self.Write(B"\n")
 
         count &= 63
-        if (count != 0):
+        if count != 0:
             self.IndentWrite(B"", 1)
             for j in range(count - 1):
                 self.WriteInt(valueArray[k])
@@ -178,13 +178,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.WriteFloat(valueArray[k])
             k += 1
 
-            if (i * 16 < count - 16):
+            if i * 16 < count - 16:
                 self.Write(B",\n")
             else:
                 self.Write(B"\n")
 
         count &= 15
-        if (count != 0):
+        if count != 0:
             self.IndentWrite(B"", 1)
             for j in range(count - 1):
                 self.WriteFloat(valueArray[k])
@@ -247,13 +247,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.WriteVector2D(getattr(vertexArray[k], attrib))
             k += 1
 
-            if (i * 8 < count - 8):
+            if i * 8 < count - 8:
                 self.Write(B",\n")
             else:
                 self.Write(B"\n")
 
         count &= 7
-        if (count != 0):
+        if count != 0:
             self.IndentWrite(B"", 1)
             for j in range(count - 1):
                 self.WriteVector2D(getattr(vertexArray[k], attrib))
@@ -278,13 +278,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.WriteVector3D(getattr(vertexArray[k], attrib))
             k += 1
 
-            if (i * 8 < count - 8):
+            if i * 8 < count - 8:
                 self.Write(B",\n")
             else:
                 self.Write(B"\n")
 
         count &= 7
-        if (count != 0):
+        if count != 0:
             self.IndentWrite(B"", 1)
             for j in range(count - 1):
                 self.WriteVector3D(getattr(vertexArray[k], attrib))
@@ -309,13 +309,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.WriteVector3D(meshVertexArray[vertexArray[k].vertexIndex].co)
             k += 1
 
-            if (i * 8 < count - 8):
+            if i * 8 < count - 8:
                 self.Write(B",\n")
             else:
                 self.Write(B"\n")
 
         count &= 7
-        if (count != 0):
+        if count != 0:
             self.IndentWrite(B"", 1)
             for j in range(count - 1):
                 self.WriteVector3D(meshVertexArray[vertexArray[k].vertexIndex].co)
@@ -335,31 +335,31 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             for j in range(7):
                 face = tessFaceArray[vertexArray[k].faceIndex]
                 self.WriteVector3D(
-                    meshVertexArray[vertexArray[k].vertexIndex].normal if (face.use_smooth) else face.normal)
+                    meshVertexArray[vertexArray[k].vertexIndex].normal if face.use_smooth else face.normal)
                 self.Write(B", ")
                 k += 1
 
             face = tessFaceArray[vertexArray[k].faceIndex]
-            self.WriteVector3D(meshVertexArray[vertexArray[k].vertexIndex].normal if (face.use_smooth) else face.normal)
+            self.WriteVector3D(meshVertexArray[vertexArray[k].vertexIndex].normal if face.use_smooth else face.normal)
             k += 1
 
-            if (i * 8 < count - 8):
+            if i * 8 < count - 8:
                 self.Write(B",\n")
             else:
                 self.Write(B"\n")
 
         count &= 7
-        if (count != 0):
+        if count != 0:
             self.IndentWrite(B"", 1)
             for j in range(count - 1):
                 face = tessFaceArray[vertexArray[k].faceIndex]
                 self.WriteVector3D(
-                    meshVertexArray[vertexArray[k].vertexIndex].normal if (face.use_smooth) else face.normal)
+                    meshVertexArray[vertexArray[k].vertexIndex].normal if face.use_smooth else face.normal)
                 self.Write(B", ")
                 k += 1
 
             face = tessFaceArray[vertexArray[k].faceIndex]
-            self.WriteVector3D(meshVertexArray[vertexArray[k].vertexIndex].normal if (face.use_smooth) else face.normal)
+            self.WriteVector3D(meshVertexArray[vertexArray[k].vertexIndex].normal if face.use_smooth else face.normal)
             self.Write(B"\n")
 
     def WriteTriangle(self, triangleIndex, indexTable):
@@ -386,13 +386,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.WriteTriangle(triangleIndex, indexTable)
             triangleIndex += 1
 
-            if (i * 16 < count - 16):
+            if i * 16 < count - 16:
                 self.Write(B",\n")
             else:
                 self.Write(B"\n")
 
         count &= 15
-        if (count != 0):
+        if count != 0:
             self.IndentWrite(B"", 1)
             for j in range(count - 1):
                 self.WriteTriangle(triangleIndex, indexTable)
@@ -405,7 +405,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     def WriteNodeTable(self, objectRef):
         first = True
         for node in objectRef[1]["nodeTable"]:
-            if (first):
+            if first:
                 self.Write(B"\t\t// ")
             else:
                 self.Write(B", ")
@@ -414,31 +414,31 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     @staticmethod
     def GetNodeType(node):
-        if (node.type == "MESH"):
-            if (len(node.data.polygons) != 0):
-                return (kNodeTypeGeometry)
-        elif (node.type == "LAMP"):
+        if node.type == "MESH":
+            if len(node.data.polygons) != 0:
+                return kNodeTypeGeometry
+        elif node.type == "LAMP":
             type = node.data.type
-            if ((type == "SUN") or (type == "POINT") or (type == "SPOT")):
-                return (kNodeTypeLight)
-        elif (node.type == "CAMERA"):
-            return (kNodeTypeCamera)
+            if (type == "SUN") or (type == "POINT") or (type == "SPOT"):
+                return kNodeTypeLight
+        elif node.type == "CAMERA":
+            return kNodeTypeCamera
 
-        return (kNodeTypeNode)
+        return kNodeTypeNode
 
     @staticmethod
     def GetShapeKeys(mesh):
         shapeKeys = mesh.shape_keys
-        if ((shapeKeys) and (len(shapeKeys.key_blocks) > 1)):
-            return (shapeKeys)
+        if shapeKeys and (len(shapeKeys.key_blocks) > 1):
+            return shapeKeys
 
-        return (None)
+        return None
 
     def FindNode(self, name):
         for nodeRef in self.nodeArray.items():
-            if (nodeRef[0].name == name):
-                return (nodeRef)
-        return (None)
+            if nodeRef[0].name == name:
+                return nodeRef
+        return None
 
     @staticmethod
     def DeindexMesh(mesh, materialTable):
@@ -463,26 +463,26 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             exportVertex.vertexIndex = k1
             exportVertex.faceIndex = faceIndex
             exportVertex.position = v1.co
-            exportVertex.normal = v1.normal if (face.use_smooth) else face.normal
+            exportVertex.normal = v1.normal if face.use_smooth else face.normal
             exportVertexArray.append(exportVertex)
 
             exportVertex = ExportVertex()
             exportVertex.vertexIndex = k2
             exportVertex.faceIndex = faceIndex
             exportVertex.position = v2.co
-            exportVertex.normal = v2.normal if (face.use_smooth) else face.normal
+            exportVertex.normal = v2.normal if face.use_smooth else face.normal
             exportVertexArray.append(exportVertex)
 
             exportVertex = ExportVertex()
             exportVertex.vertexIndex = k3
             exportVertex.faceIndex = faceIndex
             exportVertex.position = v3.co
-            exportVertex.normal = v3.normal if (face.use_smooth) else face.normal
+            exportVertex.normal = v3.normal if face.use_smooth else face.normal
             exportVertexArray.append(exportVertex)
 
             materialTable.append(face.material_index)
 
-            if (len(face.vertices) == 4):
+            if len(face.vertices) == 4:
                 k1 = face.vertices[0]
                 k2 = face.vertices[2]
                 k3 = face.vertices[3]
@@ -495,21 +495,21 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 exportVertex.vertexIndex = k1
                 exportVertex.faceIndex = faceIndex
                 exportVertex.position = v1.co
-                exportVertex.normal = v1.normal if (face.use_smooth) else face.normal
+                exportVertex.normal = v1.normal if face.use_smooth else face.normal
                 exportVertexArray.append(exportVertex)
 
                 exportVertex = ExportVertex()
                 exportVertex.vertexIndex = k2
                 exportVertex.faceIndex = faceIndex
                 exportVertex.position = v2.co
-                exportVertex.normal = v2.normal if (face.use_smooth) else face.normal
+                exportVertex.normal = v2.normal if face.use_smooth else face.normal
                 exportVertexArray.append(exportVertex)
 
                 exportVertex = ExportVertex()
                 exportVertex.vertexIndex = k3
                 exportVertex.faceIndex = faceIndex
                 exportVertex.position = v3.co
-                exportVertex.normal = v3.normal if (face.use_smooth) else face.normal
+                exportVertex.normal = v3.normal if face.use_smooth else face.normal
                 exportVertexArray.append(exportVertex)
 
                 materialTable.append(face.material_index)
@@ -517,7 +517,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             faceIndex += 1
 
         colorCount = len(mesh.tessface_vertex_colors)
-        if (colorCount > 0):
+        if colorCount > 0:
             colorFace = mesh.tessface_vertex_colors[0].data
             vertexIndex = 0
             faceIndex = 0
@@ -531,7 +531,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 exportVertexArray[vertexIndex].color = cf.color3
                 vertexIndex += 1
 
-                if (len(face.vertices) == 4):
+                if len(face.vertices) == 4:
                     exportVertexArray[vertexIndex].color = cf.color1
                     vertexIndex += 1
                     exportVertexArray[vertexIndex].color = cf.color3
@@ -542,7 +542,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 faceIndex += 1
 
         texcoordCount = len(mesh.tessface_uv_textures)
-        if (texcoordCount > 0):
+        if texcoordCount > 0:
             texcoordFace = mesh.tessface_uv_textures[0].data
             vertexIndex = 0
             faceIndex = 0
@@ -556,7 +556,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 exportVertexArray[vertexIndex].texcoord0 = tf.uv3
                 vertexIndex += 1
 
-                if (len(face.vertices) == 4):
+                if len(face.vertices) == 4:
                     exportVertexArray[vertexIndex].texcoord0 = tf.uv1
                     vertexIndex += 1
                     exportVertexArray[vertexIndex].texcoord0 = tf.uv3
@@ -566,7 +566,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                 faceIndex += 1
 
-            if (texcoordCount > 1):
+            if texcoordCount > 1:
                 texcoordFace = mesh.tessface_uv_textures[1].data
                 vertexIndex = 0
                 faceIndex = 0
@@ -580,7 +580,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     exportVertexArray[vertexIndex].texcoord1 = tf.uv3
                     vertexIndex += 1
 
-                    if (len(face.vertices) == 4):
+                    if len(face.vertices) == 4:
                         exportVertexArray[vertexIndex].texcoord1 = tf.uv1
                         vertexIndex += 1
                         exportVertexArray[vertexIndex].texcoord1 = tf.uv3
@@ -593,15 +593,15 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         for ev in exportVertexArray:
             ev.Hash()
 
-        return (exportVertexArray)
+        return exportVertexArray
 
     @staticmethod
     def FindExportVertex(bucket, exportVertexArray, vertex):
         for index in bucket:
-            if (exportVertexArray[index] == vertex):
-                return (index)
+            if exportVertexArray[index] == vertex:
+                return index
 
-        return (-1)
+        return -1
 
     @staticmethod
     def UnifyVertices(exportVertexArray, indexTable):
@@ -610,13 +610,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         # color, and texcoords. Duplicate vertices are unified, and a new index table is returned.
 
         bucketCount = len(exportVertexArray) >> 3
-        if (bucketCount > 1):
+        if bucketCount > 1:
 
             # Round down to nearest power of two.
 
             while True:
                 count = bucketCount & (bucketCount - 1)
-                if (count == 0):
+                if count == 0:
                     break
                 bucketCount = count
         else:
@@ -629,17 +629,17 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             ev = exportVertexArray[i]
             bucket = ev.hash & (bucketCount - 1)
             index = OpenGexExporter.FindExportVertex(hashTable[bucket], exportVertexArray, ev)
-            if (index < 0):
+            if index < 0:
                 indexTable.append(len(unifiedVertexArray))
                 unifiedVertexArray.append(ev)
                 hashTable[bucket].append(i)
             else:
                 indexTable.append(indexTable[index])
 
-        return (unifiedVertexArray)
+        return unifiedVertexArray
 
     def ProcessBone(self, bone):
-        if ((self.exportAllFlag) or (bone.select)):
+        if self.exportAllFlag or bone.select:
             self.nodeArray[bone] = {"nodeType": kNodeTypeBone,
                                     "structName": bytes("node" + str(len(self.nodeArray) + 1), "UTF-8")}
 
@@ -647,23 +647,23 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.ProcessBone(subnode)
 
     def ProcessNode(self, node):
-        if ((self.exportAllFlag) or (node.select)):
+        if self.exportAllFlag or node.select:
             type = OpenGexExporter.GetNodeType(node)
             self.nodeArray[node] = {"nodeType": type,
                                     "structName": bytes("node" + str(len(self.nodeArray) + 1), "UTF-8")}
 
-            if (node.parent_type == "BONE"):
+            if node.parent_type == "BONE":
                 boneSubnodeArray = self.boneParentArray.get(node.parent_bone)
-                if (boneSubnodeArray):
+                if boneSubnodeArray:
                     boneSubnodeArray.append(node)
                 else:
                     self.boneParentArray[node.parent_bone] = [node]
 
-            if (node.type == "ARMATURE"):
+            if node.type == "ARMATURE":
                 skeleton = node.data
-                if (skeleton):
+                if skeleton:
                     for bone in skeleton.bones:
-                        if (not bone.parent):
+                        if not bone.parent:
                             self.ProcessBone(bone)
 
         for subnode in node.children:
@@ -671,12 +671,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ProcessSkinnedMeshes(self):
         for nodeRef in self.nodeArray.items():
-            if (nodeRef[1]["nodeType"] == kNodeTypeGeometry):
+            if nodeRef[1]["nodeType"] == kNodeTypeGeometry:
                 armature = nodeRef[0].find_armature()
-                if (armature):
+                if armature:
                     for bone in armature.data.bones:
                         boneRef = self.FindNode(bone.name)
-                        if (boneRef):
+                        if boneRef:
                             # If a node is used as a bone, then we force its type to be a bone.
 
                             boneRef[1]["nodeType"] = kNodeTypeBone
@@ -688,88 +688,88 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         for key in fcurve.keyframe_points:
             interp = key.interpolation
-            if (interp == "LINEAR"):
+            if interp == "LINEAR":
                 linearCount += 1
-            elif (interp == "BEZIER"):
+            elif interp == "BEZIER":
                 bezierCount += 1
             else:
-                return (kAnimationSampled)
+                return kAnimationSampled
 
-        if (bezierCount == 0):
-            return (kAnimationLinear)
-        elif (linearCount == 0):
-            return (kAnimationBezier)
+        if bezierCount == 0:
+            return kAnimationLinear
+        elif linearCount == 0:
+            return kAnimationBezier
 
-        return (kAnimationSampled)
+        return kAnimationSampled
 
     @staticmethod
     def AnimationKeysDifferent(fcurve):
         keyCount = len(fcurve.keyframe_points)
-        if (keyCount > 0):
+        if keyCount > 0:
             key1 = fcurve.keyframe_points[0].co[1]
 
             for i in range(1, keyCount):
                 key2 = fcurve.keyframe_points[i].co[1]
-                if (math.fabs(key2 - key1) > kExportEpsilon):
-                    return (True)
+                if math.fabs(key2 - key1) > kExportEpsilon:
+                    return True
 
-        return (False)
+        return False
 
     @staticmethod
     def AnimationTangentsNonzero(fcurve):
         keyCount = len(fcurve.keyframe_points)
-        if (keyCount > 0):
+        if keyCount > 0:
             key = fcurve.keyframe_points[0].co[1]
             left = fcurve.keyframe_points[0].handle_left[1]
             right = fcurve.keyframe_points[0].handle_right[1]
-            if ((math.fabs(key - left) > kExportEpsilon) or (math.fabs(right - key) > kExportEpsilon)):
-                return (True)
+            if (math.fabs(key - left) > kExportEpsilon) or (math.fabs(right - key) > kExportEpsilon):
+                return True
 
             for i in range(1, keyCount):
                 key = fcurve.keyframe_points[i].co[1]
                 left = fcurve.keyframe_points[i].handle_left[1]
                 right = fcurve.keyframe_points[i].handle_right[1]
-                if ((math.fabs(key - left) > kExportEpsilon) or (math.fabs(right - key) > kExportEpsilon)):
-                    return (True)
+                if (math.fabs(key - left) > kExportEpsilon) or (math.fabs(right - key) > kExportEpsilon):
+                    return True
 
-        return (False)
+        return False
 
     @staticmethod
     def AnimationPresent(fcurve, kind):
-        if (kind != kAnimationBezier):
-            return (OpenGexExporter.AnimationKeysDifferent(fcurve))
+        if kind != kAnimationBezier:
+            return OpenGexExporter.AnimationKeysDifferent(fcurve)
 
-        return ((OpenGexExporter.AnimationKeysDifferent(fcurve)) or (OpenGexExporter.AnimationTangentsNonzero(fcurve)))
+        return (OpenGexExporter.AnimationKeysDifferent(fcurve)) or (OpenGexExporter.AnimationTangentsNonzero(fcurve))
 
     @staticmethod
     def MatricesDifferent(m1, m2):
         for i in range(4):
             for j in range(4):
-                if (math.fabs(m1[i][j] - m2[i][j]) > kExportEpsilon):
-                    return (True)
+                if math.fabs(m1[i][j] - m2[i][j]) > kExportEpsilon:
+                    return True
 
-        return (False)
+        return False
 
     @staticmethod
     def CollectBoneAnimation(armature, name):
         path = "pose.bones[\"" + name + "\"]."
         curveArray = []
 
-        if (armature.animation_data):
+        if armature.animation_data:
             action = armature.animation_data.action
-            if (action):
+            if action:
                 for fcurve in action.fcurves:
-                    if (fcurve.data_path.startswith(path)):
+                    if fcurve.data_path.startswith(path):
                         curveArray.append(fcurve)
 
-        return (curveArray)
+        return curveArray
 
     def ExportKeyTimes(self, fcurve):
         self.IndentWrite(B"Key {float {")
 
         keyCount = len(fcurve.keyframe_points)
         for i in range(keyCount):
-            if (i > 0):
+            if i > 0:
                 self.Write(B", ")
 
             time = fcurve.keyframe_points[i].co[0] - self.beginFrame
@@ -782,7 +782,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         keyCount = len(fcurve.keyframe_points)
         for i in range(keyCount):
-            if (i > 0):
+            if i > 0:
                 self.Write(B", ")
 
             ctrl = fcurve.keyframe_points[i].handle_left[0] - self.beginFrame
@@ -792,7 +792,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.IndentWrite(B"Key (kind = \"+control\") {float {")
 
         for i in range(keyCount):
-            if (i > 0):
+            if i > 0:
                 self.Write(B", ")
 
             ctrl = fcurve.keyframe_points[i].handle_right[0] - self.beginFrame
@@ -805,7 +805,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         keyCount = len(fcurve.keyframe_points)
         for i in range(keyCount):
-            if (i > 0):
+            if i > 0:
                 self.Write(B", ")
 
             value = fcurve.keyframe_points[i].co[1]
@@ -818,7 +818,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         keyCount = len(fcurve.keyframe_points)
         for i in range(keyCount):
-            if (i > 0):
+            if i > 0:
                 self.Write(B", ")
 
             ctrl = fcurve.keyframe_points[i].handle_left[1]
@@ -828,7 +828,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.IndentWrite(B"Key (kind = \"+control\") {float {")
 
         for i in range(keyCount):
-            if (i > 0):
+            if i > 0:
                 self.Write(B", ")
 
             ctrl = fcurve.keyframe_points[i].handle_right[1]
@@ -847,7 +847,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.IndentWrite(B"{\n")
         self.indentLevel += 1
 
-        if (kind != kAnimationBezier):
+        if kind != kAnimationBezier:
             self.IndentWrite(B"Time\n")
             self.IndentWrite(B"{\n")
             self.indentLevel += 1
@@ -897,11 +897,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         for i in range(self.beginFrame, self.endFrame):
             scene.frame_set(i)
             m2 = node.matrix_local
-            if (OpenGexExporter.MatricesDifferent(m1, m2)):
+            if OpenGexExporter.MatricesDifferent(m1, m2):
                 animationFlag = True
                 break
 
-        if (animationFlag):
+        if animationFlag:
             self.IndentWrite(B"Animation\n", 0, True)
             self.IndentWrite(B"{\n")
             self.indentLevel += 1
@@ -970,11 +970,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         for i in range(self.beginFrame, self.endFrame):
             scene.frame_set(i)
             m2 = poseBone.matrix
-            if (OpenGexExporter.MatricesDifferent(m1, m2)):
+            if OpenGexExporter.MatricesDifferent(m1, m2):
                 animationFlag = True
                 break
 
-        if (animationFlag):
+        if animationFlag:
             self.IndentWrite(B"Animation\n", 0, True)
             self.IndentWrite(B"{\n")
             self.indentLevel += 1
@@ -1008,10 +1008,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.IndentWrite(B"{\n")
 
             parent = poseBone.parent
-            if (parent):
+            if parent:
                 for i in range(self.beginFrame, self.endFrame):
                     scene.frame_set(i)
-                    if (math.fabs(parent.matrix.determinant()) > kExportEpsilon):
+                    if math.fabs(parent.matrix.determinant()) > kExportEpsilon:
                         self.WriteMatrixFlat(parent.matrix.inverted() * poseBone.matrix)
                     else:
                         self.WriteMatrixFlat(poseBone.matrix)
@@ -1019,7 +1019,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     self.Write(B",\n")
 
                 scene.frame_set(self.endFrame)
-                if (math.fabs(parent.matrix.determinant()) > kExportEpsilon):
+                if math.fabs(parent.matrix.determinant()) > kExportEpsilon:
                     self.WriteMatrixFlat(parent.matrix.inverted() * poseBone.matrix)
                 else:
                     self.WriteMatrixFlat(poseBone.matrix)
@@ -1126,55 +1126,55 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         deltaSclAnimated = [False, False, False]
 
         mode = node.rotation_mode
-        sampledAnimation = ((self.sampleAnimationFlag) or (mode == "QUATERNION") or (mode == "AXIS_ANGLE"))
+        sampledAnimation = (self.sampleAnimationFlag or (mode == "QUATERNION") or (mode == "AXIS_ANGLE"))
 
-        if ((not sampledAnimation) and (node.animation_data)):
+        if (not sampledAnimation) and node.animation_data:
             action = node.animation_data.action
-            if (action):
+            if action:
                 for fcurve in action.fcurves:
                     kind = OpenGexExporter.ClassifyAnimationCurve(fcurve)
-                    if (kind != kAnimationSampled):
-                        if (fcurve.data_path == "location"):
+                    if kind != kAnimationSampled:
+                        if fcurve.data_path == "location":
                             for i in range(3):
-                                if ((fcurve.array_index == i) and (not posAnimCurve[i])):
+                                if (fcurve.array_index == i) and (not posAnimCurve[i]):
                                     posAnimCurve[i] = fcurve
                                     posAnimKind[i] = kind
-                                    if (OpenGexExporter.AnimationPresent(fcurve, kind)):
+                                    if OpenGexExporter.AnimationPresent(fcurve, kind):
                                         posAnimated[i] = True
-                        elif (fcurve.data_path == "delta_location"):
+                        elif fcurve.data_path == "delta_location":
                             for i in range(3):
-                                if ((fcurve.array_index == i) and (not deltaPosAnimCurve[i])):
+                                if (fcurve.array_index == i) and (not deltaPosAnimCurve[i]):
                                     deltaPosAnimCurve[i] = fcurve
                                     deltaPosAnimKind[i] = kind
-                                    if (OpenGexExporter.AnimationPresent(fcurve, kind)):
+                                    if OpenGexExporter.AnimationPresent(fcurve, kind):
                                         deltaPosAnimated[i] = True
-                        elif (fcurve.data_path == "rotation_euler"):
+                        elif fcurve.data_path == "rotation_euler":
                             for i in range(3):
-                                if ((fcurve.array_index == i) and (not rotAnimCurve[i])):
+                                if (fcurve.array_index == i) and (not rotAnimCurve[i]):
                                     rotAnimCurve[i] = fcurve
                                     rotAnimKind[i] = kind
-                                    if (OpenGexExporter.AnimationPresent(fcurve, kind)):
+                                    if OpenGexExporter.AnimationPresent(fcurve, kind):
                                         rotAnimated[i] = True
-                        elif (fcurve.data_path == "delta_rotation_euler"):
+                        elif fcurve.data_path == "delta_rotation_euler":
                             for i in range(3):
-                                if ((fcurve.array_index == i) and (not deltaRotAnimCurve[i])):
+                                if (fcurve.array_index == i) and (not deltaRotAnimCurve[i]):
                                     deltaRotAnimCurve[i] = fcurve
                                     deltaRotAnimKind[i] = kind
-                                    if (OpenGexExporter.AnimationPresent(fcurve, kind)):
+                                    if OpenGexExporter.AnimationPresent(fcurve, kind):
                                         deltaRotAnimated[i] = True
-                        elif (fcurve.data_path == "scale"):
+                        elif fcurve.data_path == "scale":
                             for i in range(3):
-                                if ((fcurve.array_index == i) and (not sclAnimCurve[i])):
+                                if (fcurve.array_index == i) and (not sclAnimCurve[i]):
                                     sclAnimCurve[i] = fcurve
                                     sclAnimKind[i] = kind
-                                    if (OpenGexExporter.AnimationPresent(fcurve, kind)):
+                                    if OpenGexExporter.AnimationPresent(fcurve, kind):
                                         sclAnimated[i] = True
-                        elif (fcurve.data_path == "delta_scale"):
+                        elif fcurve.data_path == "delta_scale":
                             for i in range(3):
-                                if ((fcurve.array_index == i) and (not deltaSclAnimCurve[i])):
+                                if (fcurve.array_index == i) and (not deltaSclAnimCurve[i]):
                                     deltaSclAnimCurve[i] = fcurve
                                     deltaSclAnimKind[i] = kind
-                                    if (OpenGexExporter.AnimationPresent(fcurve, kind)):
+                                    if OpenGexExporter.AnimationPresent(fcurve, kind):
                                         deltaSclAnimated[i] = True
                         elif ((fcurve.data_path == "rotation_axis_angle") or (
                                     fcurve.data_path == "rotation_quaternion") or (
@@ -1193,7 +1193,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         deltaRotationAnimated = deltaRotAnimated[0] | deltaRotAnimated[1] | deltaRotAnimated[2]
         deltaScaleAnimated = deltaSclAnimated[0] | deltaSclAnimated[1] | deltaSclAnimated[2]
 
-        if ((sampledAnimation) or ((not positionAnimated) and (not rotationAnimated) and (not scaleAnimated) and (
+        if (sampledAnimation or ((not positionAnimated) and (not rotationAnimated) and (not scaleAnimated) and (
                 not deltaPositionAnimated) and (not deltaRotationAnimated) and (not deltaScaleAnimated))):
 
             # If there's no keyframe animation at all, then write the node transform as a single 4x4 matrix.
@@ -1201,7 +1201,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             self.IndentWrite(B"Transform")
 
-            if (sampledAnimation):
+            if sampledAnimation:
                 self.Write(B" %transform")
 
             self.IndentWrite(B"{\n", 0, True)
@@ -1215,21 +1215,21 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.indentLevel -= 1
             self.IndentWrite(B"}\n")
 
-            if (sampledAnimation):
+            if sampledAnimation:
                 self.ExportNodeSampledAnimation(node, scene)
 
         else:
             structFlag = False
 
             deltaTranslation = node.delta_location
-            if (deltaPositionAnimated):
+            if deltaPositionAnimated:
 
                 # When the delta location is animated, write the x, y, and z components separately
                 # so they can be targeted by different tracks having different sets of keys.
 
                 for i in range(3):
                     pos = deltaTranslation[i]
-                    if ((deltaPosAnimated[i]) or (math.fabs(pos) > kExportEpsilon)):
+                    if (deltaPosAnimated[i]) or (math.fabs(pos) > kExportEpsilon):
                         self.IndentWrite(B"Translation %", 0, structFlag)
                         self.Write(deltaSubtranslationName[i])
                         self.Write(B" (kind = \"")
@@ -1256,14 +1256,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 structFlag = True
 
             translation = node.location
-            if (positionAnimated):
+            if positionAnimated:
 
                 # When the location is animated, write the x, y, and z components separately
                 # so they can be targeted by different tracks having different sets of keys.
 
                 for i in range(3):
                     pos = translation[i]
-                    if ((posAnimated[i]) or (math.fabs(pos) > kExportEpsilon)):
+                    if (posAnimated[i]) or (math.fabs(pos) > kExportEpsilon):
                         self.IndentWrite(B"Translation %", 0, structFlag)
                         self.Write(subtranslationName[i])
                         self.Write(B" (kind = \"")
@@ -1288,7 +1288,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                 structFlag = True
 
-            if (deltaRotationAnimated):
+            if deltaRotationAnimated:
 
                 # When the delta rotation is animated, write three separate Euler angle rotations
                 # so they can be targeted by different tracks having different sets of keys.
@@ -1296,7 +1296,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 for i in range(3):
                     axis = ord(mode[2 - i]) - 0x58
                     angle = node.delta_rotation_euler[axis]
-                    if ((deltaRotAnimated[axis]) or (math.fabs(angle) > kExportEpsilon)):
+                    if (deltaRotAnimated[axis]) or (math.fabs(angle) > kExportEpsilon):
                         self.IndentWrite(B"Rotation %", 0, structFlag)
                         self.Write(deltaSubrotationName[axis])
                         self.Write(B" (kind = \"")
@@ -1315,7 +1315,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 # When the delta rotation is not animated, write it in the representation given by
                 # the node's current rotation mode. (There is no axis-angle delta rotation.)
 
-                if (mode == "QUATERNION"):
+                if mode == "QUATERNION":
                     quaternion = node.delta_rotation_quaternion
                     if ((math.fabs(quaternion[0] - 1.0) > kExportEpsilon) or (
                                 math.fabs(quaternion[1]) > kExportEpsilon) or (
@@ -1334,7 +1334,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     for i in range(3):
                         axis = ord(mode[2 - i]) - 0x58
                         angle = node.delta_rotation_euler[axis]
-                        if (math.fabs(angle) > kExportEpsilon):
+                        if math.fabs(angle) > kExportEpsilon:
                             self.IndentWrite(B"Rotation (kind = \"", 0, structFlag)
                             self.Write(axisName[axis])
                             self.Write(B"\")\n")
@@ -1346,7 +1346,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                             structFlag = True
 
-            if (rotationAnimated):
+            if rotationAnimated:
 
                 # When the rotation is animated, write three separate Euler angle rotations
                 # so they can be targeted by different tracks having different sets of keys.
@@ -1354,7 +1354,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 for i in range(3):
                     axis = ord(mode[2 - i]) - 0x58
                     angle = node.rotation_euler[axis]
-                    if ((rotAnimated[axis]) or (math.fabs(angle) > kExportEpsilon)):
+                    if (rotAnimated[axis]) or (math.fabs(angle) > kExportEpsilon):
                         self.IndentWrite(B"Rotation %", 0, structFlag)
                         self.Write(subrotationName[axis])
                         self.Write(B" (kind = \"")
@@ -1373,7 +1373,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 # When the rotation is not animated, write it in the representation given by
                 # the node's current rotation mode.
 
-                if (mode == "QUATERNION"):
+                if mode == "QUATERNION":
                     quaternion = node.rotation_quaternion
                     if ((math.fabs(quaternion[0] - 1.0) > kExportEpsilon) or (
                                 math.fabs(quaternion[1]) > kExportEpsilon) or (
@@ -1388,8 +1388,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                         structFlag = True
 
-                elif (mode == "AXIS_ANGLE"):
-                    if (math.fabs(node.rotation_axis_angle[0]) > kExportEpsilon):
+                elif mode == "AXIS_ANGLE":
+                    if math.fabs(node.rotation_axis_angle[0]) > kExportEpsilon:
                         self.IndentWrite(B"Rotation (kind = \"axis\")\n", 0, structFlag)
                         self.IndentWrite(B"{\n")
                         self.IndentWrite(B"float[4] {", 1)
@@ -1403,7 +1403,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     for i in range(3):
                         axis = ord(mode[2 - i]) - 0x58
                         angle = node.rotation_euler[axis]
-                        if (math.fabs(angle) > kExportEpsilon):
+                        if math.fabs(angle) > kExportEpsilon:
                             self.IndentWrite(B"Rotation (kind = \"", 0, structFlag)
                             self.Write(axisName[axis])
                             self.Write(B"\")\n")
@@ -1416,14 +1416,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                             structFlag = True
 
             deltaScale = node.delta_scale
-            if (deltaScaleAnimated):
+            if deltaScaleAnimated:
 
                 # When the delta scale is animated, write the x, y, and z components separately
                 # so they can be targeted by different tracks having different sets of keys.
 
                 for i in range(3):
                     scl = deltaScale[i]
-                    if ((deltaSclAnimated[i]) or (math.fabs(scl) > kExportEpsilon)):
+                    if (deltaSclAnimated[i]) or (math.fabs(scl) > kExportEpsilon):
                         self.IndentWrite(B"Scale %", 0, structFlag)
                         self.Write(deltaSubscaleName[i])
                         self.Write(B" (kind = \"")
@@ -1450,14 +1450,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 structFlag = True
 
             scale = node.scale
-            if (scaleAnimated):
+            if scaleAnimated:
 
                 # When the scale is animated, write the x, y, and z components separately
                 # so they can be targeted by different tracks having different sets of keys.
 
                 for i in range(3):
                     scl = scale[i]
-                    if ((sclAnimated[i]) or (math.fabs(scl) > kExportEpsilon)):
+                    if (sclAnimated[i]) or (math.fabs(scl) > kExportEpsilon):
                         self.IndentWrite(B"Scale %", 0, structFlag)
                         self.Write(subscaleName[i])
                         self.Write(B" (kind = \"")
@@ -1494,41 +1494,41 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             structFlag = False
 
-            if (positionAnimated):
+            if positionAnimated:
                 for i in range(3):
-                    if (posAnimated[i]):
+                    if posAnimated[i]:
                         self.ExportAnimationTrack(posAnimCurve[i], posAnimKind[i], subtranslationName[i], structFlag)
                         structFlag = True
 
-            if (rotationAnimated):
+            if rotationAnimated:
                 for i in range(3):
-                    if (rotAnimated[i]):
+                    if rotAnimated[i]:
                         self.ExportAnimationTrack(rotAnimCurve[i], rotAnimKind[i], subrotationName[i], structFlag)
                         structFlag = True
 
-            if (scaleAnimated):
+            if scaleAnimated:
                 for i in range(3):
-                    if (sclAnimated[i]):
+                    if sclAnimated[i]:
                         self.ExportAnimationTrack(sclAnimCurve[i], sclAnimKind[i], subscaleName[i], structFlag)
                         structFlag = True
 
-            if (deltaPositionAnimated):
+            if deltaPositionAnimated:
                 for i in range(3):
-                    if (deltaPosAnimated[i]):
+                    if deltaPosAnimated[i]:
                         self.ExportAnimationTrack(deltaPosAnimCurve[i], deltaPosAnimKind[i], deltaSubtranslationName[i],
                                                   structFlag)
                         structFlag = True
 
-            if (deltaRotationAnimated):
+            if deltaRotationAnimated:
                 for i in range(3):
-                    if (deltaRotAnimated[i]):
+                    if deltaRotAnimated[i]:
                         self.ExportAnimationTrack(deltaRotAnimCurve[i], deltaRotAnimKind[i], deltaSubrotationName[i],
                                                   structFlag)
                         structFlag = True
 
-            if (deltaScaleAnimated):
+            if deltaScaleAnimated:
                 for i in range(3):
-                    if (deltaSclAnimated[i]):
+                    if deltaSclAnimated[i]:
                         self.ExportAnimationTrack(deltaSclAnimCurve[i], deltaSclAnimKind[i], deltaSubscaleName[i],
                                                   structFlag)
                         structFlag = True
@@ -1539,23 +1539,23 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     def ExportBoneTransform(self, armature, bone, scene):
 
         curveArray = self.CollectBoneAnimation(armature, bone.name)
-        animation = ((len(curveArray) != 0) or (self.sampleAnimationFlag))
+        animation = ((len(curveArray) != 0) or self.sampleAnimationFlag)
 
         transform = bone.matrix_local.copy()
         parentBone = bone.parent
-        if ((parentBone) and (math.fabs(parentBone.matrix_local.determinant()) > kExportEpsilon)):
+        if parentBone and (math.fabs(parentBone.matrix_local.determinant()) > kExportEpsilon):
             transform = parentBone.matrix_local.inverted() * transform
 
         poseBone = armature.pose.bones.get(bone.name)
-        if (poseBone):
+        if poseBone:
             transform = poseBone.matrix.copy()
             parentPoseBone = poseBone.parent
-            if ((parentPoseBone) and (math.fabs(parentPoseBone.matrix.determinant()) > kExportEpsilon)):
+            if parentPoseBone and (math.fabs(parentPoseBone.matrix.determinant()) > kExportEpsilon):
                 transform = parentPoseBone.matrix.inverted() * transform
 
         self.IndentWrite(B"Transform")
 
-        if (animation):
+        if animation:
             self.Write(B" %transform")
 
         self.IndentWrite(B"{\n", 0, True)
@@ -1569,11 +1569,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.indentLevel -= 1
         self.IndentWrite(B"}\n")
 
-        if ((animation) and (poseBone)):
+        if animation and poseBone:
             self.ExportBoneSampledAnimation(poseBone, scene)
 
     def ExportMaterialRef(self, material, index):
-        if (not material in self.materialArray):
+        if material not in self.materialArray:
             self.materialArray[material] = {"structName": bytes("material" + str(len(self.materialArray) + 1), "UTF-8")}
 
         self.IndentWrite(B"MaterialRef (index = ")
@@ -1587,31 +1587,31 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         curveArray = []
         indexArray = []
 
-        if (shapeKeys.animation_data):
+        if shapeKeys.animation_data:
             action = shapeKeys.animation_data.action
-            if (action):
+            if action:
                 for fcurve in action.fcurves:
-                    if ((fcurve.data_path.startswith("key_blocks[")) and (fcurve.data_path.endswith("].value"))):
+                    if (fcurve.data_path.startswith("key_blocks[")) and (fcurve.data_path.endswith("].value")):
                         keyName = fcurve.data_path.strip("abcdehklopstuvy[]_.")
-                        if ((keyName[0] == "\"") or (keyName[0] == "'")):
+                        if (keyName[0] == "\"") or (keyName[0] == "'"):
                             index = shapeKeys.key_blocks.find(keyName.strip("\"'"))
-                            if (index >= 0):
+                            if index >= 0:
                                 curveArray.append(fcurve)
                                 indexArray.append(index)
                         else:
                             curveArray.append(fcurve)
                             indexArray.append(int(keyName))
 
-        if ((not action) and (node.animation_data)):
+        if (not action) and node.animation_data:
             action = node.animation_data.action
-            if (action):
+            if action:
                 for fcurve in action.fcurves:
                     if ((fcurve.data_path.startswith("data.shape_keys.key_blocks[")) and (
                             fcurve.data_path.endswith("].value"))):
                         keyName = fcurve.data_path.strip("abcdehklopstuvy[]_.")
-                        if ((keyName[0] == "\"") or (keyName[0] == "'")):
+                        if (keyName[0] == "\"") or (keyName[0] == "'"):
                             index = shapeKeys.key_blocks.find(keyName.strip("\"'"))
-                            if (index >= 0):
+                            if index >= 0:
                                 curveArray.append(fcurve)
                                 indexArray.append(index)
                         else:
@@ -1619,12 +1619,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                             indexArray.append(int(keyName))
 
         animated = (len(curveArray) != 0)
-        referenceName = shapeKeys.reference_key.name if (shapeKeys.use_relative) else ""
+        referenceName = shapeKeys.reference_key.name if shapeKeys.use_relative else ""
 
         for k in range(len(shapeKeys.key_blocks)):
             self.IndentWrite(B"MorphWeight", 0, (k == 0))
 
-            if (animated):
+            if animated:
                 self.Write(B" %mw")
                 self.WriteInt(k)
 
@@ -1637,7 +1637,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             self.Write(B"}}\n")
 
-        if (animated):
+        if animated:
             self.IndentWrite(B"Animation (begin = ", 0, True)
             self.WriteFloat((action.frame_range[0] - self.beginFrame) * self.frameTime)
             self.Write(B", end = ")
@@ -1654,7 +1654,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                 fcurve = curveArray[a]
                 kind = OpenGexExporter.ClassifyAnimationCurve(fcurve)
-                if ((kind != kAnimationSampled) and (not self.sampleAnimationFlag)):
+                if (kind != kAnimationSampled) and (not self.sampleAnimationFlag):
                     self.ExportAnimationTrack(fcurve, kind, target, structFlag)
                 else:
                     self.ExportMorphWeightSampledAnimationTrack(shapeKeys.key_blocks[k], target, scene, structFlag)
@@ -1666,7 +1666,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportBone(self, armature, bone, scene):
         nodeRef = self.nodeArray.get(bone)
-        if (nodeRef):
+        if nodeRef:
             self.IndentWrite(structIdentifier[nodeRef["nodeType"]], 0, True)
             self.Write(nodeRef["structName"])
 
@@ -1674,7 +1674,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.indentLevel += 1
 
             name = bone.name
-            if (name != ""):
+            if name != "":
                 self.IndentWrite(B"Name {string {\"")
                 self.Write(bytes(name, "UTF-8"))
                 self.Write(B"\"}}\n\n")
@@ -1687,15 +1687,15 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         # Export any ordinary nodes that are parented to this bone.
 
         boneSubnodeArray = self.boneParentArray.get(bone.name)
-        if (boneSubnodeArray):
+        if boneSubnodeArray:
             poseBone = None
-            if (not bone.use_relative_parent):
+            if not bone.use_relative_parent:
                 poseBone = armature.pose.bones.get(bone.name)
 
             for subnode in boneSubnodeArray:
                 self.ExportNode(subnode, scene, poseBone)
 
-        if (nodeRef):
+        if nodeRef:
             self.indentLevel -= 1
             self.IndentWrite(B"}\n")
 
@@ -1706,13 +1706,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         # Subnodes are then exported recursively.
 
         nodeRef = self.nodeArray.get(node)
-        if (nodeRef):
+        if nodeRef:
             type = nodeRef["nodeType"]
             self.IndentWrite(structIdentifier[type], 0, True)
             self.Write(nodeRef["structName"])
 
-            if (type == kNodeTypeGeometry):
-                if (node.hide_render):
+            if type == kNodeTypeGeometry:
+                if node.hide_render:
                     self.Write(B" (visible = false)")
 
             self.IndentWrite(B"{\n", 0, True)
@@ -1723,7 +1723,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             # Export the node's name if it has one.
 
             name = node.name
-            if (name != ""):
+            if name != "":
                 self.IndentWrite(B"Name {string {\"")
                 self.Write(bytes(name, "UTF-8"))
                 self.Write(B"\"}}\n")
@@ -1733,8 +1733,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             object = node.data
 
-            if (type == kNodeTypeGeometry):
-                if (not object in self.geometryArray):
+            if type == kNodeTypeGeometry:
+                if object not in self.geometryArray:
                     self.geometryArray[object] = {
                         "structName": bytes("geometry" + str(len(self.geometryArray) + 1), "UTF-8"),
                         "nodeTable": [node]}
@@ -1749,13 +1749,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     self.ExportMaterialRef(node.material_slots[i].material, i)
 
                 shapeKeys = OpenGexExporter.GetShapeKeys(object)
-                if (shapeKeys):
+                if shapeKeys:
                     self.ExportMorphWeights(node, shapeKeys, scene)
 
                 structFlag = True
 
-            elif (type == kNodeTypeLight):
-                if (not object in self.lightArray):
+            elif type == kNodeTypeLight:
+                if object not in self.lightArray:
                     self.lightArray[object] = {"structName": bytes("light" + str(len(self.lightArray) + 1), "UTF-8"),
                                                "nodeTable": [node]}
                 else:
@@ -1766,8 +1766,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 self.Write(B"}}\n")
                 structFlag = True
 
-            elif (type == kNodeTypeCamera):
-                if (not object in self.cameraArray):
+            elif type == kNodeTypeCamera:
+                if object not in self.cameraArray:
                     self.cameraArray[object] = {"structName": bytes("camera" + str(len(self.cameraArray) + 1), "UTF-8"),
                                                 "nodeTable": [node]}
                 else:
@@ -1778,14 +1778,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 self.Write(B"}}\n")
                 structFlag = True
 
-            if (structFlag):
+            if structFlag:
                 self.Write(B"\n")
 
-            if (poseBone):
+            if poseBone:
 
                 # If the node is parented to a bone and is not relative, then undo the bone's transform.
 
-                if (math.fabs(poseBone.matrix.determinant()) > kExportEpsilon):
+                if math.fabs(poseBone.matrix.determinant()) > kExportEpsilon:
                     self.IndentWrite(B"Transform\n")
                     self.IndentWrite(B"{\n")
                     self.indentLevel += 1
@@ -1802,18 +1802,18 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             self.ExportNodeTransform(node, scene)
 
-            if (node.type == "ARMATURE"):
+            if node.type == "ARMATURE":
                 skeleton = node.data
-                if (skeleton):
+                if skeleton:
                     for bone in skeleton.bones:
-                        if (not bone.parent):
+                        if not bone.parent:
                             self.ExportBone(node, bone, scene)
 
         for subnode in node.children:
-            if (subnode.parent_type != "BONE"):
+            if subnode.parent_type != "BONE":
                 self.ExportNode(subnode, scene)
 
-        if (nodeRef):
+        if nodeRef:
             self.indentLevel -= 1
             self.IndentWrite(B"}\n")
 
@@ -1863,13 +1863,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         for i in range(boneCount):
             boneRef = self.FindNode(boneArray[i].name)
-            if (boneRef):
+            if boneRef:
                 self.Write(B"$")
                 self.Write(boneRef[1]["structName"])
             else:
                 self.Write(B"null")
 
-            if (i < boneCount - 1):
+            if i < boneCount - 1:
                 self.Write(B", ")
             else:
                 self.Write(B"\n")
@@ -1891,7 +1891,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         for i in range(boneCount):
             self.WriteMatrixFlat(armature.matrix_world * boneArray[i].matrix_local)
-            if (i < boneCount - 1):
+            if i < boneCount - 1:
                 self.Write(B",\n")
 
         self.IndentWrite(B"}\n", 0, True)
@@ -1909,7 +1909,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         for group in node.vertex_groups:
             groupName = group.name
             for i in range(boneCount):
-                if (boneArray[i].name == groupName):
+                if boneArray[i].name == groupName:
                     groupRemap.append(i)
                     break
             else:
@@ -1926,14 +1926,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             for element in meshVertexArray[ev.vertexIndex].groups:
                 boneIndex = groupRemap[element.group]
                 boneWeight = element.weight
-                if ((boneIndex >= 0) and (boneWeight != 0.0)):
+                if (boneIndex >= 0) and (boneWeight != 0.0):
                     boneCount += 1
                     totalWeight += boneWeight
                     boneIndexArray.append(boneIndex)
                     boneWeightArray.append(boneWeight)
             boneCountArray.append(boneCount)
 
-            if (totalWeight != 0.0):
+            if totalWeight != 0.0:
                 normalizer = 1.0 / totalWeight
                 for i in range(-boneCount, 0):
                     boneWeightArray[i] *= normalizer
@@ -2009,17 +2009,17 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         currentMorphValue = []
 
         shapeKeys = OpenGexExporter.GetShapeKeys(mesh)
-        if (shapeKeys):
+        if shapeKeys:
             node.active_shape_key_index = 0
             node.show_only_shape_key = True
 
             baseIndex = 0
             relative = shapeKeys.use_relative
-            if (relative):
+            if relative:
                 morphCount = 0
                 baseName = shapeKeys.reference_key.name
                 for block in shapeKeys.key_blocks:
-                    if (block.name == baseName):
+                    if block.name == baseName:
                         baseIndex = morphCount
                         break
                     morphCount += 1
@@ -2029,11 +2029,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 currentMorphValue.append(block.value)
                 block.value = 0.0
 
-                if (block.name != ""):
+                if block.name != "":
                     self.IndentWrite(B"Morph (index = ", 0, structFlag)
                     self.WriteInt(morphCount)
 
-                    if ((relative) and (morphCount != baseIndex)):
+                    if relative and (morphCount != baseIndex):
                         self.Write(B", base = ")
                         self.WriteInt(baseIndex)
 
@@ -2110,7 +2110,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         # Write the color array if it exists.
 
         colorCount = len(exportMesh.tessface_vertex_colors)
-        if (colorCount > 0):
+        if colorCount > 0:
             self.IndentWrite(B"VertexArray (attrib = \"color\")\n", 0, True)
             self.IndentWrite(B"{\n")
             self.indentLevel += 1
@@ -2127,7 +2127,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         # Write the texcoord arrays.
 
         texcoordCount = len(exportMesh.tessface_uv_textures)
-        if (texcoordCount > 0):
+        if texcoordCount > 0:
             self.IndentWrite(B"VertexArray (attrib = \"texcoord\")\n", 0, True)
             self.IndentWrite(B"{\n")
             self.indentLevel += 1
@@ -2141,7 +2141,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.indentLevel -= 1
             self.IndentWrite(B"}\n")
 
-            if (texcoordCount > 1):
+            if texcoordCount > 1:
                 self.IndentWrite(B"VertexArray (attrib = \"texcoord[1]\")\n", 0, True)
                 self.IndentWrite(B"{\n")
                 self.indentLevel += 1
@@ -2157,7 +2157,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         # If there are multiple morph targets, export them here.
 
-        if (shapeKeys):
+        if shapeKeys:
             shapeKeys.key_blocks[0].value = 0.0
             for m in range(1, len(currentMorphValue)):
                 shapeKeys.key_blocks[m].value = 1.0
@@ -2207,10 +2207,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         maxMaterialIndex = 0
         for i in range(len(materialTable)):
             index = materialTable[i]
-            if (index > maxMaterialIndex):
+            if index > maxMaterialIndex:
                 maxMaterialIndex = index
 
-        if (maxMaterialIndex == 0):
+        if maxMaterialIndex == 0:
 
             # There is only one material, so write a single index array.
 
@@ -2236,10 +2236,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 materialTriangleCount[materialTable[i]] += 1
 
             for m in range(maxMaterialIndex + 1):
-                if (materialTriangleCount[m] != 0):
+                if materialTriangleCount[m] != 0:
                     materialIndexTable = []
                     for i in range(len(materialTable)):
-                        if (materialTable[i] == m):
+                        if materialTable[i] == m:
                             k = i * 3
                             materialIndexTable.append(indexTable[k])
                             materialIndexTable.append(indexTable[k + 1])
@@ -2262,12 +2262,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         # If the mesh is skinned, export the skinning data here.
 
-        if (armature):
+        if armature:
             self.ExportSkin(node, armature, unifiedVertexArray)
 
         # Restore the morph state.
 
-        if (shapeKeys):
+        if shapeKeys:
             node.active_shape_key_index = activeShapeKeyIndex
             node.show_only_shape_key = showOnlyShapeKey
 
@@ -2300,9 +2300,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         pointFlag = False
         spotFlag = False
 
-        if (type == "SUN"):
+        if type == "SUN":
             self.Write(B"\"infinite\"")
-        elif (type == "POINT"):
+        elif type == "POINT":
             self.Write(B"\"point\"")
             pointFlag = True
         else:
@@ -2310,7 +2310,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             pointFlag = True
             spotFlag = True
 
-        if (not object.use_shadow):
+        if not object.use_shadow:
             self.Write(B", shadow = false")
 
         self.Write(B")")
@@ -2326,18 +2326,18 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.Write(B"}}\n")
 
         intensity = object.energy
-        if (intensity != 1.0):
+        if intensity != 1.0:
             self.IndentWrite(B"Param (attrib = \"intensity\") {float {")
             self.WriteFloat(intensity)
             self.Write(B"}}\n")
 
-        if (pointFlag):
+        if pointFlag:
 
             # Export a separate attenuation function for each type that's in use.
 
             falloff = object.falloff_type
 
-            if (falloff == "INVERSE_LINEAR"):
+            if falloff == "INVERSE_LINEAR":
                 self.IndentWrite(B"Atten (curve = \"inverse\")\n", 0, True)
                 self.IndentWrite(B"{\n")
 
@@ -2347,7 +2347,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                 self.IndentWrite(B"}\n")
 
-            elif (falloff == "INVERSE_SQUARE"):
+            elif falloff == "INVERSE_SQUARE":
                 self.IndentWrite(B"Atten (curve = \"inverse_square\")\n", 0, True)
                 self.IndentWrite(B"{\n")
 
@@ -2357,8 +2357,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                 self.IndentWrite(B"}\n")
 
-            elif (falloff == "LINEAR_QUADRATIC_WEIGHTED"):
-                if (object.linear_attenuation != 0.0):
+            elif falloff == "LINEAR_QUADRATIC_WEIGHTED":
+                if object.linear_attenuation != 0.0:
                     self.IndentWrite(B"Atten (curve = \"inverse\")\n", 0, True)
                     self.IndentWrite(B"{\n")
 
@@ -2376,7 +2376,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                     self.IndentWrite(B"}\n\n")
 
-                if (object.quadratic_attenuation != 0.0):
+                if object.quadratic_attenuation != 0.0:
                     self.IndentWrite(B"Atten (curve = \"inverse_square\")\n")
                     self.IndentWrite(B"{\n")
 
@@ -2394,7 +2394,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                     self.IndentWrite(B"}\n")
 
-            if (object.use_sphere):
+            if object.use_sphere:
                 self.IndentWrite(B"Atten (curve = \"linear\")\n", 0, True)
                 self.IndentWrite(B"{\n")
 
@@ -2404,7 +2404,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                 self.IndentWrite(B"}\n")
 
-            if (spotFlag):
+            if spotFlag:
                 # Export additional angular attenuation for spot lights.
 
                 self.IndentWrite(B"Atten (kind = \"angle\", curve = \"linear\")\n", 0, True)
@@ -2484,7 +2484,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         uoffset = textureSlot.offset[0]
         voffset = textureSlot.offset[1]
 
-        if ((uscale != 1.0) or (vscale != 1.0) or (uoffset != 0.0) or (voffset != 0.0)):
+        if (uscale != 1.0) or (vscale != 1.0) or (uoffset != 0.0) or (voffset != 0.0):
             matrix = [[uscale, 0.0, 0.0, 0.0], [0.0, vscale, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0],
                       [uoffset, voffset, 0.0, 1.0]]
 
@@ -2515,7 +2515,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.Write(B"\n{\n")
             self.indentLevel += 1
 
-            if (material.name != ""):
+            if material.name != "":
                 self.IndentWrite(B"Name {string {\"")
                 self.Write(bytes(material.name, "UTF-8"))
                 self.Write(B"\"}}\n\n")
@@ -2532,7 +2532,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             specular = [material.specular_color[0] * intensity, material.specular_color[1] * intensity,
                         material.specular_color[2] * intensity]
 
-            if ((specular[0] > 0.0) or (specular[1] > 0.0) or (specular[2] > 0.0)):
+            if (specular[0] > 0.0) or (specular[1] > 0.0) or (specular[2] > 0.0):
                 self.IndentWrite(B"Color (attrib = \"specular\") {float[3] {")
                 self.WriteColor(specular)
                 self.Write(B"}}\n")
@@ -2542,7 +2542,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 self.Write(B"}}\n")
 
             emission = material.emit
-            if (emission > 0.0):
+            if emission > 0.0:
                 self.IndentWrite(B"Color (attrib = \"emission\") {float[3] {")
                 self.WriteColor([emission, emission, emission])
                 self.Write(B"}}\n")
@@ -2554,30 +2554,30 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             normalTexture = None
 
             for textureSlot in material.texture_slots:
-                if ((textureSlot) and (textureSlot.use) and (textureSlot.texture.type == "IMAGE")):
-                    if (((textureSlot.use_map_color_diffuse) or (textureSlot.use_map_diffuse)) and (
+                if textureSlot and textureSlot.use and (textureSlot.texture.type == "IMAGE"):
+                    if (textureSlot.use_map_color_diffuse or textureSlot.use_map_diffuse and (
                             not diffuseTexture)):
                         diffuseTexture = textureSlot
                     elif (
-                                ((textureSlot.use_map_color_spec) or (textureSlot.use_map_specular)) and (
+                                textureSlot.use_map_color_spec or textureSlot.use_map_specular and (
                                     not specularTexture)):
                         specularTexture = textureSlot
-                    elif ((textureSlot.use_map_emit) and (not emissionTexture)):
+                    elif textureSlot.use_map_emit and (not emissionTexture):
                         emissionTexture = textureSlot
-                    elif ((textureSlot.use_map_translucency) and (not transparencyTexture)):
+                    elif textureSlot.use_map_translucency and (not transparencyTexture):
                         transparencyTexture = textureSlot
-                    elif ((textureSlot.use_map_normal) and (not normalTexture)):
+                    elif textureSlot.use_map_normal and (not normalTexture):
                         normalTexture = textureSlot
 
-            if (diffuseTexture):
+            if diffuseTexture:
                 self.ExportTexture(diffuseTexture, B"diffuse")
-            if (specularTexture):
+            if specularTexture:
                 self.ExportTexture(specularTexture, B"specular")
-            if (emissionTexture):
+            if emissionTexture:
                 self.ExportTexture(emissionTexture, B"emission")
-            if (transparencyTexture):
+            if transparencyTexture:
                 self.ExportTexture(transparencyTexture, B"transparency")
-            if (normalTexture):
+            if normalTexture:
                 self.ExportTexture(normalTexture, B"normal")
 
             self.indentLevel -= 1
@@ -2586,7 +2586,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     def ExportMetrics(self, scene):
         scale = scene.unit_settings.scale_length
 
-        if (scene.unit_settings.system == "IMPERIAL"):
+        if scene.unit_settings.system == "IMPERIAL":
             scale *= 0.3048
 
         self.Write(B"Metric (key = \"distance\") {float {")
@@ -2624,19 +2624,19 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.sampleAnimationFlag = self.option_sample_animation
 
         for object in scene.objects:
-            if (not object.parent):
+            if not object.parent:
                 self.ProcessNode(object)
 
         self.ProcessSkinnedMeshes()
 
         for object in scene.objects:
-            if (not object.parent):
+            if not object.parent:
                 self.ExportNode(object, scene)
 
         self.ExportObjects(scene)
         self.ExportMaterials()
 
-        if (self.restoreFrame):
+        if self.restoreFrame:
             scene.frame_set(originalFrame, originalSubframe)
 
         self.file.close()

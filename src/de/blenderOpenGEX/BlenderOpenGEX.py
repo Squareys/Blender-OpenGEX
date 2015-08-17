@@ -30,10 +30,8 @@ bl_info = {
     "wiki_url": "http://opengex.org/",
     "category": "Import-Export"}
 
-
 import bpy
 from blenderOpenGEX.MyOpenGexExporter import OpenGexExporter
-
 
 kNodeTypeNode = 0
 kNodeTypeBone = 1
@@ -47,9 +45,7 @@ kAnimationBezier = 2
 
 kExportEpsilon = 1.0e-6
 
-
 structIdentifier = [B"Node $", B"BoneNode $", B"GeometryNode $", B"LightNode $", B"CameraNode $"]
-
 
 subtranslationName = [B"xpos", B"ypos", B"zpos"]
 subrotationName = [B"xrot", B"yrot", B"zrot"]
@@ -61,15 +57,18 @@ axisName = [B"x", B"y", B"z"]
 
 
 def menu_func(self, context):
-    self.layout.operator(OpenGexExporter.bl_idname, text = "OpenGEX (.ogex)")
+    self.layout.operator(OpenGexExporter.bl_idname, text="OpenGEX (.ogex)")
+
 
 def register():
     bpy.utils.register_class(OpenGexExporter)
     bpy.types.INFO_MT_file_export.append(menu_func)
 
+
 def unregister():
     bpy.types.INFO_MT_file_export.remove(menu_func)
     bpy.utils.unregister_class(OpenGexExporter)
+
 
 if __name__ == "__main__":
     register()
