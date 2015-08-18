@@ -1,6 +1,7 @@
 __author__ = 'aullik'
 
 from blenderOpenGEX.ExportVertex import ExportVertex
+from blenderOpenGEX import printCaller
 import bpy
 import math
 from bpy_extras.io_utils import ExportHelper
@@ -44,12 +45,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def Write(self, text):
         # FIXME REMOVE
-        print('OpenGexExporter - Write -', self, text)
+        print(printCaller(), 'OpenGexExporter - Write -', self, text)
         self.file.write(text)
 
     def IndentWrite(self, text, extra=0, newline=False):
         # FIXME REMOVE
-        print('OpenGexExporter - IndentWrite -', self, text, extra, newline)
+        print(printCaller(), 'OpenGexExporter - IndentWrite -', self, text, extra, newline)
         if newline:
             self.file.write(B"\n")
         for i in range(self.indentLevel + extra):
@@ -58,12 +59,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteInt(self, i):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteInt -', self, i)
+        print(printCaller(), 'OpenGexExporter - WriteInt -', self, i)
         self.file.write(bytes(str(i), "UTF-8"))
 
     def WriteFloat(self, f):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteFloat -', self, f)
+        print(printCaller(), 'OpenGexExporter - WriteFloat -', self, f)
         if (math.isinf(f)) or (math.isnan(f)):
             self.file.write(B"0.0")
         else:
@@ -71,7 +72,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteMatrix(self, matrix):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteMatrix -', self, matrix)
+        print(printCaller(), 'OpenGexExporter - WriteMatrix -', self, matrix)
         self.IndentWrite(B"{", 1)
         self.WriteFloat(matrix[0][0])
         self.Write(B", ")
@@ -114,7 +115,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteMatrixFlat(self, matrix):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteMatrixFlat -', self, matrix)
+        print(printCaller(), 'OpenGexExporter - WriteMatrixFlat -', self, matrix)
         self.IndentWrite(B"{", 1)
         self.WriteFloat(matrix[0][0])
         self.Write(B", ")
@@ -151,7 +152,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteColor(self, color):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteColor -', self, color)
+        print(printCaller(), 'OpenGexExporter - WriteColor -', self, color)
         self.Write(B"{")
         self.WriteFloat(color[0])
         self.Write(B", ")
@@ -162,7 +163,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteFileName(self, filename):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteFileName -', self, filename)
+        print(printCaller(), 'OpenGexExporter - WriteFileName -', self, filename)
         length = len(filename)
         if length != 0:
             if (length > 2) and (filename[1] == ":"):
@@ -174,7 +175,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteIntArray(self, valueArray):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteIntArray -', self, valueArray)
+        print(printCaller(), 'OpenGexExporter - WriteIntArray -', self, valueArray)
         count = len(valueArray)
         k = 0
 
@@ -207,7 +208,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteFloatArray(self, valueArray):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteFloatArray -', self, valueArray)
+        print(printCaller(), 'OpenGexExporter - WriteFloatArray -', self, valueArray)
         count = len(valueArray)
         k = 0
 
@@ -240,7 +241,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteVector2D(self, vector):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteVector2D -', self, vector)
+        print(printCaller(), 'OpenGexExporter - WriteVector2D -', self, vector)
         self.Write(B"{")
         self.WriteFloat(vector[0])
         self.Write(B", ")
@@ -249,7 +250,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteVector3D(self, vector):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteVector3D -', self, vector)
+        print(printCaller(), 'OpenGexExporter - WriteVector3D -', self, vector)
         self.Write(B"{")
         self.WriteFloat(vector[0])
         self.Write(B", ")
@@ -260,7 +261,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteVector4D(self, vector):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteVector4D -', self, vector)
+        print(printCaller(), 'OpenGexExporter - WriteVector4D -', self, vector)
         self.Write(B"{")
         self.WriteFloat(vector[0])
         self.Write(B", ")
@@ -273,7 +274,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteQuaternion(self, quaternion):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteQuaternion -', self, quaternion)
+        print(printCaller(), 'OpenGexExporter - WriteQuaternion -', self, quaternion)
         self.Write(B"{")
         self.WriteFloat(quaternion[1])
         self.Write(B", ")
@@ -286,7 +287,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteVertexArray2D(self, vertexArray, attrib):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteVertexArray2D -', self, vertexArray, attrib)
+        print(printCaller(), 'OpenGexExporter - WriteVertexArray2D -', self, vertexArray, attrib)
         count = len(vertexArray)
         k = 0
 
@@ -319,7 +320,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteVertexArray3D(self, vertexArray, attrib):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteVertexArray3D -', self, vertexArray, attrib)
+        print(printCaller(), 'OpenGexExporter - WriteVertexArray3D -', self, vertexArray, attrib)
         count = len(vertexArray)
         k = 0
 
@@ -352,7 +353,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteMorphPositionArray3D(self, vertexArray, meshVertexArray):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteMorphPositionArray3D -', self, vertexArray, meshVertexArray)
+        print(printCaller(), 'OpenGexExporter - WriteMorphPositionArray3D -', self, vertexArray, meshVertexArray)
         count = len(vertexArray)
         k = 0
 
@@ -385,7 +386,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteMorphNormalArray3D(self, vertexArray, meshVertexArray, tessFaceArray):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteMorphNormalArray3D -', self, vertexArray, meshVertexArray, tessFaceArray)
+        print(printCaller(), 'OpenGexExporter - WriteMorphNormalArray3D -', self, vertexArray, meshVertexArray, tessFaceArray)
         count = len(vertexArray)
         k = 0
 
@@ -424,7 +425,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteTriangle(self, triangleIndex, indexTable):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteTriangle -', self, triangleIndex, indexTable)
+        print(printCaller(), 'OpenGexExporter - WriteTriangle -', self, triangleIndex, indexTable)
         i = triangleIndex * 3
         self.Write(B"{")
         self.WriteInt(indexTable[i])
@@ -436,7 +437,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteTriangleArray(self, count, indexTable):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteTriangleArray -', self, count, indexTable)
+        print(printCaller(), 'OpenGexExporter - WriteTriangleArray -', self, count, indexTable)
         triangleIndex = 0
 
         lineCount = count >> 4
@@ -468,7 +469,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def WriteNodeTable(self, objectRef):
         # FIXME REMOVE
-        print('OpenGexExporter - WriteNodeTable -', self, objectRef)
+        print(printCaller(), 'OpenGexExporter - WriteNodeTable -', self, objectRef)
         first = True
         for node in objectRef[1]["nodeTable"]:
             if first:
@@ -481,7 +482,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     @staticmethod
     def GetNodeType(node):
         # FIXME REMOVE
-        print('OpenGexExporter - GetNodeType -', node)
+        print(printCaller(), 'OpenGexExporter - GetNodeType -', node)
         if node.type == "MESH":
             if len(node.data.polygons) != 0:
                 return kNodeTypeGeometry
@@ -497,7 +498,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     @staticmethod
     def GetShapeKeys(mesh):
         # FIXME REMOVE
-        print('OpenGexExporter - GetShapeKeys -', mesh)
+        print(printCaller(), 'OpenGexExporter - GetShapeKeys -', mesh)
         shapeKeys = mesh.shape_keys
         if shapeKeys and (len(shapeKeys.key_blocks) > 1):
             return shapeKeys
@@ -506,7 +507,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def FindNode(self, name):
         # FIXME REMOVE
-        print('OpenGexExporter - FindNode -', self, name)
+        print(printCaller(), 'OpenGexExporter - FindNode -', self, name)
         for nodeRef in self.nodeArray.items():
             if nodeRef[0].name == name:
                 return nodeRef
@@ -515,7 +516,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     @staticmethod
     def DeindexMesh(mesh, materialTable):
         # FIXME REMOVE
-        print('OpenGexExporter - DeindexMesh -', mesh, materialTable)
+        print(printCaller(), 'OpenGexExporter - DeindexMesh -', mesh, materialTable)
 
         # This function deindexes all vertex positions, colors, and texcoords.
         # Three separate ExportVertex structures are created for each triangle.
@@ -672,7 +673,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     @staticmethod
     def FindExportVertex(bucket, exportVertexArray, vertex):
         # FIXME REMOVE
-        print('OpenGexExporter - FindExportVertex -', bucket, exportVertexArray, vertex)
+        print(printCaller(), 'OpenGexExporter - FindExportVertex -', bucket, exportVertexArray, vertex)
         for index in bucket:
             if exportVertexArray[index] == vertex:
                 return index
@@ -682,7 +683,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     @staticmethod
     def UnifyVertices(exportVertexArray, indexTable):
         # FIXME REMOVE
-        print('OpenGexExporter - UnifyVertices -', exportVertexArray, indexTable)
+        print(printCaller(), 'OpenGexExporter - UnifyVertices -', exportVertexArray, indexTable)
 
         # This function looks for identical vertices having exactly the same position, normal,
         # color, and texcoords. Duplicate vertices are unified, and a new index table is returned.
@@ -718,7 +719,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ProcessBone(self, bone):
         # FIXME REMOVE
-        print('OpenGexExporter - ProcessBone -', self, bone)
+        print(printCaller(), 'OpenGexExporter - ProcessBone -', self, bone)
         if self.exportAllFlag or bone.select:
             self.nodeArray[bone] = {"nodeType": kNodeTypeBone,
                                     "structName": bytes("node" + str(len(self.nodeArray) + 1), "UTF-8")}
@@ -728,7 +729,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ProcessNode(self, node):
         # FIXME REMOVE
-        print('OpenGexExporter - ProcessNode -', self, node)
+        print(printCaller(), 'OpenGexExporter - ProcessNode -', self, node)
         if self.exportAllFlag or node.select:
             type = OpenGexExporter.GetNodeType(node)
             self.nodeArray[node] = {"nodeType": type,
@@ -753,7 +754,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ProcessSkinnedMeshes(self):
         # FIXME REMOVE
-        print('OpenGexExporter - ProcessSkinnedMeshes -', self)
+        print(printCaller(), 'OpenGexExporter - ProcessSkinnedMeshes -', self)
         for nodeRef in self.nodeArray.items():
             if nodeRef[1]["nodeType"] == kNodeTypeGeometry:
                 armature = nodeRef[0].find_armature()
@@ -768,7 +769,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     @staticmethod
     def ClassifyAnimationCurve(fcurve):
         # FIXME REMOVE
-        print('OpenGexExporter - ClassifyAnimationCurve -', fcurve)
+        print(printCaller(), 'OpenGexExporter - ClassifyAnimationCurve -', fcurve)
         linearCount = 0
         bezierCount = 0
 
@@ -791,7 +792,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     @staticmethod
     def AnimationKeysDifferent(fcurve):
         # FIXME REMOVE
-        print('OpenGexExporter - AnimationKeysDifferent -', fcurve)
+        print(printCaller(), 'OpenGexExporter - AnimationKeysDifferent -', fcurve)
         keyCount = len(fcurve.keyframe_points)
         if keyCount > 0:
             key1 = fcurve.keyframe_points[0].co[1]
@@ -806,7 +807,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     @staticmethod
     def AnimationTangentsNonzero(fcurve):
         # FIXME REMOVE
-        print('OpenGexExporter - AnimationTangentsNonzero -', fcurve)
+        print(printCaller(), 'OpenGexExporter - AnimationTangentsNonzero -', fcurve)
         keyCount = len(fcurve.keyframe_points)
         if keyCount > 0:
             key = fcurve.keyframe_points[0].co[1]
@@ -827,7 +828,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     @staticmethod
     def AnimationPresent(fcurve, kind):
         # FIXME REMOVE
-        print('OpenGexExporter - AnimationPresent -', fcurve, kind)
+        print(printCaller(), 'OpenGexExporter - AnimationPresent -', fcurve, kind)
         if kind != kAnimationBezier:
             return OpenGexExporter.AnimationKeysDifferent(fcurve)
 
@@ -836,7 +837,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     @staticmethod
     def MatricesDifferent(m1, m2):
         # FIXME REMOVE
-        print('OpenGexExporter - MatricesDifferent -', m1, m2)
+        print(printCaller(), 'OpenGexExporter - MatricesDifferent -', m1, m2)
         for i in range(4):
             for j in range(4):
                 if math.fabs(m1[i][j] - m2[i][j]) > kExportEpsilon:
@@ -847,7 +848,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     @staticmethod
     def CollectBoneAnimation(armature, name):
         # FIXME REMOVE
-        print('OpenGexExporter - CollectBoneAnimation -', armature, name)
+        print(printCaller(), 'OpenGexExporter - CollectBoneAnimation -', armature, name)
         path = "pose.bones[\"" + name + "\"]."
         curveArray = []
 
@@ -862,7 +863,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportKeyTimes(self, fcurve):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportKeyTimes -',self, fcurve)
+        print(printCaller(), 'OpenGexExporter - ExportKeyTimes -',self, fcurve)
         self.IndentWrite(B"Key {float {")
 
         keyCount = len(fcurve.keyframe_points)
@@ -877,7 +878,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportKeyTimeControlPoints(self, fcurve):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportKeyTimeControlPoints -', self, fcurve)
+        print(printCaller(), 'OpenGexExporter - ExportKeyTimeControlPoints -', self, fcurve)
         self.IndentWrite(B"Key (kind = \"-control\") {float {")
 
         keyCount = len(fcurve.keyframe_points)
@@ -902,7 +903,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportKeyValues(self, fcurve):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportKeyValues -', self, fcurve)
+        print(printCaller(), 'OpenGexExporter - ExportKeyValues -', self, fcurve)
         self.IndentWrite(B"Key {float {")
 
         keyCount = len(fcurve.keyframe_points)
@@ -917,7 +918,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportKeyValueControlPoints(self, fcurve):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportKeyValueControlPoints -', self, fcurve)
+        print(printCaller(), 'OpenGexExporter - ExportKeyValueControlPoints -', self, fcurve)
         self.IndentWrite(B"Key (kind = \"-control\") {float {")
 
         keyCount = len(fcurve.keyframe_points)
@@ -942,7 +943,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportAnimationTrack(self, fcurve, kind, target, newline):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportAnimationTrack -', self, fcurve, kind, target, newline)
+        print(printCaller(), 'OpenGexExporter - ExportAnimationTrack -', self, fcurve, kind, target, newline)
 
         # This function exports a single animation track. The curve types for the
         # Time and Value structures are given by the kind parameter.
@@ -992,7 +993,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportNodeSampledAnimation(self, node, scene):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportNodeSampledAnimation -', self, node, scene)
+        print(printCaller(), 'OpenGexExporter - ExportNodeSampledAnimation -', self, node, scene)
 
         # This function exports animation as full 4x4 matrices for each frame.
 
@@ -1067,7 +1068,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportBoneSampledAnimation(self, poseBone, scene):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportBoneSampledAnimation -', self, poseBone, scene)
+        print(printCaller(), 'OpenGexExporter - ExportBoneSampledAnimation -', self, poseBone, scene)
 
         # This function exports bone animation as full 4x4 matrices for each frame.
 
@@ -1162,7 +1163,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportMorphWeightSampledAnimationTrack(self, block, target, scene, newline):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportMorphWeightSampledAnimationTrack -', self, block, target, scene, newline)
+        print(printCaller(), 'OpenGexExporter - ExportMorphWeightSampledAnimationTrack -', self, block, target, scene, newline)
         currentFrame = scene.frame_current
         currentSubframe = scene.frame_subframe
 
@@ -1210,7 +1211,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportNodeTransform(self, node, scene):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportNodeTransform -', self, node, scene)
+        print(printCaller(), 'OpenGexExporter - ExportNodeTransform -', self, node, scene)
         posAnimCurve = [None, None, None]
         rotAnimCurve = [None, None, None]
         sclAnimCurve = [None, None, None]
@@ -1652,7 +1653,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportBoneTransform(self, armature, bone, scene):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportBoneTransform -', self, armature, bone, scene)
+        print(printCaller(), 'OpenGexExporter - ExportBoneTransform -', self, armature, bone, scene)
 
         curveArray = self.CollectBoneAnimation(armature, bone.name)
         animation = ((len(curveArray) != 0) or self.sampleAnimationFlag)
@@ -1690,7 +1691,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportMaterialRef(self, material, index):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportMaterialRef -', self, material, index)
+        print(printCaller(), 'OpenGexExporter - ExportMaterialRef -', self, material, index)
         if material not in self.materialArray:
             self.materialArray[material] = {"structName": bytes("material" + str(len(self.materialArray) + 1), "UTF-8")}
 
@@ -1702,7 +1703,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportMorphWeights(self, node, shapeKeys, scene):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportMorphWeights -', self, node, shapeKeys, scene)
+        print(printCaller(), 'OpenGexExporter - ExportMorphWeights -', self, node, shapeKeys, scene)
         action = None
         curveArray = []
         indexArray = []
@@ -1786,7 +1787,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportBone(self, armature, bone, scene):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportBone -', self, armature, bone, scene)
+        print(printCaller(), 'OpenGexExporter - ExportBone -', self, armature, bone, scene)
         nodeRef = self.nodeArray.get(bone)
         if nodeRef:
             self.IndentWrite(structIdentifier[nodeRef["nodeType"]], 0, True)
@@ -1823,7 +1824,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportNode(self, node, scene, poseBone=None):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportNode -', self, node, scene, poseBone)
+        print(printCaller(), 'OpenGexExporter - ExportNode -', self, node, scene, poseBone)
 
         # This function exports a single node in the scene and includes its name,
         # object reference, material references (for geometries), and transform.
@@ -1943,7 +1944,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportSkin(self, node, armature, exportVertexArray):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportSkin -', self, node, armature, exportVertexArray)
+        print(printCaller(), 'OpenGexExporter - ExportSkin -', self, node, armature, exportVertexArray)
 
         # This function exports all skinning data, which includes the skeleton
         # and per-vertex bone influence data.
@@ -2114,7 +2115,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportGeometry(self, objectRef, scene):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportGeometry -', self, objectRef, scene)
+        print(printCaller(), 'OpenGexExporter - ExportGeometry -', self, objectRef, scene)
 
         # This function exports a single geometry object.
 
@@ -2416,7 +2417,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportLight(self, objectRef):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportLight -', self, objectRef)
+        print(printCaller(), 'OpenGexExporter - ExportLight -', self, objectRef)
 
         # This function exports a single light object.
 
@@ -2558,7 +2559,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportCamera(self, objectRef):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportCamera -', self, objectRef)
+        print(printCaller(), 'OpenGexExporter - ExportCamera -', self, objectRef)
 
         # This function exports a single camera object.
 
@@ -2588,7 +2589,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportObjects(self, scene):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportObjects -', self, scene)
+        print(printCaller(), 'OpenGexExporter - ExportObjects -', self, scene)
         for objectRef in self.geometryArray.items():
             self.ExportGeometry(objectRef, scene)
         for objectRef in self.lightArray.items():
@@ -2598,7 +2599,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportTexture(self, textureSlot, attrib):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportTexture -', self, textureSlot, attrib)
+        print(printCaller(), 'OpenGexExporter - ExportTexture -', self, textureSlot, attrib)
 
         # This function exports a single texture from a material.
 
@@ -2641,7 +2642,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportMaterials(self):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportMaterials -', self)
+        print(printCaller(), 'OpenGexExporter - ExportMaterials -', self)
 
         # This function exports all of the materials used in the scene.
 
@@ -2723,7 +2724,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportMetrics(self, scene):
         # FIXME REMOVE
-        print('OpenGexExporter - ExportMetrics -', self, scene)
+        print(printCaller(), 'OpenGexExporter - ExportMetrics -', self, scene)
         scale = scene.unit_settings.scale_length
 
         if scene.unit_settings.system == "IMPERIAL":
@@ -2739,7 +2740,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def execute(self, context):
         # FIXME REMOVE
-        print('OpenGexExporter - execute -', self, context)
+        print('None - None : OpenGexExporter - execute -', self, context)
         self.file = open(self.filepath, "wb")
 
         self.indentLevel = 0

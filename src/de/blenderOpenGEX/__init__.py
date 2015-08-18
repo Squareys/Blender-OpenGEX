@@ -27,14 +27,33 @@ bl_info = {
     "location": "File > Import-Export",
     "category": "Import-Export"}
 
+import sys
+import traceback
+
+
+def printCaller():
+    # FIXME REMOVE
+    f = sys._getframe(2)
+
+    method = f.f_code.co_name
+
+    if 'self' in f.f_locals:
+        classname = f.f_locals['self'].__class__.__name__
+
+    else:
+        call = traceback.extract_stack(f)[-2][3]
+        classname = call.replace('.' + method + '()', '')
+
+    return classname + ' - ' + method + ' : '
+
+
+
 import bpy
 from blenderOpenGEX.MyOpenGexExporter import OpenGexExporter
-import sys
 
 
 def menu_func(self, context):
     # FIXME REMOVE
-    print (sys._getframe().f_back.f_code.co_name)
     print('__init__ - menu_func -', self, context)
     self.layout.operator(OpenGexExporter.bl_idname, text="OpenGEX (.ogex)")
 
