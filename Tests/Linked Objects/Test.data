@@ -1,0 +1,56 @@
+['__doc__', '__module__', '__slots__', 'active_base', 'active_bone', 'active_gpencil_frame', 'active_gpencil_layer', 'active_object', 'active_operator', 'active_pose_bone', 'area', 'bl_rna', 'blend_data', 'copy', 'edit_object', 'editable_bones', 'editable_gpencil_layers', 'editable_gpencil_strokes', 'gpencil_data', 'gpencil_data_owner', 'image_paint_object', 'mode', 'object', 'particle_edit_object', 'region', 'region_data', 'rna_type', 'scene', 'screen', 'sculpt_object', 'selectable_bases', 'selectable_objects', 'selected_bases', 'selected_bones', 'selected_editable_bases', 'selected_editable_bones', 'selected_editable_objects', 'selected_editable_sequences', 'selected_objects', 'selected_pose_bones', 'selected_sequences', 'sequences', 'space_data', 'tool_settings', 'user_preferences', 'vertex_paint_object', 'visible_bases', 'visible_bones', 'visible_gpencil_layers', 'visible_objects', 'visible_pose_bones', 'weight_paint_object', 'window', 'window_manager']
+
+__doc__ None
+__module__ bpy_types
+__slots__ ()
+active_base <bpy_struct, ObjectBase at 0x000000EB54EBF168>
+active_bone None
+active_gpencil_frame None
+active_gpencil_layer None
+active_object <bpy_struct, Object("CubeGroup")>
+active_operator None
+active_pose_bone None
+area <bpy_struct, Area at 0x000000EB59D3FB58>
+bl_rna <bpy_struct, Struct("Context")>
+blend_data <bpy_struct, BlendData at 0x000000EB59CAE508>
+copy <bound method Context.copy of <bpy_struct, Context at 0x000000EB4DF8F038>>
+edit_object None
+editable_bones None
+editable_gpencil_layers None
+editable_gpencil_strokes None
+gpencil_data None
+gpencil_data_owner None
+image_paint_object None
+mode OBJECT
+object <bpy_struct, Object("CubeGroup")>
+particle_edit_object None
+region <bpy_struct, Region at 0x000000EB54C720A8>
+region_data None
+rna_type <bpy_struct, Struct("Context")>
+scene <bpy_struct, Scene("Scene")>
+screen <bpy_struct, Screen("Default")>
+sculpt_object None
+selectable_bases [bpy.data.scenes['Scene']...ObjectBase]
+selectable_objects [bpy.data.objects['CubeGroup']]
+selected_bases []
+selected_bones None
+selected_editable_bases []
+selected_editable_bones None
+selected_editable_objects []
+selected_editable_sequences None
+selected_objects []
+selected_pose_bones None
+selected_sequences None
+sequences None
+space_data <bpy_struct, SpaceInfo at 0x000000EB54E05F38>
+tool_settings <bpy_struct, ToolSettings at 0x000000EB594647D8>
+user_preferences <bpy_struct, UserPreferences at 0x00007FF715C6CB00>
+vertex_paint_object None
+visible_bases [bpy.data.scenes['Scene']...ObjectBase]
+visible_bones None
+visible_gpencil_layers None
+visible_objects [bpy.data.objects['CubeGroup']]
+visible_pose_bones None
+weight_paint_object None
+window <bpy_struct, Window at 0x000000EB596EFBC8>
+window_manager <bpy_struct, WindowManager("WinMan")>
