@@ -1,0 +1,12 @@
+Return of  self.nodeArray.get(node)
+	Blind
+		{'nodeType': 2, 'structName': b'node1'}
+	Test
+		{'nodeType': 0, 'structName': b'node1'}
+		
+		
+GetNodeType -> node.type
+	Blind
+		"MESH"
+	Test
+		"EMPTY"
