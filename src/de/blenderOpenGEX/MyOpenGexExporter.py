@@ -2646,14 +2646,23 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.exportAllFlag = not self.option_export_selection
         self.sampleAnimationFlag = self.option_sample_animation
 
-        for object in scene.objects:
-            if not object.parent:
+        nodes = []
+
+        def addToNodes(objects):
+            for obj in objects:
+                if not obj.parent:
+                    nodes.append(obj)
+                    if obj.dupli_group:
+                        addToNodes(obj.dupli_group.objects)
+
+        addToNodes(scene.objects)
+
+        for object in nodes:
                 self.ProcessNode(object)
 
         self.ProcessSkinnedMeshes()
 
-        for object in scene.objects:
-            if not object.parent:
+        for object in nodes:
                 self.ExportNode(object, scene)
 
         self.ExportObjects(scene)
