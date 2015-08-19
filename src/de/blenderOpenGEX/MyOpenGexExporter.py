@@ -666,7 +666,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.nodeArray[bone] = {"nodeType": kNodeTypeBone,
                                     "structName": bytes("node" + str(len(self.nodeArray) + 1), "UTF-8")}
 
-        for subnode in bone.children:
+        for subnode in self.getChildrenForNode(bone):  # bone.children:
             self.ProcessBone(subnode)
 
     def ProcessNode(self, node):
@@ -689,7 +689,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                         if not bone.parent:
                             self.ProcessBone(bone)
 
-        for subnode in node.children:
+        for subnode in self.getChildrenForNode(node):  # node.children:
             self.ProcessNode(subnode)
 
     def ProcessSkinnedMeshes(self):
@@ -1704,7 +1704,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             self.ExportBoneTransform(armature, bone, scene)
 
-        for subnode in bone.children:
+        for subnode in self.getChildrenForNode(bone):  # bone.children:
             self.ExportBone(armature, subnode, scene)
 
         # Export any ordinary nodes that are parented to this bone.
@@ -1832,7 +1832,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                         if not bone.parent:
                             self.ExportBone(node, bone, scene)
 
-        for subnode in node.children:
+        for subnode in self.getChildrenForNode(node):  # node.children:
             if subnode.parent_type != "BONE":
                 self.ExportNode(subnode, scene)
 
@@ -2620,6 +2620,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.Write(B"Metric (key = \"time\") {float {1.0}}\n")
         self.Write(B"Metric (key = \"up\") {string {\"z\"}}\n")
 
+    def getChildrenForNode(self, node):
+        if node in self.nodeChildren:
+            return self.nodeChildren[node]
+        else:
+            return []
+
     def execute(self, context):
         self.file = open(self.filepath, "wb")
 
@@ -2646,16 +2652,18 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.exportAllFlag = not self.option_export_selection
         self.sampleAnimationFlag = self.option_sample_animation
 
+        self.nodeChildren = {}
+
         nodes = []
 
-        def addToNodes(objects):
-            for obj in objects:
-                if not obj.parent:
-                    nodes.append(obj)
-                    if obj.dupli_group:
-                        addToNodes(obj.dupli_group.objects)
-
-        addToNodes(scene.objects)
+        for obj in scene.objects:
+            if not obj.parent:
+                nodes.append(obj)
+                self.nodeChildren[obj] = []
+                if len(obj.children) != 0:
+                    self.nodeChildren[obj].extend(obj.children)
+                if obj.dupli_group:
+                    self.nodeChildren[obj].extend(obj.dupli_group.objects)
 
         for object in nodes:
                 self.ProcessNode(object)
