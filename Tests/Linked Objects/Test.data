@@ -8,7 +8,7 @@ active_shape_key_index : 0
 animation_data : None
 animation_data_clear : <bpy_func Object.animation_data_clear()>
 animation_data_create : <bpy_func Object.animation_data_create()>
-animation_visualization : <bpy_struct, AnimViz at 0x00000079300B6C70>
+animation_visualization : <bpy_struct, AnimViz at 0x000000609D10B1B0>
 bl_rna : <bpy_struct, Struct("Object")>
 bound_box : <bpy_float[8], Object.bound_box>
 cache_release : <bpy_func Object.cache_release()>
@@ -44,9 +44,9 @@ dupli_type : GROUP
 empty_draw_size : 1.0
 empty_draw_type : PLAIN_AXES
 empty_image_offset : <bpy_float[2], Object.empty_image_offset>
-field : <bpy_struct, FieldSettings at 0x00000079302DADE8>
+field : <bpy_struct, FieldSettings at 0x000000609CF4C0B8>
 find_armature : <bpy_func Object.find_armature()>
-game : <bpy_struct, GameObjectSettings at 0x00000079300B6B38>
+game : <bpy_struct, GameObjectSettings at 0x000000609D10B078>
 grease_pencil : None
 hide : False
 hide_render : False
@@ -62,7 +62,7 @@ is_visible : <bpy_func Object.is_visible()>
 layers : <bpy_boolean[20], Object.layers>
 layers_local_view : <bpy_boolean[8], Object.layers_local_view>
 library : None
-location : <Vector (5.0000, 0.0000, 0.0000)>
+location : <Vector (5.1000, 0.1000, 0.1000)>
 lock_location : <bpy_boolean[3], Object.lock_location>
 lock_rotation : <bpy_boolean[3], Object.lock_rotation>
 lock_rotation_w : False
@@ -70,21 +70,21 @@ lock_rotations_4d : True
 lock_scale : <bpy_boolean[3], Object.lock_scale>
 lod_levels : <bpy_collection[0], Object.lod_levels>
 material_slots : <bpy_collection[0], Object.material_slots>
-matrix_basis : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 5.0000)
-            (0.0000, 1.0000, 0.0000, 0.0000)
-            (0.0000, 0.0000, 1.0000, 0.0000)
+matrix_basis : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 5.1000)
+            (0.0000, 1.0000, 0.0000, 0.1000)
+            (0.0000, 0.0000, 1.0000, 0.1000)
             (0.0000, 0.0000, 0.0000, 1.0000)>
-matrix_local : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 5.0000)
-            (0.0000, 1.0000, 0.0000, 0.0000)
-            (0.0000, 0.0000, 1.0000, 0.0000)
+matrix_local : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 5.1000)
+            (0.0000, 1.0000, 0.0000, 0.1000)
+            (0.0000, 0.0000, 1.0000, 0.1000)
             (0.0000, 0.0000, 0.0000, 1.0000)>
 matrix_parent_inverse : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 0.0000)
             (0.0000, 1.0000, 0.0000, 0.0000)
             (0.0000, 0.0000, 1.0000, 0.0000)
             (0.0000, 0.0000, 0.0000, 1.0000)>
-matrix_world : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 5.0000)
-            (0.0000, 1.0000, 0.0000, 0.0000)
-            (0.0000, 0.0000, 1.0000, 0.0000)
+matrix_world : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 5.1000)
+            (0.0000, 1.0000, 0.0000, 0.1000)
+            (0.0000, 0.0000, 1.0000, 0.1000)
             (0.0000, 0.0000, 0.0000, 1.0000)>
 mode : OBJECT
 modifiers : <bpy_collection[0], ObjectModifiers>
@@ -109,7 +109,7 @@ rotation_euler : <Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>
 rotation_mode : XYZ
 rotation_quaternion : <Quaternion (w=1.0000, x=0.0000, y=0.0000, z=0.0000)>
 scale : <Vector (1.0000, 1.0000, 1.0000)>
-select : False
+select : True
 shape_key_add : <bpy_func Object.shape_key_add()>
 shape_key_remove : <bpy_func Object.shape_key_remove()>
 show_all_edges : False

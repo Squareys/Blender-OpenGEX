@@ -8,7 +8,7 @@ active_shape_key_index : 0
 animation_data : None
 animation_data_clear : <bpy_func Object.animation_data_clear()>
 animation_data_create : <bpy_func Object.animation_data_create()>
-animation_visualization : <bpy_struct, AnimViz at 0x000000C972404870>
+animation_visualization : <bpy_struct, AnimViz at 0x000000609D1108E0>
 bl_rna : <bpy_struct, Struct("Object")>
 bound_box : <bpy_float[8], Object.bound_box>
 cache_release : <bpy_func Object.cache_release()>
@@ -16,7 +16,7 @@ calc_matrix_camera : <bpy_func Object.calc_matrix_camera()>
 camera_fit_coords : <bpy_func Object.camera_fit_coords()>
 children : ()
 closest_point_on_mesh : <bpy_func Object.closest_point_on_mesh()>
-collision : <bpy_struct, CollisionSettings at 0x000000C9722178D8>
+collision : <bpy_struct, CollisionSettings at 0x000000609CF4C008>
 color : <bpy_float[4], Object.color>
 constraints : <bpy_collection[0], ObjectConstraints>
 convert_space : <bpy_func Object.convert_space()>
@@ -44,9 +44,9 @@ dupli_type : NONE
 empty_draw_size : 1.0
 empty_draw_type : PLAIN_AXES
 empty_image_offset : <bpy_float[2], Object.empty_image_offset>
-field : <bpy_struct, FieldSettings at 0x000000C9722178D8>
+field : <bpy_struct, FieldSettings at 0x000000609CF4C008>
 find_armature : <bpy_func Object.find_armature()>
-game : <bpy_struct, GameObjectSettings at 0x000000C972404738>
+game : <bpy_struct, GameObjectSettings at 0x000000609D1107A8>
 grease_pencil : None
 hide : False
 hide_render : False
@@ -62,7 +62,7 @@ is_visible : <bpy_func Object.is_visible()>
 layers : <bpy_boolean[20], Object.layers>
 layers_local_view : <bpy_boolean[8], Object.layers_local_view>
 library : <bpy_struct, Library("lib")>
-location : <Vector (0.0000, 0.0000, 0.0000)>
+location : <Vector (2.2000, 0.2000, 0.2000)>
 lock_location : <bpy_boolean[3], Object.lock_location>
 lock_rotation : <bpy_boolean[3], Object.lock_rotation>
 lock_rotation_w : False
@@ -70,21 +70,21 @@ lock_rotations_4d : True
 lock_scale : <bpy_boolean[3], Object.lock_scale>
 lod_levels : <bpy_collection[0], Object.lod_levels>
 material_slots : <bpy_collection[0], Object.material_slots>
-matrix_basis : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 0.0000)
-            (0.0000, 1.0000, 0.0000, 0.0000)
-            (0.0000, 0.0000, 1.0000, 0.0000)
+matrix_basis : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 2.2000)
+            (0.0000, 1.0000, 0.0000, 0.2000)
+            (0.0000, 0.0000, 1.0000, 0.2000)
             (0.0000, 0.0000, 0.0000, 1.0000)>
-matrix_local : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 0.0000)
-            (0.0000, 1.0000, 0.0000, 0.0000)
-            (0.0000, 0.0000, 1.0000, 0.0000)
+matrix_local : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 2.2000)
+            (0.0000, 1.0000, 0.0000, 0.2000)
+            (0.0000, 0.0000, 1.0000, 0.2000)
             (0.0000, 0.0000, 0.0000, 1.0000)>
 matrix_parent_inverse : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 0.0000)
             (0.0000, 1.0000, 0.0000, 0.0000)
             (0.0000, 0.0000, 1.0000, 0.0000)
             (0.0000, 0.0000, 0.0000, 1.0000)>
-matrix_world : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 0.0000)
-            (0.0000, 1.0000, 0.0000, 0.0000)
-            (0.0000, 0.0000, 1.0000, 0.0000)
+matrix_world : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 2.2000)
+            (0.0000, 1.0000, 0.0000, 0.2000)
+            (0.0000, 0.0000, 1.0000, 0.2000)
             (0.0000, 0.0000, 0.0000, 1.0000)>
 mode : OBJECT
 modifiers : <bpy_collection[0], ObjectModifiers>

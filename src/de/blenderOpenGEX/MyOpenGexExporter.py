@@ -30,6 +30,12 @@ deltaSubscaleName = [B"dxscl", B"dyscl", B"dzscl"]
 axisName = [B"x", B"y", B"z"]
 
 
+def printData( node):
+    # FIXME REMOVE
+    for obj in dir(node):
+        print(obj, ':', getattr(node, obj))
+
+
 class OpenGexExporter(bpy.types.Operator, ExportHelper):
     """Export to OpenGEX format"""
     bl_idname = "export_scene.ogex"
@@ -2787,9 +2793,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 if obj.dupli_group:
                     self.nodeChildren[obj].extend(obj.dupli_group.objects)
 
-
-        for object in nodes:
-                self.ProcessNode(object)
+        for obj in nodes:
+                self.ProcessNode(obj)
 
         self.ProcessSkinnedMeshes()
 
