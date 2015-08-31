@@ -1,0 +1,22 @@
+__doc__ : None
+__module__ : bpy_types
+__slots__ : ()
+animation_data_clear : <bpy_func Group.animation_data_clear()>
+animation_data_create : <bpy_func Group.animation_data_create()>
+bl_rna : <bpy_struct, Struct("Group")>
+copy : <bpy_func Group.copy()>
+dupli_offset : <Vector (2.3000, 0.3000, 0.3000)>
+is_library_indirect : False
+is_updated : False
+is_updated_data : False
+layers : <bpy_boolean[20], Group.layers>
+library : <bpy_struct, Library("lib")>
+name : CubeGroup
+objects : <bpy_collection[1], GroupObjects>
+rna_type : <bpy_struct, Struct("Group")>
+tag : False
+update_tag : <bpy_func Group.update_tag()>
+use_fake_user : False
+user_clear : <bpy_func Group.user_clear()>
+users : 2
+users_dupli_group : (bpy.data.objects['CubeGroup'],)

@@ -10,3 +10,12 @@ GetNodeType -> node.type
 		"MESH"
 	Test
 		"EMPTY"
+		
+		
+		
+        printData(scene.objects[0])
+        print()
+        print()
+        print()
+        printData(scene.objects[0].dupli_group.objects[0])
+        return {'FINISHED'}

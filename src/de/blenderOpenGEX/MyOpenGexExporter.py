@@ -1,17 +1,13 @@
+
 __author__ = 'aullik'
 
+from blenderOpenGEX.NodeWrapper import * #NodeWrapper
 from blenderOpenGEX.ExportVertex import ExportVertex
 from blenderOpenGEX import debug
 import bpy
 import math
 from bpy_extras.io_utils import ExportHelper
 
-
-kNodeTypeNode = 0
-kNodeTypeBone = 1
-kNodeTypeGeometry = 2
-kNodeTypeLight = 3
-kNodeTypeCamera = 4
 
 kAnimationSampled = 0
 kAnimationLinear = 1
@@ -51,6 +47,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     def __init__(self):
         debug()
         super().__init__()
+        self.exportAllFlag = not self.option_export_selection
+        self.sampleAnimationFlag = self.option_sample_animation
 
     def Write(self, text):
         debug()
@@ -468,21 +466,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             first = False
 
     @staticmethod
-    def GetNodeType(node):
-        debug()
-        if node.type == "MESH":
-            if len(node.data.polygons) != 0:
-                return kNodeTypeGeometry
-        elif node.type == "LAMP":
-            type = node.data.type
-            if (type == "SUN") or (type == "POINT") or (type == "SPOT"):
-                return kNodeTypeLight
-        elif node.type == "CAMERA":
-            return kNodeTypeCamera
-
-        return kNodeTypeNode
-
-    @staticmethod
     def GetShapeKeys(mesh):
         debug()
         shapeKeys = mesh.shape_keys
@@ -708,42 +691,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         for subnode in self.getChildrenForNode(bone):  # bone.children:
             self.ProcessBone(subnode)
 
-    def ProcessNode(self, node):
-        debug()
-        if self.exportAllFlag or node.select:
-            type = OpenGexExporter.GetNodeType(node)
-            self.nodeArray[node] = {"nodeType": type,
-                                    "structName": bytes("node" + str(len(self.nodeArray) + 1), "UTF-8")}
-
-            if node.parent_type == "BONE":
-                boneSubnodeArray = self.boneParentArray.get(node.parent_bone)
-                if boneSubnodeArray:
-                    boneSubnodeArray.append(node)
-                else:
-                    self.boneParentArray[node.parent_bone] = [node]
-
-            if node.type == "ARMATURE":
-                skeleton = node.data
-                if skeleton:
-                    for bone in skeleton.bones:
-                        if not bone.parent:
-                            self.ProcessBone(bone)
-
-        for subnode in self.getChildrenForNode(node):  # node.children:
-            self.ProcessNode(subnode)
-
-    def ProcessSkinnedMeshes(self):
-        debug()
-        for nodeRef in self.nodeArray.items():
-            if nodeRef[1]["nodeType"] == kNodeTypeGeometry:
-                armature = nodeRef[0].find_armature()
-                if armature:
-                    for bone in armature.data.bones:
-                        boneRef = self.FindNode(bone.name)
-                        if boneRef:
-                            # If a node is used as a bone, then we force its type to be a bone.
-
-                            boneRef[1]["nodeType"] = kNodeTypeBone
 
     @staticmethod
     def ClassifyAnimationCurve(fcurve):
@@ -2713,36 +2660,24 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.endFrame = scene.frame_end
         self.frameTime = 1.0 / (scene.render.fps_base * scene.render.fps)
 
-        self.nodeArray = {}
         self.geometryArray = {}
         self.lightArray = {}
         self.cameraArray = {}
         self.materialArray = {}
         self.boneParentArray = {}
 
-        self.exportAllFlag = not self.option_export_selection
-        self.sampleAnimationFlag = self.option_sample_animation
 
-        self.nodeChildren = {}
 
-        nodes = []
+        wrappedNodes = []
 
         for obj in scene.objects:
             if not obj.parent:
-                nodes.append(obj)
-                self.nodeChildren[obj] = []
-                if len(obj.children) != 0:
-                    self.nodeChildren[obj].extend(obj.children)
-                if obj.dupli_group:
-                    self.nodeChildren[obj].extend(obj.dupli_group.objects)
+                wrappedNodes.append(NodeWrapper(obj))
 
-        for obj in nodes:
-                self.ProcessNode(obj)
+        processSkinnedMesh()
 
-        self.ProcessSkinnedMeshes()
-
-        for object in nodes:
-                self.ExportNode(object, scene)
+        for obj in wrappedNodes:
+            self.ExportNode(obj, scene)
 
         self.ExportObjects(scene)
         self.ExportMaterials()

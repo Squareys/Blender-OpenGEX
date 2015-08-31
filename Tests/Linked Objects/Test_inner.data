@@ -8,7 +8,7 @@ active_shape_key_index : 0
 animation_data : None
 animation_data_clear : <bpy_func Object.animation_data_clear()>
 animation_data_create : <bpy_func Object.animation_data_create()>
-animation_visualization : <bpy_struct, AnimViz at 0x000000609D1108E0>
+animation_visualization : <bpy_struct, AnimViz at 0x000000E9C6F58420>
 bl_rna : <bpy_struct, Struct("Object")>
 bound_box : <bpy_float[8], Object.bound_box>
 cache_release : <bpy_func Object.cache_release()>
@@ -16,7 +16,7 @@ calc_matrix_camera : <bpy_func Object.calc_matrix_camera()>
 camera_fit_coords : <bpy_func Object.camera_fit_coords()>
 children : ()
 closest_point_on_mesh : <bpy_func Object.closest_point_on_mesh()>
-collision : <bpy_struct, CollisionSettings at 0x000000609CF4C008>
+collision : <bpy_struct, CollisionSettings at 0x000000E9C6DC0D18>
 color : <bpy_float[4], Object.color>
 constraints : <bpy_collection[0], ObjectConstraints>
 convert_space : <bpy_func Object.convert_space()>
@@ -44,9 +44,9 @@ dupli_type : NONE
 empty_draw_size : 1.0
 empty_draw_type : PLAIN_AXES
 empty_image_offset : <bpy_float[2], Object.empty_image_offset>
-field : <bpy_struct, FieldSettings at 0x000000609CF4C008>
+field : <bpy_struct, FieldSettings at 0x000000E9C6DC0D18>
 find_armature : <bpy_func Object.find_armature()>
-game : <bpy_struct, GameObjectSettings at 0x000000609D1107A8>
+game : <bpy_struct, GameObjectSettings at 0x000000E9C6F582E8>
 grease_pencil : None
 hide : False
 hide_render : False
