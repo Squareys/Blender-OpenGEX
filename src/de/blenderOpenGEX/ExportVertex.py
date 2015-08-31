@@ -1,21 +1,19 @@
 __author__ = 'aullik'
 
-from blenderOpenGEX import printCaller
+from blenderOpenGEX import debug
 
 class ExportVertex:
     __slots__ = ("hash", "vertexIndex", "faceIndex", "position", "normal", "color", "texcoord0", "texcoord1")
 
     def __init__(self):
-        # FIXME REMOVE
-        print(printCaller(), 'ExportVertex - __init__ -', self)
+        debug()
 
         self.color = [1.0, 1.0, 1.0]
         self.texcoord0 = [0.0, 0.0]
         self.texcoord1 = [0.0, 0.0]
 
     def __eq__(self, v):
-        # FIXME REMOVE
-        print(printCaller(), 'ExportVertex - __eq__ -', self, v)
+        debug()
 
         if self.hash != v.hash:
             return False
@@ -32,8 +30,7 @@ class ExportVertex:
         return True
 
     def Hash(self):
-        # FIXME REMOVE
-        print(printCaller(), 'ExportVertex -  Hash', self)
+        debug()
 
         h = hash(self.position[0])
         h = h * 21737 + hash(self.position[1])

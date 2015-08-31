@@ -31,21 +31,51 @@ import sys
 import traceback
 
 
-def printCaller():
-    # FIXME REMOVE
-    f = sys._getframe(2)
+def debug():
+    _printCaller()
 
-    method = f.f_code.co_name
 
-    if 'self' in f.f_locals:
-        classname = f.f_locals['self'].__class__.__name__
+def _printCaller():
+    self = sys._getframe(2)
+    if self.f_back is None:
+        parent = 'None - None'
+    else:
+        parent = _getClassAndMethod(self.f_back)
+
+    args = ''
+    first = True
+
+    for k, v in self.f_locals.items():
+        if k == 'self':
+            continue
+
+        if first:
+            first = False
+        else:
+            args += ', '
+
+        args += k + ': ' + str(v)
+
+    out = parent + ' : ' + _getClassAndMethod(self) + ' :-: ' + args
+    print(out)
+
+
+def _getClassAndMethod(frame):
+    method = frame.f_code.co_name
+
+    if 'self' in frame.f_locals:
+        classname = frame.f_locals['self'].__class__.__name__
 
     else:
-        call = traceback.extract_stack(f)[-2][3]
-        classname = call.replace('.' + method + '()', '')
+        stack = traceback.extract_stack(frame)
+        if(len(stack)< 2):
+            classname =stack[0][0].rsplit('/', 1)[1]
+            method = 'None'
+        else:
+            call = stack[-2][3]
+            classname = call.replace('.' + method + '()', '')
 
-    return classname + ' - ' + method + ' : '
-
+    return classname + ' - ' + method
 
 
 import bpy
