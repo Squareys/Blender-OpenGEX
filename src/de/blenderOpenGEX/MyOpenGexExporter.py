@@ -1115,7 +1115,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         scene.frame_set(currentFrame, currentSubframe)
 
-    def ExportNodeTransform(self, node, scene):
+    # FIXME Handle NodeWrapper
+    def ExportNodeTransform(self, nw, scene):
+        node = nw.item
         debug()
         posAnimCurve = [None, None, None]
         rotAnimCurve = [None, None, None]
@@ -1229,6 +1231,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             self.IndentWrite(B"float[16]\n")
             self.IndentWrite(B"{\n")
+            # FIXME ADD OFFSET
             self.WriteMatrix(node.matrix_local)
             self.IndentWrite(B"}\n")
 
@@ -1826,7 +1829,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             # Export the transform. If the node is animated, then animation tracks are exported here.
 
-            self.ExportNodeTransform(nw.item, scene)
+            self.ExportNodeTransform(nw, scene)
 
             if nw.bones:
                 for bw in nw.bones:
@@ -2667,7 +2670,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.processSkinnedMeshes()
 
         for obj in self.container.nodes:
-            self.ExportNode(obj, scene)
+            if not obj.parent:
+                self.ExportNode(obj, scene)
 
         self.ExportObjects(scene)
         self.ExportMaterials()
