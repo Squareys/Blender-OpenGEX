@@ -71,6 +71,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         if (math.isinf(f)) or (math.isnan(f)):
             self.container.file.write(B"0.0")
         else:
+            # TODO make float rounding optional
             self.container.file.write(bytes(str(round(f, 6)), "UTF-8"))
 
     def WriteMatrix(self, matrix):
@@ -1231,8 +1232,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             self.IndentWrite(B"float[16]\n")
             self.IndentWrite(B"{\n")
-            # FIXME ADD OFFSET
-            self.WriteMatrix(node.matrix_local)
+
+            self.handleOffset(node.matrix_local, nw.offset)
             self.IndentWrite(B"}\n")
 
             self.container.indentLevel -= 1
@@ -1558,6 +1559,20 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             self.container.indentLevel -= 1
             self.IndentWrite(B"}\n")
+
+    def handleOffset(self, matrix, offset):
+        debug()
+        if not offset:
+            self.WriteMatrix(matrix)
+            return
+
+        line0 = (matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3] - offset[0])
+        line1 = (matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3] - offset[1])
+        line2 = (matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3] - offset[2])
+        line3 = (matrix[3][0], matrix[3][1], matrix[3][2], matrix[3][3])
+
+        matrix = (line0, line1, line2, line3)
+        self.WriteMatrix(matrix)
 
     def ExportBoneTransform(self, nw, bw, scene):  # armature, bone, scene):
         debug()
