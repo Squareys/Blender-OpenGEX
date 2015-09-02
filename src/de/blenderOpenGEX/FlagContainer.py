@@ -1,3 +1,5 @@
+from blenderOpenGEX import debug
+
 __author__ = 'aullik'
 
 kNodeTypeNode = 0
@@ -9,6 +11,7 @@ kNodeTypeCamera = 4
 
 class FlagContainer:
     def __init__(self, exportAllFlag, sampleAnimationFlag, scene, file):
+        debug()
         self.nodes = []
         self.exportAllFlag = exportAllFlag
         self.sampleAnimationFlag = sampleAnimationFlag
@@ -27,6 +30,7 @@ class FlagContainer:
         self.materialArray = {}
 
     def findNodeWrapperByName(self, nodeName):
+        debug()
         for nw in self.nodes:
             if nw.item.name == nodeName:
                 return nw

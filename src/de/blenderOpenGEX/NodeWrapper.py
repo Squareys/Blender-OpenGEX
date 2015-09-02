@@ -10,6 +10,7 @@ from blenderOpenGEX import debug
 class NodeWrapper(BaseWrapper):
 
     def __init__(self, node, container, parent=None, offset=None):
+        debug()
         super().__init__(node, container, parent, offset)
 
         self.bones = []
@@ -24,6 +25,7 @@ class NodeWrapper(BaseWrapper):
             self.createChildren(node.dupli_group.objects, offset)
 
     def createChildren(self, children, offset=None):
+        debug()
         for obj in children:
             self.children.append(NodeWrapper(obj, self.container, self, offset))
 

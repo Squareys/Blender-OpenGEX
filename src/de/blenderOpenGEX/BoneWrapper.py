@@ -1,6 +1,7 @@
-from blenderOpenGEX import debug
 from blenderOpenGEX.BaseWrapper import BaseWrapper
 from blenderOpenGEX.FlagContainer import *
+from blenderOpenGEX import debug
+
 
 __author__ = 'aullik'
 
@@ -8,6 +9,7 @@ __author__ = 'aullik'
 class BoneWrapper(BaseWrapper):
 
     def __init__(self, bone, container, parent=None, offset=None):
+        debug()
         super().__init__(bone, container, parent, offset)
 
         self.processBone()
@@ -26,5 +28,6 @@ class BoneWrapper(BaseWrapper):
             self.nodeRef["structName"] = bytes("node" + str(len(self.container.nodes)), "UTF-8")
 
     def createChildren(self, children, offset=None):
+        debug()
         for bone in children:
             self.children.append(BoneWrapper(bone, self.container, self, offset))

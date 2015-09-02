@@ -42,21 +42,7 @@ def _printCaller():
     else:
         parent = _getClassAndMethod(self.f_back)
 
-    args = ''
-    first = True
-
-    for k, v in self.f_locals.items():
-        if k == 'self':
-            continue
-
-        if first:
-            first = False
-        else:
-            args += ', '
-
-        args += k + ': ' + str(v)
-
-    out = parent + ' : ' + _getClassAndMethod(self) + ' :-: ' + args
+    out = parent + ' : ' + _getClassAndMethod(self) + ' :-: ' + getArgs(self)
     print(out)
 
 
@@ -76,6 +62,24 @@ def _getClassAndMethod(frame):
             classname = call.replace('.' + method + '()', '')
 
     return classname + ' - ' + method
+
+
+def getArgs(self):
+    args = ''
+    first = True
+
+    for k, v in self.f_locals.items():
+        if k == 'self':
+            continue
+
+        if first:
+            first = False
+        else:
+            args += ', '
+
+        args += k + ': ' + str(v)
+
+    return args
 
 
 import bpy
