@@ -71,7 +71,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         if (math.isinf(f)) or (math.isnan(f)):
             self.container.file.write(B"0.0")
         else:
-            self.container.file.write(bytes(str(f), "UTF-8"))
+            self.container.file.write(bytes(str(round(f, 6)), "UTF-8"))
 
     def WriteMatrix(self, matrix):
         debug()
