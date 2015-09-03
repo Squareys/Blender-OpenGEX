@@ -1,0 +1,13 @@
+Es gibt 2 Installationsmöglichkeiten
+
+M1:
+Kopiere den Ordner blenderOpenGEX nach
+%AppData%\Blender Foundation\Blender\2.75\scripts\addons
+Blender öffnen - File - User preferences... - Add-ons
+Nach opengex suchen und das Addon aktivieren
+
+M2
+blenderOpenGEX zum blenderOpenGEX.zip zippen.
+Blender öffnen - File - User preferences... - Add-ons
+Install from file - das Zip auswählen - Install from file
+Nach opengex suchen und das Addon aktivieren
