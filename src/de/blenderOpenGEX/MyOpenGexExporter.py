@@ -26,12 +26,6 @@ deltaSubscaleName = [B"dxscl", B"dyscl", B"dzscl"]
 axisName = [B"x", B"y", B"z"]
 
 
-def printData(node):
-    # FIXME REMOVE
-    for obj in dir(node):
-        print(obj, ':', getattr(node, obj))
-
-
 class OpenGexExporter(bpy.types.Operator, ExportHelper):
     """Export to OpenGEX format"""
     bl_idname = "export_scene.ogex"
@@ -47,8 +41,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     def __init__(self):
         debug()
         super().__init__()
-        # FIXME this is for debugging reasons. Set NONE
-        # self.container = FlagContainer(None, None, None, None)
 
     def Write(self, text):
         debug()
@@ -1792,7 +1784,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                 shapeKeys = OpenGexExporter.GetShapeKeys(object)
                 if shapeKeys:
-                    # FIXME Wrapper or item
+                    # FIXME Wrapper or item?
                     self.ExportMorphWeights(nw.item, shapeKeys, scene)
 
                 structFlag = True

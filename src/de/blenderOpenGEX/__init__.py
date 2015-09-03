@@ -32,7 +32,8 @@ import traceback
 
 
 def debug():
-    _printCaller()
+    # _printCaller()
+    pass
 
 
 def _printCaller():
