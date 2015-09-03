@@ -1,0 +1,146 @@
+__doc__ : None
+__module__ : bpy_types
+__slots__ : ()
+active_material : None
+active_material_index : 0
+active_shape_key : None
+active_shape_key_index : 0
+animation_data : None
+animation_data_clear : <bpy_func Object.animation_data_clear()>
+animation_data_create : <bpy_func Object.animation_data_create()>
+animation_visualization : <bpy_struct, AnimViz at 0x000000CDAE746CE0>
+bl_rna : <bpy_struct, Struct("Object")>
+bound_box : <bpy_float[8], Object.bound_box>
+cache_release : <bpy_func Object.cache_release()>
+calc_matrix_camera : <bpy_func Object.calc_matrix_camera()>
+camera_fit_coords : <bpy_func Object.camera_fit_coords()>
+children : ()
+closest_point_on_mesh : <bpy_func Object.closest_point_on_mesh()>
+collision : <bpy_struct, CollisionSettings at 0x000000CDAE95A578>
+color : <bpy_float[4], Object.color>
+constraints : <bpy_collection[0], ObjectConstraints>
+convert_space : <bpy_func Object.convert_space()>
+copy : <bpy_func Object.copy()>
+cycles : <bpy_struct, CyclesObjectBlurSettings("")>
+cycles_visibility : <bpy_struct, CyclesVisibilitySettings("")>
+data : <bpy_struct, Mesh("Cube")>
+delta_location : <Vector (0.0000, 0.0000, 0.0000)>
+delta_rotation_euler : <Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>
+delta_rotation_quaternion : <Quaternion (w=1.0000, x=0.0000, y=0.0000, z=0.0000)>
+delta_scale : <Vector (1.0000, 1.0000, 1.0000)>
+dimensions : <Vector (2.0000, 2.0000, 2.0000)>
+draw_bounds_type : BOX
+draw_type : TEXTURED
+dupli_faces_scale : 1.0
+dupli_frames_end : 100
+dupli_frames_off : 0
+dupli_frames_on : 1
+dupli_frames_start : 1
+dupli_group : None
+dupli_list : <bpy_collection[0], Object.dupli_list>
+dupli_list_clear : <bpy_func Object.dupli_list_clear()>
+dupli_list_create : <bpy_func Object.dupli_list_create()>
+dupli_type : NONE
+empty_draw_size : 1.0
+empty_draw_type : ARROWS
+empty_image_offset : <bpy_float[2], Object.empty_image_offset>
+field : <bpy_struct, FieldSettings at 0x000000CDAE95A578>
+find_armature : <bpy_func Object.find_armature()>
+game : <bpy_struct, GameObjectSettings at 0x000000CDAE746BA8>
+grease_pencil : None
+hide : False
+hide_render : False
+hide_select : False
+image_user : None
+is_deform_modified : <bpy_func Object.is_deform_modified()>
+is_duplicator : False
+is_library_indirect : False
+is_modified : <bpy_func Object.is_modified()>
+is_updated : False
+is_updated_data : False
+is_visible : <bpy_func Object.is_visible()>
+layers : <bpy_boolean[20], Object.layers>
+layers_local_view : <bpy_boolean[8], Object.layers_local_view>
+library : None
+location : <Vector (5.0000, 0.0000, 0.0000)>
+lock_location : <bpy_boolean[3], Object.lock_location>
+lock_rotation : <bpy_boolean[3], Object.lock_rotation>
+lock_rotation_w : False
+lock_rotations_4d : False
+lock_scale : <bpy_boolean[3], Object.lock_scale>
+lod_levels : <bpy_collection[0], Object.lod_levels>
+material_slots : <bpy_collection[0], Object.material_slots>
+matrix_basis : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 5.0000)
+            (0.0000, 1.0000, 0.0000, 0.0000)
+            (0.0000, 0.0000, 1.0000, 0.0000)
+            (0.0000, 0.0000, 0.0000, 1.0000)>
+matrix_local : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 5.0000)
+            (0.0000, 1.0000, 0.0000, 0.0000)
+            (0.0000, 0.0000, 1.0000, 0.0000)
+            (0.0000, 0.0000, 0.0000, 1.0000)>
+matrix_parent_inverse : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 0.0000)
+            (0.0000, 1.0000, 0.0000, 0.0000)
+            (0.0000, 0.0000, 1.0000, 0.0000)
+            (0.0000, 0.0000, 0.0000, 1.0000)>
+matrix_world : <Matrix 4x4 (1.0000, 0.0000, 0.0000, 5.0000)
+            (0.0000, 1.0000, 0.0000, 0.0000)
+            (0.0000, 0.0000, 1.0000, 0.0000)
+            (0.0000, 0.0000, 0.0000, 1.0000)>
+mode : OBJECT
+modifiers : <bpy_collection[0], ObjectModifiers>
+motion_path : None
+name : Cube
+parent : None
+parent_bone :
+parent_type : OBJECT
+parent_vertices : <bpy_int[3], Object.parent_vertices>
+particle_systems : <bpy_collection[0], ParticleSystems>
+pass_index : 0
+pose : None
+pose_library : None
+proxy : None
+proxy_group : None
+ray_cast : <bpy_func Object.ray_cast()>
+rigid_body : None
+rigid_body_constraint : None
+rna_type : <bpy_struct, Struct("Object")>
+rotation_axis_angle : <bpy_float[4], Object.rotation_axis_angle>
+rotation_euler : <Euler (x=0.0000, y=0.0000, z=0.0000), order='XYZ'>
+rotation_mode : XYZ
+rotation_quaternion : <Quaternion (w=1.0000, x=0.0000, y=0.0000, z=0.0000)>
+scale : <Vector (1.0000, 1.0000, 1.0000)>
+select : True
+shape_key_add : <bpy_func Object.shape_key_add()>
+shape_key_remove : <bpy_func Object.shape_key_remove()>
+show_all_edges : False
+show_axis : False
+show_bounds : False
+show_name : False
+show_only_shape_key : False
+show_texture_space : False
+show_transparent : False
+show_wire : False
+show_x_ray : False
+slow_parent_offset : 0.0
+soft_body : None
+tag : True
+to_mesh : <bpy_func Object.to_mesh()>
+track_axis : POS_Y
+type : MESH
+up_axis : Z
+update_from_editmode : <bpy_func Object.update_from_editmode()>
+update_tag : <bpy_func Object.update_tag()>
+use_dupli_faces_scale : False
+use_dupli_frames_speed : True
+use_dupli_vertices_rotation : False
+use_dynamic_topology_sculpting : False
+use_extra_recalc_data : False
+use_extra_recalc_object : False
+use_fake_user : False
+use_shape_key_edit_mode : False
+use_slow_parent : False
+user_clear : <bpy_func Object.user_clear()>
+users : 1
+users_group : (bpy.data.groups['CubeGroup'],)
+users_scene : (bpy.data.scenes['Scene'],)
+vertex_groups : <bpy_collection[0], VertexGroups>
