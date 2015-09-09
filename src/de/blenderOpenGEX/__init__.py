@@ -78,7 +78,11 @@ def getArgs(self):
         else:
             args += ', '
 
-        args += k + ': ' + str(v)
+        arg = str(v).strip()
+        if len(arg) > 15:
+            arg = arg[:12].strip() + '...'
+
+        args += k + ': ' + arg
 
     return args
 
