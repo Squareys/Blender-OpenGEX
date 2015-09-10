@@ -579,10 +579,21 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     vertexIndex += 1
 
                 faceIndex += 1
-
-        texcoordCount = len(mesh.tessface_uv_textures)
+                
+        # go through all UV maps and add all active_render to a list
+        active_tessface_uv_textures = [] # the first two uv maps will be inserted into this array
+        texcoordCount = 0 # number of UV maps, max 2
+        
+        # find first two active uv maps
+        for index in range(len(mesh.tessface_uv_textures)):
+            if mesh.uv_textures[index].active_render:
+                active_tessface_uv_textures.append(mesh.tessface_uv_textures[index])
+                texcoordCount += 1
+                if texcoordCount == 1:
+                    break
+                    
         if texcoordCount > 0:
-            texcoordFace = mesh.tessface_uv_textures[0].data
+            texcoordFace = active_tessface_uv_textures[0].data
             vertexIndex = 0
             faceIndex = 0
 
@@ -606,7 +617,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 faceIndex += 1
 
             if texcoordCount > 1:
-                texcoordFace = mesh.tessface_uv_textures[1].data
+                texcoordFace = active_tessface_uv_textures[1].data
                 vertexIndex = 0
                 faceIndex = 0
 
@@ -2160,35 +2171,28 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             self.IndentWrite(B"}\n")
 
         # Write the texcoord arrays.
-
-        texcoordCount = len(exportMesh.tessface_uv_textures)
-        if texcoordCount > 0:
-            self.IndentWrite(B"VertexArray (attrib = \"texcoord\")\n", 0, True)
-            self.IndentWrite(B"{\n")
-            self.container.indentLevel += 1
-
-            self.IndentWrite(B"float[2]\t\t// ")
-            self.WriteInt(vertexCount)
-            self.IndentWrite(B"{\n", 0, True)
-            self.WriteVertexArray2D(unifiedVertexArray, "texcoord0")
-            self.IndentWrite(B"}\n")
-
-            self.container.indentLevel -= 1
-            self.IndentWrite(B"}\n")
-
-            if texcoordCount > 1:
-                self.IndentWrite(B"VertexArray (attrib = \"texcoord[1]\")\n", 0, True)
+        count = 0
+        for i in range(len(exportMesh.uv_textures)):
+            if exportMesh.uv_textures[i].active_render:
+                name = B'texcoord'
+                if count > 0:
+                    name += B'[' + bytes(str(count)) + B']'
+                self.IndentWrite(B"VertexArray (attrib = \"" + name + B"\")\n", 0, True)
                 self.IndentWrite(B"{\n")
                 self.container.indentLevel += 1
-
                 self.IndentWrite(B"float[2]\t\t// ")
                 self.WriteInt(vertexCount)
                 self.IndentWrite(B"{\n", 0, True)
-                self.WriteVertexArray2D(unifiedVertexArray, "texcoord1")
+                self.WriteVertexArray2D(unifiedVertexArray, "texcoord" + str(count))
                 self.IndentWrite(B"}\n")
-
+                
                 self.container.indentLevel -= 1
                 self.IndentWrite(B"}\n")
+                
+                count += 1
+                
+                if count > 2:
+                    break
 
         # If there are multiple morph targets, export them here.
 
