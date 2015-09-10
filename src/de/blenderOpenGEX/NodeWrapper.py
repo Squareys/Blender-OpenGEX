@@ -20,7 +20,7 @@ class NodeWrapper(BaseWrapper):
         if len(node.children) != 0:
             self.createChildren(node.children)
 
-        if node.dupli_type == 'Group' and node.dupli_group:
+        if node.dupli_type == 'GROUP' and node.dupli_group:
             offset = node.dupli_group.dupli_offset
             self.createChildren(node.dupli_group.objects, offset)
 
