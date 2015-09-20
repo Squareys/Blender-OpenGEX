@@ -2517,7 +2517,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.container.indentLevel += 1
 
         self.IndentWrite(B"string {\"")
-        self.WriteFileName(textureSlot.texture.image.filepath)
+        self.WriteFileName(textureSlot.texture.image.filepath.replace("//", ""))
         self.Write(B"\"}\n")
 
         # If the texture has a scale and/or offset, then export a coordinate transform.
