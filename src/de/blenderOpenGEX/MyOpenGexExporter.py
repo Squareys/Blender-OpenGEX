@@ -478,6 +478,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 return nodeRef
         return None
 
+        
+     
     @staticmethod
     def DeindexMesh(mesh, materialTable):
         debug()
@@ -490,68 +492,24 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         faceIndex = 0
 
         for face in mesh.tessfaces:
-            k1 = face.vertices[0]
-            k2 = face.vertices[1]
-            k3 = face.vertices[2]
-
-            v1 = vertexArray[k1]
-            v2 = vertexArray[k2]
-            v3 = vertexArray[k3]
-
-            exportVertex = ExportVertex()
-            exportVertex.vertexIndex = k1
-            exportVertex.faceIndex = faceIndex
-            exportVertex.position = v1.co
-            exportVertex.normal = v1.normal if face.use_smooth else face.normal
-            exportVertexArray.append(exportVertex)
-
-            exportVertex = ExportVertex()
-            exportVertex.vertexIndex = k2
-            exportVertex.faceIndex = faceIndex
-            exportVertex.position = v2.co
-            exportVertex.normal = v2.normal if face.use_smooth else face.normal
-            exportVertexArray.append(exportVertex)
-
-            exportVertex = ExportVertex()
-            exportVertex.vertexIndex = k3
-            exportVertex.faceIndex = faceIndex
-            exportVertex.position = v3.co
-            exportVertex.normal = v3.normal if face.use_smooth else face.normal
-            exportVertexArray.append(exportVertex)
-
+        
+            list = [0, 1, 2]
             materialTable.append(face.material_index)
-
+            
             if len(face.vertices) == 4:
-                k1 = face.vertices[0]
-                k2 = face.vertices[2]
-                k3 = face.vertices[3]
-
-                v1 = vertexArray[k1]
-                v2 = vertexArray[k2]
-                v3 = vertexArray[k3]
-
-                exportVertex = ExportVertex()
-                exportVertex.vertexIndex = k1
-                exportVertex.faceIndex = faceIndex
-                exportVertex.position = v1.co
-                exportVertex.normal = v1.normal if face.use_smooth else face.normal
-                exportVertexArray.append(exportVertex)
-
-                exportVertex = ExportVertex()
-                exportVertex.vertexIndex = k2
-                exportVertex.faceIndex = faceIndex
-                exportVertex.position = v2.co
-                exportVertex.normal = v2.normal if face.use_smooth else face.normal
-                exportVertexArray.append(exportVertex)
-
-                exportVertex = ExportVertex()
-                exportVertex.vertexIndex = k3
-                exportVertex.faceIndex = faceIndex
-                exportVertex.position = v3.co
-                exportVertex.normal = v3.normal if face.use_smooth else face.normal
-                exportVertexArray.append(exportVertex)
-
+                list = list + [0, 2, 3]
                 materialTable.append(face.material_index)
+            
+            for i in list:
+                vertex_index = face.vertices[i]
+                vertex = vertexArray[vertex_index]
+
+                exportVertex = ExportVertex()
+                exportVertex.vertexIndex = vertex_index
+                exportVertex.faceIndex = faceIndex
+                exportVertex.position = vertex.co
+                exportVertex.normal = vertex.normal if face.use_smooth else face.normal
+                exportVertexArray.append(exportVertex)
 
             faceIndex += 1
 
@@ -591,54 +549,26 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 texcoordCount += 1
                 if texcoordCount == 1:
                     break
-                    
-        if texcoordCount > 0:
-            texcoordFace = active_tessface_uv_textures[0].data
+         
+        for texCoordIndex in range(0, texcoordCount):
+            texcoord_attrib = "texcoord" + str(texCoordIndex)
+        
+            texcoordFace = active_tessface_uv_textures[texCoordIndex].data
             vertexIndex = 0
             faceIndex = 0
 
             for face in mesh.tessfaces:
                 tf = texcoordFace[faceIndex]
-                exportVertexArray[vertexIndex].texcoord0 = tf.uv1
-                vertexIndex += 1
-                exportVertexArray[vertexIndex].texcoord0 = tf.uv2
-                vertexIndex += 1
-                exportVertexArray[vertexIndex].texcoord0 = tf.uv3
-                vertexIndex += 1
-
+                
+                uvs = [tf.uv1, tf.uv2, tf.uv3]
                 if len(face.vertices) == 4:
-                    exportVertexArray[vertexIndex].texcoord0 = tf.uv1
-                    vertexIndex += 1
-                    exportVertexArray[vertexIndex].texcoord0 = tf.uv3
-                    vertexIndex += 1
-                    exportVertexArray[vertexIndex].texcoord0 = tf.uv4
+                    uvs = uvs + [tf.uv1, tf.uv3, tf.uv4]
+                
+                for uv in uvs:
+                    setattr(exportVertexArray[vertexIndex], texcoord_attrib, uv)
                     vertexIndex += 1
 
                 faceIndex += 1
-
-            if texcoordCount > 1:
-                texcoordFace = active_tessface_uv_textures[1].data
-                vertexIndex = 0
-                faceIndex = 0
-
-                for face in mesh.tessfaces:
-                    tf = texcoordFace[faceIndex]
-                    exportVertexArray[vertexIndex].texcoord1 = tf.uv1
-                    vertexIndex += 1
-                    exportVertexArray[vertexIndex].texcoord1 = tf.uv2
-                    vertexIndex += 1
-                    exportVertexArray[vertexIndex].texcoord1 = tf.uv3
-                    vertexIndex += 1
-
-                    if len(face.vertices) == 4:
-                        exportVertexArray[vertexIndex].texcoord1 = tf.uv1
-                        vertexIndex += 1
-                        exportVertexArray[vertexIndex].texcoord1 = tf.uv3
-                        vertexIndex += 1
-                        exportVertexArray[vertexIndex].texcoord1 = tf.uv4
-                        vertexIndex += 1
-
-                    faceIndex += 1
 
         for ev in exportVertexArray:
             ev.Hash()
