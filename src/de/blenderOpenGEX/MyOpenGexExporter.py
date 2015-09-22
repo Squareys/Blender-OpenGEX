@@ -2436,6 +2436,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def ExportTexture(self, textureSlot, attrib):
         debug()
+        
+        if textureSlot.texture.type != 'IMAGE':
+            return # only image textures supported.
+            
+        if textureSlot.texture.image is None:
+            return # cannot export no image.
 
         # This function exports a single texture from a material.
 
