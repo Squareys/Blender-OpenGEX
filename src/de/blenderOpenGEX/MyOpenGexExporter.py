@@ -6,6 +6,7 @@ from blenderOpenGEX.ExportVertex import ExportVertex
 from blenderOpenGEX import debug
 import bpy
 import math
+import time
 from bpy_extras.io_utils import ExportHelper
 
 
@@ -24,6 +25,20 @@ deltaSubtranslationName = [B"dxpos", B"dypos", B"dzpos"]
 deltaSubrotationName = [B"dxrot", B"dyrot", B"dzrot"]
 deltaSubscaleName = [B"dxscl", B"dyscl", B"dzscl"]
 axisName = [B"x", B"y", B"z"]
+
+class ProgressLog():
+
+    def __init__(self):
+        self.lastTime = 0
+        pass
+        
+    def BeginTask(self, message):
+        print(message, end="", flush=True)
+        self.lastTime = time.time()
+        
+    def EndTask(self):
+        print(" done! ({:.2f} ms)".format((time.time() - self.lastTime)*1000)
+        
 
 class Writer():
 
@@ -401,7 +416,6 @@ class Writer():
                 self.file.write(B", ")
             self.file.write(bytes(node.name, "UTF-8"))
             first = False
-
         
 class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
     """Export to OpenGEX format"""
@@ -418,6 +432,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
     def __init__(self):
         debug()
         super().__init__()
+        self.progress = ProgressLog()
 
     @staticmethod
     def GetShapeKeys(mesh):
@@ -1920,6 +1935,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
     def ExportGeometry(self, objectRef, scene):
         debug()
+        
+        self.progress.BeginTask("Exporting geometry for " + objectRef[1]["nodeTable"][0].name + "...")
 
         # This function exports a single geometry object.
 
@@ -2211,6 +2228,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         self.DecIndent()
         self.file.write(B"}\n")
+        
+        self.progress.EndTask()
 
     def ExportLight(self, objectRef):
         debug()
@@ -2554,6 +2573,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
     def execute(self, context):
         debug()
+        
+        startTime = time.time()
 
         scene = context.scene
         exportAllFlag = not self.option_export_selection
@@ -2565,22 +2586,36 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         originalFrame = scene.frame_current
         originalSubframe = scene.frame_subframe
 
+        self.progress.BeginTask("Preparing objects...")
         for obj in scene.objects:
             if not obj.parent:
                 NodeWrapper(obj, self.container)
-
+                
         self.processSkinnedMeshes()
-
+        
+        self.progress.EndTask()
+        
+        self.progress.BeginTask("Exporting nodes...")
+        lastTime = time.time()
         for obj in self.container.nodes:
             if not obj.parent:
                 self.ExportNode(obj, scene)
+        self.progress.EndTask()
 
+        # progress update is handled withing ExportObjects()
         self.ExportObjects(scene)
+        
+        
+        self.progress.BeginTask("Exporting materials...")
         self.ExportMaterials()
+        self.progress.EndTask()
 
         restoreFrame = False
         if restoreFrame:
             scene.frame_set(originalFrame, originalSubframe)
 
         self.close()
+        
+        print('-- Successfully exported to "{}". ({:.2f} sec)'.format(self.filepath, time.time() - startTime))
+        
         return {'FINISHED'}
