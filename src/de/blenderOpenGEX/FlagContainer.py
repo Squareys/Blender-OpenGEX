@@ -10,15 +10,12 @@ kNodeTypeCamera = 4
 
 
 class FlagContainer:
-    def __init__(self, exportAllFlag, sampleAnimationFlag, scene, file):
+    def __init__(self, exportAllFlag, sampleAnimationFlag, scene):
         debug()
         self.nodes = []
         self.exportAllFlag = exportAllFlag
         self.sampleAnimationFlag = sampleAnimationFlag
         self.boneParentArray = {}
-
-        self.file = file
-        self.indentLevel = 0
 
         self.beginFrame = scene.frame_start
         self.endFrame = scene.frame_end
