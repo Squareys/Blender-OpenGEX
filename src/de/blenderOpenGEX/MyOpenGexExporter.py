@@ -27,18 +27,19 @@ deltaSubrotationName = [B"dxrot", B"dyrot", B"dzrot"]
 deltaSubscaleName = [B"dxscl", B"dyscl", B"dzscl"]
 axisName = [B"x", B"y", B"z"]
 
-class ProgressLog():
+
+class ProgressLog:
 
     def __init__(self):
         self.lastTime = 0
         pass
-        
+
     def BeginTask(self, message):
         print(message, end="", flush=True)
         self.lastTime = time.time()
-        
+
     def EndTask(self):
-        print(" done! ({:.2f} ms)".format((time.time() - self.lastTime)*1000)
+        print(" done! ({:.2f} ms)".format((time.time() - self.lastTime) * 1000))
 
 
 class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
@@ -74,8 +75,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 return nodeRef
         return None
 
-        
-     
+
+
     @staticmethod
     def DeindexMesh(mesh, materialTable):
         debug()
@@ -88,14 +89,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         faceIndex = 0
 
         for face in mesh.tessfaces:
-        
+
             list = [0, 1, 2]
             materialTable.append(face.material_index)
-            
+
             if len(face.vertices) == 4:
                 list = list + [0, 2, 3]
                 materialTable.append(face.material_index)
-            
+
             for i in list:
                 vertex_index = face.vertices[i]
                 vertex = vertexArray[vertex_index]
@@ -133,11 +134,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     vertexIndex += 1
 
                 faceIndex += 1
-                
+
         # go through all UV maps and add all active_render to a list
         active_tessface_uv_textures = [] # the first two uv maps will be inserted into this array
         texcoordCount = 0 # number of UV maps, max 2
-        
+
         # find first two active uv maps
         for index in range(len(mesh.tessface_uv_textures)):
             if mesh.uv_textures[index].active_render:
@@ -145,21 +146,21 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 texcoordCount += 1
                 if texcoordCount == 1:
                     break
-         
+
         for texCoordIndex in range(0, texcoordCount):
             texcoord_attrib = "texcoord" + str(texCoordIndex)
-        
+
             texcoordFace = active_tessface_uv_textures[texCoordIndex].data
             vertexIndex = 0
             faceIndex = 0
 
             for face in mesh.tessfaces:
                 tf = texcoordFace[faceIndex]
-                
+
                 uvs = [tf.uv1, tf.uv2, tf.uv3]
                 if len(face.vertices) == 4:
                     uvs = uvs + [tf.uv1, tf.uv3, tf.uv4]
-                
+
                 for uv in uvs:
                     setattr(exportVertexArray[vertexIndex], texcoord_attrib, uv)
                     vertexIndex += 1
@@ -1559,7 +1560,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
     def ExportGeometry(self, objectRef, scene):
         debug()
-        
+
         self.progress.BeginTask("Exporting geometry for " + objectRef[1]["nodeTable"][0].name + "...")
 
         # This function exports a single geometry object.
@@ -1713,12 +1714,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 self.IndentWrite(B"{\n", 0, True)
                 self.WriteVertexArray2D(unifiedVertexArray, "texcoord" + str(count))
                 self.IndentWrite(B"}\n")
-                
+
                 self.DecIndent()
                 self.IndentWrite(B"}\n")
-                
+
                 count += 1
-                
+
                 if count > 2:
                     break
 
@@ -1852,7 +1853,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         self.DecIndent()
         self.file.write(B"}\n")
-        
+
         self.progress.EndTask()
 
     def ExportLight(self, objectRef):
@@ -2036,10 +2037,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
     def ExportTexture(self, textureSlot, attrib):
         debug()
-        
+
         if textureSlot.texture.type != 'IMAGE':
             return # only image textures supported.
-            
+
         if textureSlot.texture.image is None:
             return # cannot export no image.
 
@@ -2197,7 +2198,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
     def execute(self, context):
         debug()
-        
+
         startTime = time.time()
 
         scene = context.scene
@@ -2214,11 +2215,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         for obj in scene.objects:
             if not obj.parent:
                 NodeWrapper(obj, self.container)
-                
+
         self.processSkinnedMeshes()
-        
+
         self.progress.EndTask()
-        
+
         self.progress.BeginTask("Exporting nodes...")
         lastTime = time.time()
         for obj in self.container.nodes:
@@ -2228,8 +2229,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         # progress update is handled withing ExportObjects()
         self.ExportObjects(scene)
-        
-        
+
+
         self.progress.BeginTask("Exporting materials...")
         self.ExportMaterials()
         self.progress.EndTask()
@@ -2239,7 +2240,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             scene.frame_set(originalFrame, originalSubframe)
 
         self.close()
-        
+
         print('-- Successfully exported to "{}". ({:.2f} sec)'.format(self.filepath, time.time() - startTime))
-        
+
         return {'FINISHED'}
