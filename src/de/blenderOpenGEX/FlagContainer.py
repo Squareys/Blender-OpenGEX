@@ -1,6 +1,6 @@
 from blenderOpenGEX import debug
 
-__author__ = 'aullik'
+__author__ = ['aullik', 'Squareys']
 
 kNodeTypeNode = 0
 kNodeTypeBone = 1
@@ -10,11 +10,11 @@ kNodeTypeCamera = 4
 
 
 class FlagContainer:
-    def __init__(self, exportAllFlag, sampleAnimationFlag, scene):
+    def __init__(self, export_all, sample_animation, scene):
         debug()
         self.nodes = []
-        self.exportAllFlag = exportAllFlag
-        self.sampleAnimationFlag = sampleAnimationFlag
+        self.exportAllFlag = export_all
+        self.sampleAnimationFlag = sample_animation
         self.boneParentArray = {}
 
         self.beginFrame = scene.frame_start
@@ -26,10 +26,10 @@ class FlagContainer:
         self.cameraArray = {}
         self.materialArray = {}
 
-    def findNodeWrapperByName(self, nodeName):
+    def find_node_wrapper_by_name(self, node_name):
         debug()
         for nw in self.nodes:
-            if nw.item.name == nodeName:
+            if nw.item.name == node_name:
                 return nw
 
         return None

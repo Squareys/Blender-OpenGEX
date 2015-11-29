@@ -67,7 +67,7 @@ class ExportVertex:
 		self.texcoord1 = [0.0, 0.0]
 
 	def __eq__(self, v):
-		if (self.hash != v.hash):
+		if (self.hash != v.get_hash):
 			return (False)
 		if (self.position != v.position):
 			return (False)
@@ -703,7 +703,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 					faceIndex += 1
 
 		for ev in exportVertexArray:
-			ev.Hash()
+			ev.get_hash()
 
 		return (exportVertexArray)
 
@@ -741,7 +741,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
 		for i in range(len(exportVertexArray)):
 			ev = exportVertexArray[i]
-			bucket = ev.hash & (bucketCount - 1)
+			bucket = ev.get_hash & (bucketCount - 1)
 			index = OpenGexExporter.FindExportVertex(hashTable[bucket], exportVertexArray, ev)
 			if (index < 0):
 				indexTable.append(len(unifiedVertexArray))

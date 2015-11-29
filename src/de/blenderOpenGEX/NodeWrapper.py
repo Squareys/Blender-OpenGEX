@@ -15,25 +15,24 @@ class NodeWrapper(BaseWrapper):
 
         self.bones = []
 
-        self.processNode()
+        self.process_node()
 
         if len(node.children) != 0:
-            self.createChildren(node.children)
+            self.create_children(node.children)
 
         if node.dupli_type == 'GROUP' and node.dupli_group:
             offset = node.dupli_group.dupli_offset
-            self.createChildren(node.dupli_group.objects, offset)
+            self.create_children(node.dupli_group.objects, offset)
 
-
-    def createChildren(self, children, offset=None):
+    def create_children(self, children, offset=None):
         debug()
         for obj in children:
             self.children.append(NodeWrapper(obj, self.container, self, offset))
 
-    def processNode(self):
+    def process_node(self):
         debug()
         if self.container.exportAllFlag or self.item.select:
-            self.nodeRef["nodeType"] = self.getNodeType()
+            self.nodeRef["nodeType"] = self.get_node_type()
             self.nodeRef["structName"] = bytes("node" + str(len(self.container.nodes)), "UTF-8")
 
             if self.item.parent_type == "BONE":
@@ -49,9 +48,9 @@ class NodeWrapper(BaseWrapper):
                     for bone in skeleton.bones:
                         if not bone.parent:
                             # FIXME register somehow
-                            self.boney.append(BoneWrapper(bone, self.container))
+                            self.bones.append(BoneWrapper(bone, self.container))
 
-    def getNodeType(self):
+    def get_node_type(self):
         debug()
         if self.item.type == "MESH":
             if len(self.item.data.polygons) != 0:
