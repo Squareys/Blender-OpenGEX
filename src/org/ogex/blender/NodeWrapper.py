@@ -26,14 +26,14 @@ class NodeWrapper(BaseWrapper):
             self.children.append(NodeWrapper(obj, self.container, self, offset))
 
     def process_node(self):
-        if self.container.exportAllFlag or self.item.select:
+        if self.container.exportAll or self.item.select:
             self.nodeRef["nodeType"] = self.get_node_type()
             self.nodeRef["structName"] = bytes("node" + str(len(self.container.nodes)), "UTF-8")
 
             if self.item.parent_type == "BONE":
-                boneSubnodeArray = self.container.boneParentArray.get(self.item.parent_bone)
-                if boneSubnodeArray:
-                    boneSubnodeArray.append(self)
+                bone_subnode_array = self.container.boneParentArray.get(self.item.parent_bone)
+                if bone_subnode_array:
+                    bone_subnode_array.append(self)
                 else:
                     self.container.boneParentArray[self.item.parent_bone] = [self]
 
@@ -48,12 +48,12 @@ class NodeWrapper(BaseWrapper):
     def get_node_type(self):
         if self.item.type == "MESH":
             if len(self.item.data.polygons) != 0:
-                return kNodeTypeGeometry
+                return NodeType.geometry
         elif self.item.type == "LAMP":
-            type = self.item.data.type
-            if (type == "SUN") or (type == "POINT") or (type == "SPOT"):
-                return kNodeTypeLight
+            lamp_type = self.item.data.type
+            if (lamp_type == "SUN") or (lamp_type == "POINT") or (lamp_type == "SPOT"):
+                return NodeType.light
         elif self.item.type == "CAMERA":
-            return kNodeTypeCamera
+            return NodeType.camera
 
-        return kNodeTypeNode
+        return NodeType.node

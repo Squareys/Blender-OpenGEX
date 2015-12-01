@@ -1,17 +1,21 @@
+from enum import IntEnum
+
 __author__ = 'Eric Lengyel, Jonathan Hale, Nicolas Wehrle'
 
-kNodeTypeNode = 0
-kNodeTypeBone = 1
-kNodeTypeGeometry = 2
-kNodeTypeLight = 3
-kNodeTypeCamera = 4
+
+class NodeType(IntEnum):
+    node = 0
+    bone = 1
+    geometry = 2
+    light = 3
+    camera = 4
 
 
 class FlagContainer:
     def __init__(self, export_all, sample_animation, scene):
         self.nodes = []
-        self.exportAllFlag = export_all
-        self.sampleAnimationFlag = sample_animation
+        self.exportAll = export_all
+        self.sampleAnimation = sample_animation
         self.boneParentArray = {}
 
         self.beginFrame = scene.frame_start

@@ -663,7 +663,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         delta_scl_animated = [False, False, False]
 
         mode = node.rotation_mode
-        sampled_animation = (self.container.sampleAnimationFlag or (mode == "QUATERNION") or (mode == "AXIS_ANGLE"))
+        sampled_animation = (self.container.sampleAnimation or (mode == "QUATERNION") or (mode == "AXIS_ANGLE"))
 
         if (not sampled_animation) and node.animation_data:
             action = node.animation_data.action
@@ -1271,7 +1271,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             self.indent_write(structIdentifier[type], 0, True)
             self.file.write(nw.nodeRef["structName"])
 
-            if type == kNodeTypeGeometry:
+            if type == NodeType.geometry:
                 if nw.item.hide_render:
                     self.file.write(B" (visible = false)")
 
@@ -1293,7 +1293,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
             obj = nw.item.data
 
-            if type == kNodeTypeGeometry:
+            if type == NodeType.geometry:
                 if obj not in self.container.geometryArray:
                     self.container.geometryArray[obj] = {
                         "structName": bytes("geometry" + str(len(self.container.geometryArray) + 1), "UTF-8"),
@@ -1315,7 +1315,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
                 struct_flag = True
 
-            elif type == kNodeTypeLight:
+            elif type == NodeType.light:
                 if obj not in self.container.lightArray:
                     self.container.lightArray[obj] = \
                         {"structName": bytes("light" + str(len(self.container.lightArray) + 1), "UTF-8"),
@@ -1328,7 +1328,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 self.file.write(B"}}\n")
                 struct_flag = True
 
-            elif type == kNodeTypeCamera:
+            elif type == NodeType.camera:
                 if obj not in self.container.cameraArray:
                     self.container.cameraArray[obj] = \
                         {"structName": bytes("camera" + str(len(self.container.cameraArray) + 1), "UTF-8"),
@@ -2169,14 +2169,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
     def process_skinned_meshes(self):
 
         for nw in self.container.nodes:
-            if nw.nodeRef["nodeType"] == kNodeTypeGeometry:
+            if nw.nodeRef["nodeType"] == NodeType.geometry:
                 armature = nw.item.find_armature()
                 if armature:
                     for bone in armature.data.bones:
                         bone_ref = self.container.find_node_wrapper_by_name(bone.name)
                         if bone_ref:
                             # If a node is used as a bone, then we force its type to be a bone.
-                            bone_ref.dict["nodeType"] = kNodeTypeBone
+                            bone_ref.dict["nodeType"] = NodeType.bone
 
     def execute(self, context):
 
