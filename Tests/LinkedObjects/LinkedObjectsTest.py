@@ -15,7 +15,7 @@ class LinkedObjectsTest(unittest.TestCase):
         bpy.ops.wm.open_mainfile(filepath=base_dir + "\\Test.blend")
         bpy.ops.export_scene.ogex(filepath=base_dir + "\\Test.ogex")
 
-        self.assertEqual(open(base_dir + "\\Test.blend").read(), open(base_dir + "\\Expected.blend").read())
+        self.assertEqual(open(base_dir + "\\Test.ogex").read(), open(base_dir + "\\Expected.ogex").read())
 
 if __name__ == '__main__':
     unittest.main()
