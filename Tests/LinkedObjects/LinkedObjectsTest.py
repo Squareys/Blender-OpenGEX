@@ -1,30 +1,30 @@
-import unittest
 import os
-import filecmp
-from bpy import context
+import unittest
 
-import blenderOpenGEX
-from blenderOpenGEX.MyOpenGexExporter import *
+import org.ogex.blender
+from org.ogex.blender.OpenGexExporter import *
+
+__author__ = 'Jonathan Hale'
 
 
 class LinkedObjectsTest(unittest.TestCase):
 
     # name of the output file
     base_dir = os.path.dirname(os.path.realpath(__file__))
-    filename = base_dir + "\\Test.ogex"
+    filename = base_dir + os.sep + "Test.ogex"
 
     def setUp(self):
-        blenderOpenGEX.register()
+        org.ogex.blender.register()
 
     def tearDown(self):
         if os.path.isfile(self.filename):
             os.remove(self.filename)
 
     def testLinkedObjects(self):
-        bpy.ops.wm.open_mainfile(filepath=self.base_dir + "\\Test.blend")
+        bpy.ops.wm.open_mainfile(filepath=self.base_dir + os.sep + "Test.blend")
         bpy.ops.export_scene.ogex(filepath=self.filename)
 
-        self.assertEqual(open(self.base_dir + "\\Test.ogex").read(), open(self.base_dir + "\\Expected.ogex").read())
+        self.assertEqual(open(self.filename).read(), open(self.base_dir + os.sep + "Expected.ogex").read())
 
 if __name__ == '__main__':
     unittest.main()
