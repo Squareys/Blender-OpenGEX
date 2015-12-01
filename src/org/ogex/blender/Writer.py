@@ -1,7 +1,6 @@
-
 import math
 
-__author__ = 'Jonathan Hale, Eric Lengyel'
+__author__ = 'Eric Lengyel, Jonathan Hale, aullik'
 
 
 class Writer:

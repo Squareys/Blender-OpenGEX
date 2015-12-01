@@ -1,14 +1,14 @@
+import bpy
 import math
 import time
-import bpy
 
-from blenderOpenGEX.FlagContainer import *
-from blenderOpenGEX.NodeWrapper import NodeWrapper
-from blenderOpenGEX.Writer import Writer
 from bpy_extras.io_utils import ExportHelper
-from blenderOpenGEX.ExportVertex import ExportVertex
+from org.ogex.blender.ExportVertex import ExportVertex
+from org.ogex.blender.FlagContainer import *
+from org.ogex.blender.Writer import Writer
+from org.ogex.blender.NodeWrapper import NodeWrapper
 
-__author__ = 'Eric Lengyel, aullik, Jonathan Hale'
+__author__ = 'Eric Lengyel, Jonathan Hale, aullik'
 
 kAnimationSampled = 0
 kAnimationLinear = 1

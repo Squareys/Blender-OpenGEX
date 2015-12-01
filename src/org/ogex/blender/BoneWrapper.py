@@ -1,8 +1,7 @@
-from blenderOpenGEX.FlagContainer import *
+from org.ogex.blender.FlagContainer import *
+from org.ogex.blender.BaseWrapper import BaseWrapper
 
-from blenderOpenGEX.BaseWrapper import BaseWrapper
-
-__author__ = 'aullik'
+__author__ = 'Eric Lengyel, Jonathan Hale, aullik'
 
 
 class BoneWrapper(BaseWrapper):

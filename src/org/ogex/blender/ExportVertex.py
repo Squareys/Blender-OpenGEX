@@ -1,4 +1,4 @@
-__author__ = 'aullik'
+__author__ = 'Eric Lengyel, Jonathan Hale, aullik'
 
 
 class ExportVertex:

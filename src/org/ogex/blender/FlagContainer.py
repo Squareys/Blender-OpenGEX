@@ -1,4 +1,4 @@
-__author__ = ['aullik', 'Jonathan Hale']
+__author__ = 'Eric Lengyel, Jonathan Hale, aullik'
 
 kNodeTypeNode = 0
 kNodeTypeBone = 1
