@@ -33,9 +33,11 @@ class Writer:
     def indent_write(self, text, extra=0, newline=False):
         if newline:
             self.file.write(B"\n")
-        for i in range(self.indentLevel + extra):
-            self.file.write(B"\t")
+        self.file.write((B"\t"*(self.indentLevel + extra)))
         self.file.write(text)
+
+    def get_indent(self, extra=0):
+        return B"\t"*(self.indentLevel + extra)
         
     def write_int(self, i):
         self.file.write(bytes(str(i), "UTF-8"))
@@ -61,15 +63,17 @@ class Writer:
         self.write_float(matrix[3][i])
         
     def write_matrix(self, matrix):
-        self.indent_write(B"{", 1)
+        self.inc_indent()
+        self.indent_write(B"{")
         self.write_matrix_row(matrix, 0)
-        self.file.write(B",\n")
+        self.file.write(B",\n" + self.get_indent() + B" ")
         self.write_matrix_row(matrix, 1)
-        self.file.write(B",\n")
+        self.file.write(B",\n" + self.get_indent() + B" ")
         self.write_matrix_row(matrix, 2)
-        self.file.write(B",\n")
+        self.file.write(B",\n" + self.get_indent() + B" ")
         self.write_matrix_row(matrix, 3)
         self.file.write(B"}\n")
+        self.dec_indent()
         
     def write_matrix_flat(self, matrix):
         self.indent_write(B"{", 1)
