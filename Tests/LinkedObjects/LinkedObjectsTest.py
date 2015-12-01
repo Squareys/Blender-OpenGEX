@@ -1,9 +1,8 @@
+import bpy
 import os
 import unittest
 
-from src import *
-
-from org.ogex.blender.OpenGexExporter import *
+import io_scene_ogex
 
 __author__ = 'Jonathan Hale'
 
@@ -15,7 +14,7 @@ class LinkedObjectsTest(unittest.TestCase):
     filename = base_dir + os.sep + "Test.ogex"
 
     def setUp(self):
-        register()
+        io_scene_ogex.register()
 
     def tearDown(self):
         if os.path.isfile(self.filename):

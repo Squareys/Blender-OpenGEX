@@ -1,5 +1,6 @@
-from org.ogex.blender.ExporterState import *
-from org.ogex.blender.BaseWrapper import BaseWrapper
+from io_scene_ogex.BaseWrapper import BaseWrapper
+
+from io_scene_ogex.ExporterState import *
 
 __author__ = 'Eric Lengyel, Jonathan Hale, Nicolas Wehrle'
 

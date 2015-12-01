@@ -3,10 +3,11 @@ import math
 import time
 
 from bpy_extras.io_utils import ExportHelper
-from org.ogex.blender.ExportVertex import ExportVertex
-from org.ogex.blender.ExporterState import *
-from org.ogex.blender.Writer import Writer
-from org.ogex.blender.NodeWrapper import NodeWrapper
+from io_scene_ogex.ExportVertex import ExportVertex
+from io_scene_ogex.NodeWrapper import NodeWrapper
+from io_scene_ogex.Writer import Writer
+
+from io_scene_ogex.ExporterState import *
 
 __author__ = 'Eric Lengyel, Jonathan Hale, Nicolas Wehrle'
 

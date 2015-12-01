@@ -20,14 +20,15 @@
 # =============================================================
 
 import bpy
-from org.ogex.blender.OpenGexExporter import OpenGexExporter
+
+from io_scene_ogex.OpenGexExporter import OpenGexExporter
 
 __author__ = 'Eric Lengyel, Jonathan Hale, Nicolas Wehrle'
 
 bl_info = {
     "name": "OpenGEX format (.ogex)",
     "description": "OpenGEX Exporter",
-    "author": __author__,
+    "author": "Eric Lengyel, Jonathan Hale, Nicolas Wehrle",
     "version": (1, 2, 0, 0),
     "location": "File > Import-Export",
     "category": "Import-Export"}
