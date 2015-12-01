@@ -29,6 +29,8 @@ bl_info = {
 
 import sys
 import traceback
+import bpy
+from blenderOpenGEX.MyOpenGexExporter import OpenGexExporter
 
 
 def debug():
@@ -87,26 +89,16 @@ def getArgs(self):
     return args
 
 
-import bpy
-from blenderOpenGEX.MyOpenGexExporter import OpenGexExporter
-
-
 def menu_func(self, context):
-    # FIXME REMOVE
-    print('__init__ - menu_func -', self, context)
     self.layout.operator(OpenGexExporter.bl_idname, text="OpenGEX (.ogex)")
 
 
 def register():
-    # FIXME REMOVE
-    print('__init__ - register -')
     bpy.utils.register_class(OpenGexExporter)
     bpy.types.INFO_MT_file_export.append(menu_func)
 
 
 def unregister():
-    # FIXME REMOVE
-    print('__init__ - unregister -')
     bpy.types.INFO_MT_file_export.remove(menu_func)
     bpy.utils.unregister_class(OpenGexExporter)
 

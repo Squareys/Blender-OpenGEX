@@ -4,7 +4,6 @@ __author__ = 'aullik'
 
 from blenderOpenGEX.FlagContainer import *
 from blenderOpenGEX.BaseWrapper import BaseWrapper
-from blenderOpenGEX import debug
 
 
 class NodeWrapper(BaseWrapper):
@@ -25,12 +24,10 @@ class NodeWrapper(BaseWrapper):
             self.create_children(node.dupli_group.objects, offset)
 
     def create_children(self, children, offset=None):
-        debug()
         for obj in children:
             self.children.append(NodeWrapper(obj, self.container, self, offset))
 
     def process_node(self):
-        debug()
         if self.container.exportAllFlag or self.item.select:
             self.nodeRef["nodeType"] = self.get_node_type()
             self.nodeRef["structName"] = bytes("node" + str(len(self.container.nodes)), "UTF-8")
@@ -51,7 +48,6 @@ class NodeWrapper(BaseWrapper):
                             self.bones.append(BoneWrapper(bone, self.container))
 
     def get_node_type(self):
-        debug()
         if self.item.type == "MESH":
             if len(self.item.data.polygons) != 0:
                 return kNodeTypeGeometry

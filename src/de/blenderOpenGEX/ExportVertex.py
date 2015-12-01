@@ -1,7 +1,5 @@
 __author__ = 'aullik'
 
-from blenderOpenGEX import debug
-
 
 class ExportVertex:
     __slots__ = ("hash", "vertexIndex", "faceIndex", "position", "normal", "color", "texcoord0", "texcoord1")
