@@ -11,7 +11,7 @@ class NodeType(IntEnum):
     camera = 4
 
 
-class FlagContainer:
+class ExporterState:
     def __init__(self, export_all, sample_animation, scene):
         self.nodes = []
         self.exportAll = export_all

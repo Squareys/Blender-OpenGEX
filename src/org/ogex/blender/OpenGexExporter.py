@@ -4,7 +4,7 @@ import time
 
 from bpy_extras.io_utils import ExportHelper
 from org.ogex.blender.ExportVertex import ExportVertex
-from org.ogex.blender.FlagContainer import *
+from org.ogex.blender.ExporterState import *
 from org.ogex.blender.Writer import Writer
 from org.ogex.blender.NodeWrapper import NodeWrapper
 
@@ -2185,7 +2185,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         scene = context.scene
         export_all_flag = not self.option_export_selection
         self.open(self.filepath)
-        self.container = FlagContainer(export_all_flag, self.option_sample_animation, scene)
+        self.container = ExporterState(export_all_flag, self.option_sample_animation, scene)
 
         self.export_metrics(scene)
 
