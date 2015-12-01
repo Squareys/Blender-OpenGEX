@@ -1,7 +1,8 @@
 import os
 import unittest
 
-import org.ogex.blender
+from src import *
+
 from org.ogex.blender.OpenGexExporter import *
 
 __author__ = 'Jonathan Hale'
@@ -14,7 +15,7 @@ class LinkedObjectsTest(unittest.TestCase):
     filename = base_dir + os.sep + "Test.ogex"
 
     def setUp(self):
-        org.ogex.blender.register()
+        register()
 
     def tearDown(self):
         if os.path.isfile(self.filename):
