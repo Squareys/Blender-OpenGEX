@@ -20,7 +20,7 @@ class BoneWrapper(BaseWrapper):
 
     def process_bone(self, bone):
         if self.container.exportAllFlag or bone.select:
-            self.nodeRef["nodeType"] = kNodeTypeBone
+            self.nodeRef["nodeType"] = NodeType.bone
             self.nodeRef["structName"] = bytes("node" + str(len(self.container.nodes)), "UTF-8")
 
     def create_children(self, children, offset=None):
