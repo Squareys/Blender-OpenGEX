@@ -1,7 +1,7 @@
 from org.ogex.blender.FlagContainer import *
 from org.ogex.blender.BaseWrapper import BaseWrapper
 
-__author__ = 'Eric Lengyel, Jonathan Hale, aullik'
+__author__ = 'Eric Lengyel, Jonathan Hale, Nicolas Wehrle'
 
 
 class BoneWrapper(BaseWrapper):

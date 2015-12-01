@@ -8,7 +8,7 @@ from org.ogex.blender.FlagContainer import *
 from org.ogex.blender.Writer import Writer
 from org.ogex.blender.NodeWrapper import NodeWrapper
 
-__author__ = 'Eric Lengyel, Jonathan Hale, aullik'
+__author__ = 'Eric Lengyel, Jonathan Hale, Nicolas Wehrle'
 
 kAnimationSampled = 0
 kAnimationLinear = 1
