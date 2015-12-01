@@ -9,7 +9,6 @@ from blenderOpenGEX.BaseWrapper import BaseWrapper
 class NodeWrapper(BaseWrapper):
 
     def __init__(self, node, container, parent=None, offset=None):
-        debug()
         super().__init__(node, container, parent, offset)
 
         self.bones = []
