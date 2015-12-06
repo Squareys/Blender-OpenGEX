@@ -44,6 +44,11 @@ class Writer:
         self.file.write(text)
 
     def get_indent(self, extra=0):
+        """
+        Get bytestring containing the current amount of indent tabs
+        :param extra Additional indent
+        :return: bytestring for the indentation
+        """
         return B"\t"*(self.indentLevel + extra)
 
     def write_int(self, i):
@@ -64,46 +69,35 @@ class Writer:
     def write_float(self, f):
         self.file.write(self.to_float_byte(f))
 
-    def write_matrix_row(self, matrix, i):
+    @staticmethod
+    def to_matrix_row_byte(matrix, i):
         to_f = Writer.to_float_byte
-        self.write(
+        return (
             to_f(matrix[0][i]) + B", " +
             to_f(matrix[1][i]) + B", " +
             to_f(matrix[2][i]) + B", " +
             to_f(matrix[3][i]))
 
     def write_matrix(self, matrix):
-        self.inc_indent()
-        self.indent_write(B"{")
-        self.write_matrix_row(matrix, 0)
-        self.file.write(B",\n" + self.get_indent() + B" ")
-        self.write_matrix_row(matrix, 1)
-        self.file.write(B",\n" + self.get_indent() + B" ")
-        self.write_matrix_row(matrix, 2)
-        self.file.write(B",\n" + self.get_indent() + B" ")
-        self.write_matrix_row(matrix, 3)
-        self.file.write(B"}\n")
-        self.dec_indent()
+        indent = B",\n" + self.get_indent(1) + B" "
+        self.indent_write(B"{" + self.to_matrix_row_byte(matrix, 0) +
+                          indent + self.to_matrix_row_byte(matrix, 1) +
+                          indent + self.to_matrix_row_byte(matrix, 2) +
+                          indent + self.to_matrix_row_byte(matrix, 3) + B"}\n",
+                          extra=1)
 
     def write_matrix_flat(self, matrix):
-        self.indent_write(B"{", 1)
-        self.write_matrix_row(matrix, 0)
-        self.file.write(B", ")
-        self.write_matrix_row(matrix, 1)
-        self.file.write(B", ")
-        self.write_matrix_row(matrix, 2)
-        self.file.write(B", ")
-        self.write_matrix_row(matrix, 3)
-        self.file.write(B"}")
+        self.indent_write(B"{" + self.to_matrix_row_byte(matrix, 0) + B", " +
+                          self.to_matrix_row_byte(matrix, 1) + B", " +
+                          self.to_matrix_row_byte(matrix, 2) + B", " +
+                          self.to_matrix_row_byte(matrix, 3) + B"}", 1)
 
     def write_color(self, color):
-        self.file.write(B"{")
-        self.write_float(color[0])
-        self.file.write(B", ")
-        self.write_float(color[1])
-        self.file.write(B", ")
-        self.write_float(color[2])
-        self.file.write(B"}")
+        to_f = Writer.to_float_byte
+        self.file.write(B"{" +
+                        to_f(color[0]) + B", " +
+                        to_f(color[1]) + B", " +
+                        to_f(color[2]) + B"}")
 
     def write_file_name(self, filename):
         length = len(filename)
