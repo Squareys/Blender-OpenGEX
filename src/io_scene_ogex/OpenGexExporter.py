@@ -1,4 +1,5 @@
 import bpy
+import bmesh
 import math
 import time
 
@@ -74,101 +75,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             if nodeRef[0].name == name:
                 return nodeRef
         return None
-
-    # TODO: We can probably do without this method:
-    @staticmethod
-    def deindex_mesh(mesh, material_table):
-
-        # This function deindexes all vertex positions, colors, and texcoords.
-        # Three separate ExportVertex structures are created for each triangle.
-
-        vertex_array = mesh.vertices
-        export_vertex_array = []
-        face_index = 0
-
-        for face in mesh.tessfaces:
-
-            list = [0, 1, 2]
-            material_table.append(face.material_index)
-
-            if len(face.vertices) == 4:
-                list = list + [0, 2, 3]
-                material_table.append(face.material_index)
-
-            for i in list:
-                vertex_index = face.vertices[i]
-                vertex = vertex_array[vertex_index]
-
-                export_vertex = ExportVertex()
-                export_vertex.vertexIndex = vertex_index
-                export_vertex.faceIndex = face_index
-                export_vertex.position = vertex.co
-                export_vertex.normal = vertex.normal if face.use_smooth else face.normal
-                export_vertex_array.append(export_vertex)
-
-            face_index += 1
-
-        color_count = len(mesh.tessface_vertex_colors)
-        if color_count > 0:
-            color_face = mesh.tessface_vertex_colors[0].data
-            vertex_index = 0
-            face_index = 0
-
-            for face in mesh.tessfaces:
-                cf = color_face[face_index]
-                export_vertex_array[vertex_index].color = cf.color1
-                vertex_index += 1
-                export_vertex_array[vertex_index].color = cf.color2
-                vertex_index += 1
-                export_vertex_array[vertex_index].color = cf.color3
-                vertex_index += 1
-
-                if len(face.vertices) == 4:
-                    export_vertex_array[vertex_index].color = cf.color1
-                    vertex_index += 1
-                    export_vertex_array[vertex_index].color = cf.color3
-                    vertex_index += 1
-                    export_vertex_array[vertex_index].color = cf.color4
-                    vertex_index += 1
-
-                face_index += 1
-
-        # go through all UV maps and add all active_render to a list
-        active_tessface_uv_textures = []  # the first two uv maps will be inserted into this array
-        texcoord_count = 0  # number of UV maps, max 2
-
-        # find first two active uv maps
-        for index in range(len(mesh.tessface_uv_textures)):
-            if mesh.uv_textures[index].active_render:
-                active_tessface_uv_textures.append(mesh.tessface_uv_textures[index])
-                texcoord_count += 1
-                if texcoord_count == 1:
-                    break
-
-        for texCoordIndex in range(0, texcoord_count):
-            texcoord_attrib = "texcoord" + str(texCoordIndex)
-
-            texcoord_face = active_tessface_uv_textures[texCoordIndex].data
-            vertex_index = 0
-            face_index = 0
-
-            for face in mesh.tessfaces:
-                tf = texcoord_face[face_index]
-
-                uvs = [tf.uv1, tf.uv2, tf.uv3]
-                if len(face.vertices) == 4:
-                    uvs = uvs + [tf.uv1, tf.uv3, tf.uv4]
-
-                for uv in uvs:
-                    setattr(export_vertex_array[vertex_index], texcoord_attrib, uv)
-                    vertex_index += 1
-
-                face_index += 1
-
-        for ev in export_vertex_array:
-            ev.get_hash()
-
-        return export_vertex_array
 
     @staticmethod
     def find_export_vertex(bucket, export_vertex_array, vertex):
@@ -1623,17 +1529,49 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         # but the Blender API does not provide a reasonable way to retrieve the mesh at an
         # arbitrary stage in the modifier stack.
 
-        export_mesh = node.to_mesh(scene, apply_modifiers, "RENDER", True, False)
+        m = bmesh.new()
+        m.from_mesh(mesh, face_normals=False)
+
+        bmesh.ops.triangulate(m, faces=m.faces, quad_method=0, ngon_method=0)
+
+        print("Triangulated...")
+
+        m.faces.ensure_lookup_table()
+        m.edges.ensure_lookup_table()
+
+        normals_backup = [None] * len(m.verts)
+
+        split = []
+        for edge in m.edges:
+            smooth = 0
+            for f in edge.link_faces:
+                if f.smooth:
+                    smooth += 1
+
+            if smooth == 1:
+                split.append(edge)
+
+                for v in edge.verts:
+                    normals_backup[v.index] = v.normal
+
+        m.verts.ensure_lookup_table()
+
+        for (i, normal) in enumerate(normals_backup):
+            if normal is None:
+                continue
+
+            m.verts[i].normal = normal
+
+        export_mesh = bpy.data.meshes.new(name="ogex_exp_temp")
+        m.to_mesh(export_mesh)
+        export_mesh.calc_tessface(free_mpoly=True)
 
         # Triangulate mesh and remap vertices to eliminate duplicates.
 
         material_table = []
-        export_vertex_array = OpenGexExporter.deindex_mesh(export_mesh, material_table)
-        triangle_count = len(material_table)
 
         index_table = []
-        unified_vertex_array = OpenGexExporter.unify_vertices(export_vertex_array, index_table)
-        vertex_count = len(unified_vertex_array)
+        vertex_count = len(export_mesh.vertices)
 
         # Write the position array.
 
@@ -1644,7 +1582,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.indent_write(B"float[3]\t\t// ")
         self.write_int(vertex_count)
         self.indent_write(B"{\n", 0, True)
-        self.write_vertex_array3d(unified_vertex_array, "position")
+        self.write_vertex_array3d([v.co or v in export_mesh.vertices])
         self.indent_write(B"}\n")
 
         self.dec_indent()
@@ -1659,7 +1597,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.indent_write(B"float[3]\t\t// ")
         self.write_int(vertex_count)
         self.indent_write(B"{\n", 0, True)
-        self.write_vertex_array3d(unified_vertex_array, "normal")
+        self.write_vertex_array3d([v.normal for v in export_mesh.vertices])
         self.indent_write(B"}\n")
 
         self.dec_indent()
@@ -1676,7 +1614,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             self.indent_write(B"float[3]\t\t// ")
             self.write_int(vertex_count)
             self.indent_write(B"{\n", 0, True)
-            self.write_vertex_array3d(unified_vertex_array, "color")
+            self.write_vertex_array3d(export_mesh.tessface_vertex_colors)
             self.indent_write(B"}\n")
 
             self.dec_indent()
@@ -1695,7 +1633,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 self.indent_write(B"float[2]\t\t// ")
                 self.write_int(vertex_count)
                 self.indent_write(B"{\n", 0, True)
-                self.write_vertex_array2d(unified_vertex_array, "texcoord" + str(count))
+                self.write_vertex_array2d(export_mesh.tessface_uv_textures[i])
                 self.indent_write(B"}\n")
 
                 self.dec_indent()
@@ -1707,8 +1645,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     break
 
         # If there are multiple morph targets, export them here.
-
-        if shape_keys:
+        if shape_keys and False:  # TODO
             shape_keys.key_blocks[0].value = 0.0
             for m in range(1, len(current_morph_value)):
                 shape_keys.key_blocks[m].value = 1.0
@@ -1728,7 +1665,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 self.indent_write(B"float[3]\t\t// ")
                 self.write_int(vertex_count)
                 self.indent_write(B"{\n", 0, True)
-                self.write_morph_position_array3d(unified_vertex_array, morph_mesh.vertices)
+                self.write_morph_position_array3d(export_mesh, morph_mesh.vertices)  # TODO
                 self.indent_write(B"}\n")
 
                 self.dec_indent()
@@ -1745,7 +1682,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 self.indent_write(B"float[3]\t\t// ")
                 self.write_int(vertex_count)
                 self.indent_write(B"{\n", 0, True)
-                self.write_morph_normal_array3d(unified_vertex_array, morph_mesh.vertices, morph_mesh.tessfaces)
+                self.write_morph_normal_array3d(export_mesh, morph_mesh.vertices, morph_mesh.tessfaces)  # TODO
                 self.indent_write(B"}\n")
 
                 self.dec_indent()
@@ -1770,9 +1707,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             self.inc_indent()
 
             self.indent_write(B"unsigned_int32[3]\t\t// ")
-            self.write_int(triangle_count)
+            self.write_int(len(export_mesh.tessfaces))
             self.indent_write(B"{\n", 0, True)
-            self.write_triangle_array(triangle_count, index_table)
+            self.write_triangle_array(export_mesh.tessfaces)
             self.indent_write(B"}\n")
 
             self.dec_indent()
@@ -1813,12 +1750,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         # If the mesh is skinned, export the skinning data here.
 
-        if armature:
-            self.export_skin(node, armature, unified_vertex_array)
+        if armature and False:  # TODO
+            self.export_skin(node, armature, export_mesh)
 
         # Restore the morph state.
 
-        if shape_keys:
+        if shape_keys and False:  # TODO
             node.active_shape_key_index = active_shape_key_index
             node.show_only_shape_key = show_only_shape_key
 

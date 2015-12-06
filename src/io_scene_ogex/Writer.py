@@ -217,7 +217,7 @@ class Writer:
             self.write_vector2d(getattr(vertex_array[k], attrib))
             self.file.write(B"\n")
 
-    def write_vertex_array3d(self, vertex_array, attrib):
+    def write_vertex_array3d(self, vertex_array):
         count = len(vertex_array)
         k = 0
 
@@ -225,11 +225,11 @@ class Writer:
         for i in range(line_count):
             self.indent_write(B"", 1)
             for j in range(7):
-                self.write_vector3d(getattr(vertex_array[k], attrib))
+                self.write_vector3d(vertex_array[k])
                 self.file.write(B", ")
                 k += 1
 
-            self.write_vector3d(getattr(vertex_array[k], attrib))
+            self.write_vector3d(vertex_array[k])
             k += 1
 
             if i * 8 < count - 8:
@@ -241,11 +241,11 @@ class Writer:
         if count != 0:
             self.indent_write(B"", 1)
             for j in range(count - 1):
-                self.write_vector3d(getattr(vertex_array[k], attrib))
+                self.write_vector3d(vertex_array[k])
                 self.file.write(B", ")
                 k += 1
 
-            self.write_vector3d(getattr(vertex_array[k], attrib))
+            self.write_vector3d(vertex_array[k])
             self.file.write(B"\n")
 
     def write_morph_position_array3d(self, vertex_array, mesh_vertex_array):
@@ -316,24 +316,20 @@ class Writer:
             self.write_vector3d(mesh_vertex_array[vertex_array[k].vertexIndex].normal if face.use_smooth else face.normal)
             self.file.write(B"\n")
 
-    @staticmethod
-    def grouper(iterable, n):
-        "Collect data into fixed-length chunks or blocks"
-        # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
-        args = [iter(iterable)] * n
-        return zip_longest(*args, fillvalue="")
-
-    def write_triangle_array(self, count, index_table):
+    # Write a triangle array
+    # @param indices list of triple of int
+    def write_triangle_array(self, triangles):
         to_i = self.to_int_byte
         i = 0  # index of fist index of current triangle
 
-        line_count = count >> 4
+        line_count = len(triangles) >> 4
+        count = 0
         for x in range(line_count):
             self.indent_write(B"", 1)
 
-            self.write(B", ".join([(B"{" + (B", ".join(map(to_i, tri))) + B"}")
-                       for tri in self.grouper(index_table[i:i + 16*3], 3)]))
-            i += 16*3
+            self.write(B", ".join([(B"{" + (B", ".join(map(to_i, tri.vertices))) + B"}")
+                                   for tri in triangles[i:i + 16]]))
+            i += 16
 
             if x * 16 < count - 16:
                 self.file.write(B",\n")
@@ -344,7 +340,7 @@ class Writer:
         if count != 0:
             self.indent_write(B"", 1)
             self.write(B", ".join([(B"{" + (B", ".join(map(to_i, tri))) + B"}")
-                       for tri in self.grouper(index_table[i:i + count*3], 3)]) + B"\n")
+                                   for tri in triangles[i:i + count]]))
 
     def write_node_table(self, objectRef):
         first = True
