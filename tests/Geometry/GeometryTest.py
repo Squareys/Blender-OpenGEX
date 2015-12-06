@@ -5,6 +5,8 @@ import io_scene_ogex
 
 __author__ = 'Jonathan Hale'
 
+# Currently not running, because vertex export order has changed because of the
+# new way of exporting geometry.
 
 # Regression test for exporting meshes
 class GeometryTest(unittest.TestCase):
