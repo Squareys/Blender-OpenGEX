@@ -4,7 +4,6 @@ import math
 import time
 
 from bpy_extras.io_utils import ExportHelper
-from io_scene_ogex.ExportVertex import ExportVertex
 from io_scene_ogex.NodeWrapper import NodeWrapper
 from io_scene_ogex.Writer import Writer
 
@@ -1532,15 +1531,16 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         m = bmesh.new()
         m.from_mesh(mesh, face_normals=False)
 
+        # Triangulate the mesh
         bmesh.ops.triangulate(m, faces=m.faces, quad_method=0, ngon_method=0)
-
-        print("Triangulated...")
 
         m.faces.ensure_lookup_table()
         m.edges.ensure_lookup_table()
 
         normals_backup = [None] * len(m.verts)
 
+        # Find all edges which are connected to exactly one smooth and one flat face.
+        # We will then later split at these to ensure two vertices are exported.
         split = []
         for edge in m.edges:
             smooth = 0
@@ -1556,18 +1556,21 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         m.verts.ensure_lookup_table()
 
+        # TODO: This does not work correctly yet
         for (i, normal) in enumerate(normals_backup):
             if normal is None:
                 continue
 
             m.verts[i].normal = normal
 
+        # Convert the bmesh to a temporary standard mesh
         export_mesh = bpy.data.meshes.new(name="ogex_exp_temp")
         m.to_mesh(export_mesh)
+
+        # Calculate tessface mesh for export (converts per-face-vertex texture coordinates and colors to per-vertex.
         export_mesh.calc_tessface(free_mpoly=True)
 
         # Triangulate mesh and remap vertices to eliminate duplicates.
-
         material_table = []
 
         index_table = []

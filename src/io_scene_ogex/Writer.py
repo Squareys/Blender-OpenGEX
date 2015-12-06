@@ -30,10 +30,17 @@ class Writer:
     def dec_indent(self):
         self.indentLevel -= 1
 
-    def indent_write(self, text, extra=0, newline=False):
+    def indent_write(self, text, extra=0, newline=False) -> None:
+        """
+        Write text indented with the current indentation amount
+        :rtype: None
+        :param text text to write
+        :param extra Additional indent
+        :param newline (default `False`) Whether to add a newline at the beginning.
+        """
         if newline:
             self.file.write(B"\n")
-        self.file.write((B"\t"*(self.indentLevel + extra)))
+        self.file.write((B"\t" * (self.indentLevel + extra)))
         self.file.write(text)
 
     def get_indent(self, extra=0):
