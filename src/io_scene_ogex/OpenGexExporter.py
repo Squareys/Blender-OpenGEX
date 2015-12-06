@@ -1191,6 +1191,34 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 self.file.write(B"\"}}\n")
                 struct_flag = True
 
+            # Export custom properties
+            if len(nw.item.items()) != 0:
+                indent = self.get_indent()
+                self.write(indent + B"Extension (applic = \"Blender\", version = \"Property\")\n" + indent + B"{\n")
+
+                indent_extra = self.get_indent(extra=1)
+                for (name, value) in nw.item.items():
+                    if name == "_RNA_UI":
+                        continue  # for blender only
+
+                    if isinstance(value, int):
+                        type_name = B"int32"
+                        value_bytes = self.to_int_byte(value)
+                    elif isinstance(value, float):
+                        type_name = B"float"
+                        value_bytes = self.to_float_byte(value)
+                    elif isinstance(value, str):
+                        type_name = B"string"
+                        value_bytes = B"\"" + bytes(value, "UTF-8") + B"\""
+                    else:
+                        print("\nWARNING: Unknown custom property type for property \"{}\"".format(name))
+                        continue
+
+                    self.write(indent_extra + B"Property(name = \"" + bytes(name, "UTF-8") + B"\")"B"{" +
+                               type_name + B" {" + value_bytes + B"}}\n")
+
+                self.write(indent + B"}\n")
+
             # Export the object reference and material references.
 
             obj = nw.item.data
@@ -1564,7 +1592,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     for v in edge.verts:
                         normals_backup[v.index] = v.normal
                         # else: face is between two flat faces, we need to split
-            # add to splitting todo list
+            # add to splitting list
             split.append(edge)
 
         m.verts.ensure_lookup_table()
