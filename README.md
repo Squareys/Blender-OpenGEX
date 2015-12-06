@@ -16,7 +16,7 @@ Install instructions for all operating systems:
   * currently does not quite export smooth surfaces correctly in some cases
   * No support for morphing
   * Armature export untested
-* (Soon) Support for exporting custom properties as Extensions
+* Support for exporting custom properties as Extensions
 
 # License
 This software is licensed under the Creative Commons
