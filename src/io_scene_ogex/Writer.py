@@ -193,7 +193,7 @@ class Writer:
     def write_quaternion(self, quaternion):
         self.write_vector4d(quaternion)
 
-    def write_vertex_array2d(self, vertex_array, attrib):
+    def write_vertex_array2d(self, vertex_array):
         count = len(vertex_array)
         k = 0
 
@@ -201,11 +201,11 @@ class Writer:
         for i in range(line_count):
             self.indent_write(B"", 1)
             for j in range(7):
-                self.write_vector2d(getattr(vertex_array[k], attrib))
+                self.write_vector2d(vertex_array[k])
                 self.file.write(B", ")
                 k += 1
 
-            self.write_vector2d(getattr(vertex_array[k], attrib))
+            self.write_vector2d(vertex_array[k])
             k += 1
 
             if i * 8 < count - 8:
@@ -217,11 +217,11 @@ class Writer:
         if count != 0:
             self.indent_write(B"", 1)
             for j in range(count - 1):
-                self.write_vector2d(getattr(vertex_array[k], attrib))
+                self.write_vector2d(vertex_array[k])
                 self.file.write(B", ")
                 k += 1
 
-            self.write_vector2d(getattr(vertex_array[k], attrib))
+            self.write_vector2d(vertex_array[k])
             self.file.write(B"\n")
 
     def write_vertex_array3d(self, vertex_array):

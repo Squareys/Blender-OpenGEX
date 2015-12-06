@@ -1539,20 +1539,23 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         normals_backup = [None] * len(m.verts)
 
-        # Find all edges which are connected to exactly one smooth and one flat face.
-        # We will then later split at these to ensure two vertices are exported.
+        # Find edges to split at to ensure that normals/uv coordinates can be later used per-vertex instead of
+        # per face index.
         split = []
         for edge in m.edges:
             smooth = 0
-            for f in edge.link_faces:
-                if f.smooth:
-                    smooth += 1
+            if not edge.seam:
+                for f in edge.link_faces:
+                    if f.smooth:
+                        smooth += 1
 
-            if smooth == 1:
-                split.append(edge)
+                if smooth > 1:  # edge is between two smooth faces, no split
+                    continue
+                elif smooth == 1:  # edge is between one smooth and one flat face, split and restore normal later
+                    for v in edge.verts:
+                        normals_backup[v.index] = v.normal
 
-                for v in edge.verts:
-                    normals_backup[v.index] = v.normal
+            split.append(edge)
 
         m.verts.ensure_lookup_table()
 
@@ -1585,7 +1588,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.indent_write(B"float[3]\t\t// ")
         self.write_int(vertex_count)
         self.indent_write(B"{\n", 0, True)
-        self.write_vertex_array3d([v.co or v in export_mesh.vertices])
+        self.write_vertex_array3d([v.co for v in export_mesh.vertices])
         self.indent_write(B"}\n")
 
         self.dec_indent()
@@ -1625,8 +1628,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         # Write the texcoord arrays.
         count = 0
-        for i in range(len(export_mesh.uv_textures)):
-            if export_mesh.uv_textures[i].active_render:
+        for i in range(len(export_mesh.tessface_uv_textures)):
+            if export_mesh.tessface_uv_textures[i].active_render:
                 name = B'texcoord'
                 if count > 0:
                     name += B'[' + bytes(str(count)) + B']'
@@ -1636,7 +1639,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 self.indent_write(B"float[2]\t\t// ")
                 self.write_int(vertex_count)
                 self.indent_write(B"{\n", 0, True)
-                self.write_vertex_array2d(export_mesh.tessface_uv_textures[i])
+                uv_coords = [(0.0, 0.0)] * vertex_count
+
+                for (face, face_uvs) in zip(export_mesh.tessfaces, export_mesh.tessface_uv_textures[i].data):
+                    uvs = [face_uvs.uv1, face_uvs.uv2, face_uvs.uv3]
+                    for (vindex, uv) in zip(face.vertices, uvs):
+                        uv_coords[vindex] = uv
+
+                self.write_vertex_array2d(uv_coords)
                 self.indent_write(B"}\n")
 
                 self.dec_indent()
@@ -1732,9 +1742,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     for i in range(len(material_table)):
                         if material_table[i] == m:
                             k = i * 3
-                            material_index_table.append(index_table[k])
-                            material_index_table.append(index_table[k + 1])
-                            material_index_table.append(index_table[k + 2])
+                            material_index_table.append(tuple(index_table[k:k+2]));
 
                     self.indent_write(B"IndexArray (material = ", 0, True)
                     self.write_int(m)
@@ -1745,7 +1753,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     self.indent_write(B"unsigned_int32[3]\t\t// ")
                     self.write_int(material_triangle_count[m])
                     self.indent_write(B"{\n", 0, True)
-                    self.write_triangle_array(material_triangle_count[m], material_index_table)
+                    self.write_triangle_array(material_index_table)
                     self.indent_write(B"}\n")
 
                     self.dec_indent()
