@@ -1,0 +1,56 @@
+Metric (key = "distance") {float {1.0}}
+Metric (key = "angle") {float {1.0}}
+Metric (key = "time") {float {1.0}}
+Metric (key = "up") {string {"z"}}
+
+Node $node1
+{
+	Name {string {"Empty"}}
+	Extension (applic = "Blender", version = "Property")
+	{
+		Property(name = "a_string"){string {"Hello World"}}
+		Property(name = "a_int"){int32 {42}}
+		Property(name = "a_float"){float {3.14}}
+	}
+
+	Transform
+	{
+		float[16]
+		{
+			{1.0, 0.0, 0.0, 0.0,
+			 0.0, 1.0, 0.0, 0.0,
+			 0.0, 0.0, 1.0, 0.0,
+			 0.0, 0.0, 0.0, 1.0}
+		}
+	}
+}
+
+CameraNode $node2
+{
+	Name {string {"Camera"}}
+	Extension (applic = "Blender", version = "Property")
+	{
+		Property(name = "another_string"){string {"Bye World"}}
+		Property(name = "another_int"){int32 {42}}
+		Property(name = "another_float"){float {31.4}}
+	}
+	ObjectRef {ref {$camera1}}
+
+	Transform
+	{
+		float[16]
+		{
+			{0.685881, 0.727634, -0.010817, 0.0,
+			 -0.31737, 0.312469, 0.895343, 0.0,
+			 0.654862, -0.610666, 0.445245, 0.0,
+			 7.481132, -6.50764, 5.343665, 1.0}
+		}
+	}
+}
+
+CameraObject $camera1		// Camera
+{
+	Param (attrib = "fov") {float {0.857556}}
+	Param (attrib = "near") {float {0.1}}
+	Param (attrib = "far") {float {100.0}}
+}
