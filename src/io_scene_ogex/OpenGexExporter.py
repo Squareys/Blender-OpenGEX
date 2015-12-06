@@ -1543,21 +1543,33 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         # per face index.
         split = []
         for edge in m.edges:
-            smooth = 0
-            if not edge.seam:
+            if not edge.seam:  # always split on seams
+
+                smooth = 0
+                last_normal = None
+                # count amount of flat faces attached
                 for f in edge.link_faces:
                     if f.smooth:
                         smooth += 1
+                    else:
+                        if last_normal != f.normal:
+                            last_normal = f.normal
+                        else:
+                            # edge is between two parallel faces, no need to split
+                            smooth = 1000
 
                 if smooth > 1:  # edge is between two smooth faces, no split
                     continue
                 elif smooth == 1:  # edge is between one smooth and one flat face, split and restore normal later
                     for v in edge.verts:
                         normals_backup[v.index] = v.normal
-
+                        # else: face is between two flat faces, we need to split
+            # add to splitting todo list
             split.append(edge)
 
         m.verts.ensure_lookup_table()
+
+        bmesh.ops.split_edges(m, edges=split)
 
         # TODO: This does not work correctly yet
         for (i, normal) in enumerate(normals_backup):
