@@ -53,7 +53,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                                                      description="Always export animation as per-frame samples",
                                                      default=False)
 
-    option_export_custom_properties = bpy.propes.BoolProperty(name="Export Custom Properties",
+    option_export_custom_properties = bpy.props.BoolProperty(name="Export Custom Properties",
                                                               description="Export object custom properties to an OGEX" +
                                                                           "Extension structure",
                                                               default=False)
@@ -1606,9 +1606,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             # add to splitting list
             split.append(edge)
 
-        m.verts.ensure_lookup_table()
-
         bmesh.ops.split_edges(m, edges=split)
+
+        m.verts.ensure_lookup_table()
 
         # TODO: This does not work correctly yet
         for (i, normal) in enumerate(normals_backup):

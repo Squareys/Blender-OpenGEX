@@ -9,7 +9,7 @@ class Writer:
 
     def __init__(self):
         self.file = None
-        self.indentLevel = 0
+        self.indent = B""
         pass
 
     def open(self, filename):
@@ -25,10 +25,10 @@ class Writer:
         self.file.write(data)  # TODO inline later!
 
     def inc_indent(self):
-        self.indentLevel += 1
+        self.indent = self.indent + B"\t"
 
     def dec_indent(self):
-        self.indentLevel -= 1
+        self.indent = self.indent[:-1]
 
     def indent_write(self, text, extra=0, newline=False) -> None:
         """
@@ -40,8 +40,7 @@ class Writer:
         """
         if newline:
             self.file.write(B"\n")
-        self.file.write((B"\t" * (self.indentLevel + extra)))
-        self.file.write(text)
+        self.file.write(self.indent + B"\t" * extra + text)
 
     def get_indent(self, extra=0):
         """
@@ -49,7 +48,7 @@ class Writer:
         :param extra Additional indent
         :return: bytestring for the indentation
         """
-        return B"\t"*(self.indentLevel + extra)
+        return self.indent + B"\t" * extra
 
     def write_int(self, i):
         self.file.write(bytes(str(i), "UTF-8"))
