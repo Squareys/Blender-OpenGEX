@@ -1568,6 +1568,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         # arbitrary stage in the modifier stack.
 
         m = bmesh.new()
+        m.from_object(node, scene, render=True, face_normals=False)
         m.from_mesh(mesh, face_normals=False)
 
         # Triangulate the mesh
@@ -1671,7 +1672,16 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             self.indent_write(B"float[3]\t\t// ")
             self.write_int(vertex_count)
             self.indent_write(B"{\n", 0, True)
-            self.write_vertex_array3d(export_mesh.tessface_vertex_colors)
+
+            colors = [(0.0, 0.0, 0.0)] * vertex_count
+
+            for (face, face_cols) in zip(export_mesh.tessfaces, export_mesh.tessface_vertex_colors.active.data):
+                uvs = [face_cols.color1, face_cols.color2, face_cols.color3]
+                for (vindex, uv) in zip(face.vertices, uvs):
+                    if colors[vindex] != (0.0, 0.0, 0.0) and colors[vindex] != uv:
+                        print("WARNING: Colision in Vertex colors")
+                    colors[vindex] = uv
+
             self.indent_write(B"}\n")
 
             self.dec_indent()

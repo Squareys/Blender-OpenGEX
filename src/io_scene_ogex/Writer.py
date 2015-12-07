@@ -92,13 +92,9 @@ class Writer:
                           self.to_matrix_row_byte(matrix, 3) + B"}", 1)
 
     def write_color(self, color):
-        to_f = Writer.to_float_byte
-        self.file.write(B"{" +
-                        to_f(color[0]) + B", " +
-                        to_f(color[1]) + B", " +
-                        to_f(color[2]) + B"}")
+        self.write_vector3d(color)
 
-    def write_file_name(self, filename):
+    def write_filename(self, filename):
         length = len(filename)
         if (length > 2) and (filename[1] == ":"):
             self.file.write(B"//")
@@ -322,8 +318,8 @@ class Writer:
         to_i = self.to_int_byte
         i = 0  # index of fist index of current triangle
 
-        line_count = len(triangles) >> 4
-        count = 0
+        count = len(triangles)
+        line_count = count >> 4
         for x in range(line_count):
             self.indent_write(B"", 1)
 
@@ -339,12 +335,12 @@ class Writer:
         count &= 15
         if count != 0:
             self.indent_write(B"", 1)
-            self.write(B", ".join([(B"{" + (B", ".join(map(to_i, tri))) + B"}")
+            self.write(B", ".join([(B"{" + (B", ".join(map(to_i, tri.vertices))) + B"}")
                                    for tri in triangles[i:i + count]]))
 
-    def write_node_table(self, objectRef):
+    def write_node_table(self, object_ref):
         first = True
-        for node in objectRef[1]["nodeTable"]:
+        for node in object_ref[1]["nodeTable"]:
             if first:
                 self.file.write(B"\t\t// ")
             else:
