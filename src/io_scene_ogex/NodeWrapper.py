@@ -48,7 +48,7 @@ class NodeWrapper(BaseWrapper):
 
     def get_node_type(self):
         if self.item.type == "MESH":
-            if len(self.item.data.polygons) != 0:
+            if len(self.item.data.vertices) != 0:
                 return NodeType.geometry
         elif self.item.type == "LAMP":
             lamp_type = self.item.data.type
