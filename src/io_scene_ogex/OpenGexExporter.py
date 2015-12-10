@@ -2206,7 +2206,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         self.progress.begin_task("Preparing objects...")
         for obj in scene.objects:
-            if not obj.parent:
+            if obj.parent is None:
                 NodeWrapper(obj, self.container)
 
         self.process_skinned_meshes()
