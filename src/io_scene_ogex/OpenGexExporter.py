@@ -1487,13 +1487,24 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.indent_write(B"}\n")
 
     @staticmethod
-    def to_per_vertex_data(m):
+    def to_per_vertex_data(m, uv_layers=None):
+        """
+        Generate per vertex data from blender bmesh.
+        :param m: the bmesh to generate the data from
+        :param uv_layers: names of uv layers to export or None to export all.
+        :return: dict of property to data. Possibly keys are: "position", "normal", "tris" and "texcoord"
+        """
+
         num_verts = len(m.verts)
 
         index_translation = [[i] for i in range(num_verts)]
         positions = [v.co for v in m.verts]
         normals = [None] * num_verts
-        active_uv_layers = [layer for layer in m.loops.layers.uv.values()]  # TODO Export only render_active layers
+        if uv_layers is None:
+            active_uv_layers = [layer for layer in m.loops.layers.uv.values()]
+        else:
+            active_uv_layers = [m.loops.layers.uv[name] for name in uv_layers]
+
         has_uv_layers = (len(active_uv_layers) != 0)
         texcoords = {l: [None] * num_verts for l in active_uv_layers}
         mesh_indices = []
@@ -1649,7 +1660,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         # cleanup loose edges and vertices
         bmesh.ops.delete(m, geom=[v for v in m.verts if len(v.link_faces) == 0], context=1)  # 1 <=> DEL_VERTS
 
-        export_mesh = self.to_per_vertex_data(m)
+        uv_layers = [layer.name for layer in mesh.uv_textures if layer.active_render]
+
+        export_mesh = self.to_per_vertex_data(m, uv_layers=uv_layers)
 
         # Triangulate mesh and remap vertices to eliminate duplicates.
         material_table = []
