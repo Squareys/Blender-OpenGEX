@@ -323,7 +323,7 @@ class Writer:
         for x in range(line_count):
             self.indent_write(B"", 1)
 
-            self.write(B", ".join([(B"{" + (B", ".join(map(to_i, tri.vertices))) + B"}")
+            self.write(B", ".join([(B"{" + (B", ".join(map(to_i, tri))) + B"}")
                                    for tri in triangles[i:i + 16]]))
             i += 16
 
@@ -335,7 +335,7 @@ class Writer:
         count &= 15
         if count != 0:
             self.indent_write(B"", 1)
-            self.write(B", ".join([(B"{" + (B", ".join(map(to_i, tri.vertices))) + B"}")
+            self.write(B", ".join([(B"{" + (B", ".join(map(to_i, tri))) + B"}")
                                    for tri in triangles[i:i + count]]))
 
     def write_node_table(self, object_ref):
