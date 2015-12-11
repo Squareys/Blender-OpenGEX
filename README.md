@@ -1,5 +1,5 @@
 # Blender-OpenGEX
-"Inofficial" OpenGEX Import/Export for Blender 2.7x, based on the original exporter code by Eric Lengyel (can be found at http://opengex.org/).
+"Inofficial OpenGEX Exporter" for Blender 2.7x, based on the original exporter code by Eric Lengyel (can be found at http://opengex.org/).
 
 # How to install
 
