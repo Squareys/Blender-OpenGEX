@@ -16,7 +16,7 @@ Install instructions for all operating systems:
   * No support for morphing
   * No support for vertex skin weights
 * Support for exporting custom properties as Extensions
-  * ```
+```
 Extension (applic = "Blender", version = "Property")
 {
     Property(name = "a_string"){string {"Hello World"}}
