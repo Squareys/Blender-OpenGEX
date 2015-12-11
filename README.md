@@ -21,7 +21,21 @@ Install instructions for all operating systems:
 Some of the broken features may be implemented if I start needing them.
 
 # License
+
+```
+Copyright 2015, Terathon Software LLC
+Copyright 2015, Jonathan Hale
+Copyright 2015, Nicolas Wehrle
+
 This software is licensed under the Creative Commons
 Attribution-ShareAlike 3.0 Unported License:
 
 http://creativecommons.org/licenses/by-sa/3.0/deed.en_US
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+```
