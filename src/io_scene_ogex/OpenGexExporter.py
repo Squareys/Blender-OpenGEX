@@ -1487,16 +1487,19 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.indent_write(B"}\n")
 
     @staticmethod
-    def to_per_vertex_data(m, uv_layers=None):
+    def to_per_vertex_data(m, num_materials=1, uv_layers=None):
         """
         Generate per vertex data from blender bmesh.
-        :param m: the bmesh to generate the data from
+        :param m: triangulated bmesh to generate the data from
+        :param num_materials: number of materials used in the mesh
         :param uv_layers: names of uv layers to export or None to export all.
         :return: dict of property to data. Possibly keys are: "position", "normal", "tris" and "texcoord"
         """
+        num_materials = max(1, num_materials)
 
         num_verts = len(m.verts)
 
+        # list of list which stores all the new indices corresponding to an old index
         index_translation = [[i] for i in range(num_verts)]
         positions = [v.co for v in m.verts]
         normals = [None] * num_verts
@@ -1506,66 +1509,79 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             active_uv_layers = [m.loops.layers.uv[name] for name in uv_layers]
 
         has_uv_layers = (len(active_uv_layers) != 0)
-        texcoords = {l: [None] * num_verts for l in active_uv_layers}
-        mesh_indices = []
+        if has_uv_layers:
+            texcoords = {l: [None] * num_verts for l in active_uv_layers}
+
+        mesh_indices = [[]] * num_materials  # list of triples of the faces for all materials
 
         for face in m.faces:
             face_indices = [0, 0, 0]
 
             for cur_index, loop in enumerate(face.loops):
                 vert = loop.vert
-                indices = index_translation[vert.index]
 
                 pos = vert.co
                 normal = vert.normal if face.smooth else face.normal
 
+                # check if this vertex has not been initialized yet:
+                i = vert.index
+                if normals[i] is None:
+                    # not in use yet, we can set the data for this
+                    # vertex safely
+                    normals[i] = normal
+                    for layer in active_uv_layers:
+                        texcoords[layer][i] = loop[layer].uv
+
+                    face_indices[cur_index] = i
+                    continue
+                # else: check for an existing vertex that matches our data.
+                indices = index_translation[vert.index]  # existing indices with same position
                 found_existing = False
                 for i in indices:
                     # position is always identical.
 
-                    found_uvs = not has_uv_layers
-                    for layer in active_uv_layers:
-                        if texcoords[layer][i] is None:
-                            texcoords[layer][i] = loop[layer].uv
-                            found_uvs = True
-
-                    if normals[i] is None:
-                        normals[i] = normal
-                    elif normals[i] != normal:
+                    # normals
+                    if normals[i] != normal:
                         # this one does not have an identical normal
                         continue
 
-                    if not found_uvs:
-                        for layer in active_uv_layers:
-                            if texcoords[layer][i] == loop[layer].uv:
-                                found_uvs = True
-                            else:
-                                found_uvs = False
-                                break
+                    # texture coordinates
+                    found_uvs = True  # in case we do not have any active layers.
+                    for layer in active_uv_layers:
+                        if texcoords[layer][i] != loop[layer].uv:
+                            found_uvs = False
+                            break
 
                     if not found_uvs:
+                        # this one does not have an identical uv coord in one of its layers
                         continue
 
+                    # we found matching data => reuse!
                     found_existing = True
                     face_indices[cur_index] = i
                     break
 
                 if not found_existing:
-                    # create a new one:
+                    # no data matched, we need to create some.
                     new_index = len(positions)
 
-                    indices.append(new_index)
+                    indices.append(new_index)  # make sure this vertex can be found later
                     face_indices[cur_index] = new_index
 
+                    # append data of current loop
                     positions.append(pos)
                     normals.append(normal)
 
                     for layer in active_uv_layers:
                         texcoords[layer].append(loop[layer].uv)
 
-            mesh_indices.append(face_indices)
+            # add the triple to the list of faces/triangles for the corresponding material index
+            mesh_indices[face.material_index].append(face_indices)
 
-        return {"position": positions, "normal": normals, "tris": mesh_indices, "texcoord": texcoords}
+        ret_value = {"position": positions, "normal": normals, "tris": mesh_indices}
+        if has_uv_layers:
+            ret_value["texcoord"] = texcoords
+        return ret_value
 
     def export_geometry(self, object_ref, scene):
         self.progress.begin_task("Exporting geometry for " + object_ref[1]["nodeTable"][0].name + "...")
@@ -1662,12 +1678,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         uv_layers = [layer.name for layer in mesh.uv_textures if layer.active_render]
 
-        export_mesh = self.to_per_vertex_data(m, uv_layers=uv_layers)
-
-        # Triangulate mesh and remap vertices to eliminate duplicates.
-        material_table = []
-
-        index_table = []
+        export_mesh = self.to_per_vertex_data(m, num_materials=len(mesh.materials), uv_layers=uv_layers)
         vertex_count = len(export_mesh["position"])
 
         # Write the position array.
@@ -1788,63 +1799,25 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 bpy.data.meshes.remove(morph_mesh)
 
         # Write the index arrays.
+        for material_index, indices in enumerate(export_mesh["tris"]):
+            num_tris = len(indices)
+            if num_tris != 0:
+                self.indent_write(B"IndexArray (material = ", 0, True)
+                self.write_int(material_index)
+                self.file.write(B")\n")
+                self.indent_write(B"{\n")
+                self.inc_indent()
 
-        max_material_index = 0
-        for i in range(len(material_table)):
-            index = material_table[i]
-            if index > max_material_index:
-                max_material_index = index
+                self.indent_write(B"unsigned_int32[3]\t\t// ")
+                self.write_int(num_tris)
+                self.indent_write(B"{\n", 0, True)
+                self.write_triangle_array(indices)
+                self.write(B"\n" + self.get_indent() + B"}\n")
 
-        if max_material_index == 0:
-
-            # There is only one material, so write a single index array.
-
-            self.indent_write(B"IndexArray\n", 0, True)
-            self.indent_write(B"{\n")
-            self.inc_indent()
-
-            self.indent_write(B"unsigned_int32[3]\t\t// ")
-            self.write_int(len(export_mesh["tris"]))
-            self.indent_write(B"{\n", 0, True)
-            self.write_triangle_array(export_mesh["tris"])
-            self.indent_write(B"}\n")
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
-
-        else:
-
-            # If there are multiple material indexes, then write a separate index array for each one.
-
-            material_triangle_count = [0 for i in range(max_material_index + 1)]
-            for i in range(len(material_table)):
-                material_triangle_count[material_table[i]] += 1
-
-            for m in range(max_material_index + 1):
-                if material_triangle_count[m] != 0:
-                    material_index_table = []
-                    for i in range(len(material_table)):
-                        if material_table[i] == m:
-                            k = i * 3
-                            material_index_table.append(tuple(index_table[k:k+2]));
-
-                    self.indent_write(B"IndexArray (material = ", 0, True)
-                    self.write_int(m)
-                    self.file.write(B")\n")
-                    self.indent_write(B"{\n")
-                    self.inc_indent()
-
-                    self.indent_write(B"unsigned_int32[3]\t\t// ")
-                    self.write_int(material_triangle_count[m])
-                    self.indent_write(B"{\n", 0, True)
-                    self.write_triangle_array(material_index_table)
-                    self.indent_write(B"}\n")
-
-                    self.dec_indent()
-                    self.indent_write(B"}\n")
+                self.dec_indent()
+                self.indent_write(B"}\n")
 
         # If the mesh is skinned, export the skinning data here.
-
         if armature and False:  # TODO
             self.export_skin(node, armature, export_mesh)
 
