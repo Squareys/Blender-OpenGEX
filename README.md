@@ -14,7 +14,6 @@ Install instructions for all operating systems:
 * Support for exporting linked objects and linked groups
 * Faster geometry export, but:
   * No support for morphing
-  * No support for vertex colors
   * No support for vertex skin weights
 * Support for exporting custom properties as Extensions
 
