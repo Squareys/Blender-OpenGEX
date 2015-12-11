@@ -1503,6 +1503,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         index_translation = [[i] for i in range(num_verts)]
         positions = [v.co for v in m.verts]
         normals = [None] * num_verts
+        color_layer = m.loops.layers.color.active
+
+        if color_layer is not None:
+            colors = [None] * num_verts
+
         if uv_layers is None:
             active_uv_layers = [layer for layer in m.loops.layers.uv.values()]
         else:
@@ -1529,6 +1534,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     # not in use yet, we can set the data for this
                     # vertex safely
                     normals[i] = normal
+                    if color_layer is not None:
+                        colors[i] = loop[color_layer]
                     for layer in active_uv_layers:
                         texcoords[layer][i] = loop[layer].uv
 
@@ -1544,6 +1551,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     if normals[i] != normal:
                         # this one does not have an identical normal
                         continue
+
+                    # vertex colors
+                    if color_layer is not None:
+                        if colors[i] != loop[color_layer]:
+                            # this one does not have an identical vertex color
+                            continue
 
                     # texture coordinates
                     found_uvs = True  # in case we do not have any active layers.
@@ -1571,6 +1584,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     # append data of current loop
                     positions.append(pos)
                     normals.append(normal)
+                    if color_layer is not None:
+                        colors.append(loop[color_layer])
 
                     for layer in active_uv_layers:
                         texcoords[layer].append(loop[layer].uv)
@@ -1581,6 +1596,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         ret_value = {"position": positions, "normal": normals, "tris": mesh_indices}
         if has_uv_layers:
             ret_value["texcoord"] = texcoords
+        if color_layer is not None:
+            ret_value["color"] = colors
         return ret_value
 
     def export_geometry(self, object_ref, scene):
