@@ -12,11 +12,13 @@ Install instructions for all operating systems:
 # Differences from the original
 
 * Support for exporting linked objects and linked groups
-* Faster geometry export
-  * currently does not quite export smooth surfaces correctly in some cases
+* Faster geometry export, but:
   * No support for morphing
-  * Armature export untested
+  * No support for vertex colors
+  * No support for vertex skin weights
 * Support for exporting custom properties as Extensions
+
+Some of the broken features may be implemented if I start needing them.
 
 # License
 This software is licensed under the Creative Commons
