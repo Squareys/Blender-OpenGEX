@@ -1199,12 +1199,15 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             # Export custom properties
             if len(nw.item.items()) != 0 and self.option_export_custom_properties:
                 indent = self.get_indent()
-                self.write(indent + B"Extension (applic = \"Blender\", version = \"Property\")\n" + indent + B"{\n")
+                buffer = indent + B"Extension (applic = \"Blender\", version = \"Property\")\n" + indent + B"{\n"
 
                 indent_extra = self.get_indent(extra=1)
+                count = 0
                 for (name, value) in nw.item.items():
                     if name == "_RNA_UI":
                         continue  # for blender only
+
+                    count += 1
 
                     if isinstance(value, int):
                         type_name = B"int32"
@@ -1225,10 +1228,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                         print("\nWARNING: Unknown custom property type for property \"{}\"".format(name))
                         continue
 
-                    self.write(indent_extra + B"Property(name = \"" + bytes(name, "UTF-8") + B"\")"B"{" +
-                               type_name + B" {" + value_bytes + B"}}\n")
+                    buffer += indent_extra + B"Property(name = \"" + bytes(name, "UTF-8") + B"\")"B"{"\
+                        + type_name + B" {" + value_bytes + B"}}\n"
 
-                self.write(indent + B"}\n")
+                if count != 0:
+                    buffer += indent + B"}\n"
+                    self.write(buffer)
 
             # Export the object reference and material references.
 
