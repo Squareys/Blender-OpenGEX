@@ -1226,6 +1226,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                         value_bytes = B"\"" + bytes(value, "UTF-8") + B"\""
                     else:
                         print("\nWARNING: Unknown custom property type for property \"{}\"".format(name))
+                        count -= 1 # not exporting this property after all
                         continue
 
                     buffer += indent_extra + B"Property(name = \"" + bytes(name, "UTF-8") + B"\")"B"{"\
