@@ -6,7 +6,7 @@ Metric (key = "up") {string {"z"}}
 Node $node1
 {
 	Name {string {"Empty"}}
-	Extension (applic = "Blender", version = "Property")
+	Extension (applic = "Blender", type = "Property")
 	{
 		Property(name = "a_string"){string {"Hello World"}}
 		Property(name = "a_int"){int32 {42}}
@@ -28,7 +28,7 @@ Node $node1
 CameraNode $node2
 {
 	Name {string {"Camera"}}
-	Extension (applic = "Blender", version = "Property")
+	Extension (applic = "Blender", type = "Property")
 	{
 		Property(name = "another_string"){string {"Bye World"}}
 		Property(name = "another_int"){int32 {42}}
