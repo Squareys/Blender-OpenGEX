@@ -1,6 +1,7 @@
 import bpy
 import bmesh
 import math
+from mathutils import Matrix
 import time
 
 from bpy_extras.io_utils import ExportHelper
@@ -658,7 +659,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             self.indent_write(B"float[16]\n")
             self.indent_write(B"{\n")
 
-            self.handle_offset(node.matrix_local, nw.offset)
+            transformation = node.matrix_local
+            if node.type == 'CAMERA':
+                # handle Blenders unusual downward-facing camera rest pose
+                transformation = transformation * Matrix.Rotation(math.radians(-90.0), 4, 'X')
+            self.handle_offset(transformation, nw.offset)
             self.indent_write(B"}\n")
 
             self.dec_indent()
