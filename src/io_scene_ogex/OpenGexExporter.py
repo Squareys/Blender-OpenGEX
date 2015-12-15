@@ -1204,7 +1204,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             # Export custom properties
             if len(nw.item.items()) != 0 and self.option_export_custom_properties:
                 indent = self.get_indent()
-                buffer = indent + B"Extension (applic = \"Blender\", version = \"Property\")\n" + indent + B"{\n"
+                buffer = indent + B"Extension (applic = \"Blender\", type = \"Property\")\n" + indent + B"{\n"
 
                 indent_extra = self.get_indent(extra=1)
                 count = 0
@@ -1220,12 +1220,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     elif isinstance(value, float):
                         type_name = B"float"
                         value_bytes = self.to_float_byte(value)
-                    elif isinstance(value, bool):
-                        type_name = B"bool"
-                        if value:
-                            value_bytes = B"true"
-                        else:
-                            value_bytes = B"false"
                     elif isinstance(value, str):
                         type_name = B"string"
                         value_bytes = B"\"" + bytes(value, "UTF-8") + B"\""
