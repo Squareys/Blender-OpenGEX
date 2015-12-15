@@ -1,0 +1,28 @@
+Metric (key = "distance") {float {1.0}}
+Metric (key = "angle") {float {1.0}}
+Metric (key = "time") {float {1.0}}
+Metric (key = "up") {string {"z"}}
+
+CameraNode $node1
+{
+	Name {string {"Camera"}}
+	ObjectRef {ref {$camera1}}
+
+	Transform
+	{
+		float[16]
+		{
+			{1.0, 0.0, 0.0, 0.0,
+			 0.0, 1.0, -0.0, 0.0,
+			 0.0, 0.0, 1.0, 0.0,
+			 0.0, 0.0, 1.8, 1.0}
+		}
+	}
+}
+
+CameraObject $camera1		// Camera
+{
+	Param (attrib = "fov") {float {0.857556}}
+	Param (attrib = "near") {float {0.1}}
+	Param (attrib = "far") {float {100.0}}
+}
