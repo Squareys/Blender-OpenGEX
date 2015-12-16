@@ -1,0 +1,84 @@
+Metric (key = "distance") {float {1.0}}
+Metric (key = "angle") {float {1.0}}
+Metric (key = "time") {float {1.0}}
+Metric (key = "up") {string {"z"}}
+
+Node $node1
+{
+	Name {string {"Empty"}}
+
+	Transform
+	{
+		float[16]
+		{
+			{1.0, 0.0, 0.0, 0.0,
+			 0.0, 1.0, 0.0, 0.0,
+			 0.0, 0.0, 1.0, 0.0,
+			 0.0, 0.0, 0.0, 1.0}
+		}
+	}
+
+	Node $node2
+	{
+		Name {string {"Empty.001"}}
+
+		Transform
+		{
+			float[16]
+			{
+				{1.0, 0.0, 0.0, 0.0,
+				 0.0, 1.0, 0.0, 0.0,
+				 0.0, 0.0, 1.0, 0.0,
+				 0.0, 0.0, 3.0, 1.0}
+			}
+		}
+	}
+}
+
+Node $node3
+{
+	Name {string {"DupliInstance"}}
+
+	Transform
+	{
+		float[16]
+		{
+			{1.0, 0.0, 0.0, 0.0,
+			 0.0, 1.0, 0.0, 0.0,
+			 0.0, 0.0, 1.0, 0.0,
+			 0.0, 0.0, 0.0, 1.0}
+		}
+	}
+
+	Node $node4
+	{
+		Name {string {"Empty"}}
+
+		Transform
+		{
+			float[16]
+			{
+				{1.0, 0.0, 0.0, 0.0,
+				 0.0, 1.0, 0.0, 0.0,
+				 0.0, 0.0, 1.0, 0.0,
+				 0.0, 0.0, 0.0, 1.0}
+			}
+		}
+
+		Node $node5
+		{
+			Name {string {"Empty.001"}}
+
+			Transform
+			{
+				float[16]
+				{
+					{1.0, 0.0, 0.0, 0.0,
+					 0.0, 1.0, 0.0, 0.0,
+					 0.0, 0.0, 1.0, 0.0,
+					 0.0, 0.0, 3.0, 1.0}
+				}
+			}
+		}
+	}
+}
