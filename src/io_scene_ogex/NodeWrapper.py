@@ -20,7 +20,7 @@ class NodeWrapper(BaseWrapper):
 
         if node.dupli_type == 'GROUP' and node.dupli_group:
             offset = node.dupli_group.dupli_offset
-            self.create_children(node.dupli_group.objects, offset)
+            self.create_children([o for o in node.dupli_group.objects if o.parent is None], offset)
 
     def create_children(self, children, offset=None):
         for obj in children:
