@@ -17,7 +17,7 @@ Install instructions for all operating systems:
   * No support for vertex skin weights
 * Support for exporting custom properties as Extensions
 ```
-Extension (applic = "Blender", version = "Property")
+Extension (applic = "Blender", type = "Property")
 {
     Property(name = "a_string"){string {"Hello World"}}
     Property(name = "a_int"){int32 {42}}
