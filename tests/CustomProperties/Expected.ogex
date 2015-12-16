@@ -8,9 +8,18 @@ Node $node1
 	Name {string {"Empty"}}
 	Extension (applic = "Blender", type = "Property")
 	{
-		Property(name = "a_string"){string {"Hello World"}}
-		Property(name = "a_int"){int32 {42}}
-		Property(name = "a_float"){float {3.14}}
+		string {"a_string"}
+		string {"Hello World"}
+	}
+	Extension (applic = "Blender", type = "Property")
+	{
+		string {"a_int"}
+		int32 {42}
+	}
+	Extension (applic = "Blender", type = "Property")
+	{
+		string {"a_float"}
+		float {3.14}
 	}
 
 	Transform
@@ -30,9 +39,18 @@ CameraNode $node2
 	Name {string {"Camera"}}
 	Extension (applic = "Blender", type = "Property")
 	{
-		Property(name = "another_string"){string {"Bye World"}}
-		Property(name = "another_int"){int32 {42}}
-		Property(name = "another_float"){float {31.4}}
+		string {"another_string"}
+		string {"Bye World"}
+	}
+	Extension (applic = "Blender", type = "Property")
+	{
+		string {"another_int"}
+		int32 {42}
+	}
+	Extension (applic = "Blender", type = "Property")
+	{
+		string {"another_float"}
+		float {31.4}
 	}
 	ObjectRef {ref {$camera1}}
 
@@ -41,8 +59,8 @@ CameraNode $node2
 		float[16]
 		{
 			{0.685881, 0.727634, -0.010817, 0.0,
+			 -0.654862, 0.610666, -0.445245, 0.0,
 			 -0.31737, 0.312469, 0.895343, 0.0,
-			 0.654862, -0.610666, 0.445245, 0.0,
 			 7.481132, -6.50764, 5.343665, 1.0}
 		}
 	}

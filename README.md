@@ -16,13 +16,24 @@ Install instructions for all operating systems:
   * No support for morphing
   * No support for vertex skin weights
 * Support for exporting custom properties as Extensions
+
+Properties can be exported as:
 ```
-Extension (applic = "Blender", type = "Property")
-{
-    Property(name = "a_string"){string {"Hello World"}}
-    Property(name = "a_int"){int32 {42}}
-    Property(name = "a_float"){float {3.14}}
-}
+	Extension (applic = "Blender", type = "Property")
+	{
+		string {"a_string"}
+		string {"Hello World"}
+	}
+	Extension (applic = "Blender", type = "Property")
+	{
+		string {"a_int"}
+		int32 {42}
+	}
+	Extension (applic = "Blender", type = "Property")
+	{
+		string {"a_float"}
+		float {3.14}
+	}
 ```
 
 Some of the broken features may be implemented if I start needing them.

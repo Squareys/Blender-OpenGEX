@@ -1204,7 +1204,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             # Export custom properties
             if len(nw.item.items()) != 0 and self.option_export_custom_properties:
                 indent = self.get_indent()
-                buffer = indent + B"Extension (applic = \"Blender\", type = \"Property\")\n" + indent + B"{\n"
+                prefix = indent + B"Extension (applic = \"Blender\", type = \"Property\")\n" + indent + B"{\n"
 
                 indent_extra = self.get_indent(extra=1)
                 count = 0
@@ -1225,15 +1225,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                         value_bytes = B"\"" + bytes(value, "UTF-8") + B"\""
                     else:
                         print("\nWARNING: Unknown custom property type for property \"{}\"".format(name))
-                        count -= 1 # not exporting this property after all
                         continue
 
-                    buffer += indent_extra + B"Property(name = \"" + bytes(name, "UTF-8") + B"\")"B"{"\
-                        + type_name + B" {" + value_bytes + B"}}\n"
-
-                if count != 0:
-                    buffer += indent + B"}\n"
-                    self.write(buffer)
+                    self.write(prefix + indent_extra + B"string {\"" + bytes(name, "UTF-8") + B"\"}\n"
+                               + indent_extra + type_name + B" {" + value_bytes + B"}\n" + indent + B"}\n")
 
             # Export the object reference and material references.
 
