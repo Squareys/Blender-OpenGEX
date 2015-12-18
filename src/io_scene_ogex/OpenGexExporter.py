@@ -48,16 +48,16 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
     bl_label = "Export OpenGEX"
     filename_ext = ".ogex"
 
-    option_export_selection = bpy.props.BoolProperty(name="Export Selection Only",
-                                                     description="Export only selected objects", default=False)
-    option_sample_animation = bpy.props.BoolProperty(name="Force Sampled Animation",
-                                                     description="Always export animation as per-frame samples",
-                                                     default=False)
+    export_selection = bpy.props.BoolProperty(name="Export Selection Only",
+                                              description="Export only selected objects", default=False)
+    sample_animation = bpy.props.BoolProperty(name="Force Sampled Animation",
+                                              description="Always export animation as per-frame samples",
+                                              default=False)
 
-    option_export_custom_properties = bpy.props.BoolProperty(name="Export Custom Properties",
-                                                              description="Export object custom properties to an OGEX" +
+    export_custom_properties = bpy.props.BoolProperty(name="Export Custom Properties",
+                                                      description="Export object custom properties to an OGEX" +
                                                                           "Extension structure",
-                                                              default=False)
+                                                      default=False)
 
     def __init__(self):
 
@@ -1202,7 +1202,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 struct_flag = True
 
             # Export custom properties
-            if len(nw.item.items()) != 0 and self.option_export_custom_properties:
+            if len(nw.item.items()) != 0 and self.export_custom_properties:
                 indent = self.get_indent()
                 prefix = indent + B"Extension (applic = \"Blender\", type = \"Property\")\n" + indent + B"{\n"
 
@@ -2198,9 +2198,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         start_time = time.time()
 
         scene = context.scene
-        export_all_flag = not self.option_export_selection
+        export_all_flag = not self.export_selection
         self.open(self.filepath)
-        self.container = ExporterState(export_all_flag, self.option_sample_animation, scene)
+        self.container = ExporterState(export_all_flag, self.sample_animation, scene)
 
         self.export_metrics(scene)
 

@@ -22,7 +22,7 @@ class CameraTest(unittest.TestCase):
 
     def testCustomProperties(self):
         bpy.ops.wm.open_mainfile(filepath=self.base_dir + os.sep + "Test.blend")
-        bpy.ops.export_scene.ogex(filepath=self.filename, option_export_custom_properties=True)
+        bpy.ops.export_scene.ogex(filepath=self.filename, export_custom_properties=True)
 
         self.assertEqual(open(self.filename).read(), open(self.base_dir + os.sep + "Expected.ogex").read())
 
