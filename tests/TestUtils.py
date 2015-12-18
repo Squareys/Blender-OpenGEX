@@ -9,11 +9,13 @@ __author__ = 'Jonathan Hale'
 
 class OgexExporterTest(unittest.TestCase):
 
+    no_delete = False
+
     def setUp(self):
         io_scene_ogex.register()
 
     def tearDown(self):
-        if os.path.isfile(self.filename):
+        if os.path.isfile(self.filename) and not self.no_delete:
             os.remove(self.filename)
         io_scene_ogex.unregister()
 
