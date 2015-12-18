@@ -15,13 +15,6 @@ class LinkedParentedObjectsTest(TestUtils.OgexExporterTest):
     base_dir = os.path.dirname(os.path.realpath(__file__))
     filename = base_dir + os.sep + "Test.ogex"
 
-    def setUp(self):
-        io_scene_ogex.register()
-
-    def tearDown(self):
-        if os.path.isfile(self.filename):
-            os.remove(self.filename)
-
     def testLinkedObjects(self):
         bpy.ops.wm.open_mainfile(filepath=self.base_dir + os.sep + "Test.blend")
         bpy.ops.export_scene.ogex(filepath=self.filename)
