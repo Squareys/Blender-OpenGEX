@@ -1,0 +1,115 @@
+Metric (key = "distance") {float {1.0}}
+Metric (key = "angle") {float {1.0}}
+Metric (key = "time") {float {1.0}}
+Metric (key = "up") {string {"z"}}
+
+GeometryNode $node1
+{
+	Name {string {"Plane"}}
+	ObjectRef {ref {$geometry1}}
+
+	Transform
+	{
+		float[16]
+		{
+			{1.0, 0.0, 0.0, 0.0,
+			 0.0, 1.0, 0.0, 0.0,
+			 0.0, 0.0, 1.0, 0.0,
+			 0.0, 0.0, 0.0, 1.0}
+		}
+	}
+
+	Extension (applic = "Blender", type = "PhysicsMaterial") {
+        Extension (applic = "Blender", type = "PM/type") {
+            string {"STATIC"}
+        }
+        Extension (applic = "Blender", type = "PM/shape") {
+            Extension (applic = "Blender", type = "TriangleMeshShape") {
+                string {"$geometry1"}
+                Extension (applic = "Blender", type = "PM/margin") {
+                    float {0.04}
+                }
+
+            }
+        }
+    }
+}
+
+Node $node2
+{
+	Name {string {"Empty.002"}}
+
+	Transform
+	{
+		float[16]
+		{
+			{1.0, 0.0, 0.0, 0.0,
+			 0.0, 1.0, 0.0, 0.0,
+			 0.0, 0.0, 1.0, 0.0,
+			 -5.0, 0.0, 0.0, 1.0}
+		}
+	}
+}
+
+Node $node3
+{
+	Name {string {"Empty.001"}}
+
+	Transform
+	{
+		float[16]
+		{
+			{1.0, 0.0, 0.0, 0.0,
+			 0.0, 1.0, 0.0, 0.0,
+			 0.0, 0.0, 1.0, 0.0,
+			 5.0, 0.0, 0.0, 1.0}
+		}
+	}
+
+	Extension (applic = "Blender", type = "PhysicsMaterial") {
+        Extension (applic = "Blender", type = "PM/type") {
+            string {"RIGID_BODY"}
+        }
+        Extension (applic = "Blender", type = "PM/shape") {
+            Extension (applic = "Blender", type = "TriangleMeshShape") {
+                float
+                {
+                    1, 1, 1
+                }
+                Extension (applic = "Blender", type = "PM/margin") {
+                    float {0.04}
+                }
+            }
+        }
+    }
+}
+
+GeometryObject $geometry1		// Plane
+{
+	Mesh (primitive = "triangles")
+	{
+		VertexArray (attrib = "position")
+		{
+			float[3]		// 4
+			{
+				{-1.0, -1.0, 0.0}, {1.0, -1.0, 0.0}, {-1.0, 1.0, 0.0}, {1.0, 1.0, 0.0}
+			}
+		}
+
+		VertexArray (attrib = "normal")
+		{
+			float[3]		// 4
+			{
+				{-0.0, 0.0, 1.0}, {-0.0, 0.0, 1.0}, {-0.0, 0.0, 1.0}, {-0.0, 0.0, 1.0}
+			}
+		}
+
+		IndexArray (material = 0)
+		{
+			unsigned_int32[3]		// 2
+			{
+				{1, 2, 0}, {1, 3, 2}
+			}
+		}
+	}
+}
