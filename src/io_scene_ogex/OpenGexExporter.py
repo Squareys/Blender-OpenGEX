@@ -1313,7 +1313,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.dec_indent()
         buff += self.get_indent() + B"}\n"
 
-        if props.use_collision_bounds:
+        if props.use_collision_bounds and props.physics_type not in ['NAVMESH', 'OCCLUDER']:
             # export collision shape
             buff += self.get_extension_header(B"Blender", B"PM/shape")
             self.inc_indent()
@@ -1334,7 +1334,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             self.inc_indent()
             buff += self.get_primitive_bytes(B"float", [self.to_float_byte(props.collision_margin)])
             self.dec_indent()
-            buff += self.get_indent() + B"}\n"  #end PM/margin
+            buff += self.get_indent() + B"}\n"  # end PM/margin
 
             self.dec_indent()
             buff += self.get_indent() + B"}\n"  # end *Shape
