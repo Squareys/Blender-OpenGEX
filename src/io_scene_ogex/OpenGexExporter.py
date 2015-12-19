@@ -1251,6 +1251,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 for bw in nw.bones:
                     self.export_bone(nw, bw, scene)
 
+        # export physics properties
+        if self.export_physics and nw.item.game.physics_type != 'NO_COLLISION':
+            self.export_physics_properties(nw.item)
+
         for subnode in nw.children:
             if subnode.parent.item.type != "BONE":
                 self.export_node(subnode, scene)
@@ -1288,6 +1292,58 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                        self.get_primitive_bytes(type_name, [value_bytes]))
             self.dec_indent()
             self.write(self.get_indent() + B"}\n")
+
+    SHAPE_TYPE_TO_EXTENSION = {"BOX": B"BoxShape",
+                               "SHPERE": B"SphereShape",
+                               "CYLINDER": B"CylinderShape",
+                               "CONE": B"ConeShape",
+                               "CONVEX_HULL": B"ConvexHullShape",
+                               "TRIANGLE_MESH": B"TriangleMeshShape",
+                               "CAPSULE": B"CapsuleShape"}
+
+    def export_physics_properties(self, o):
+        props = o.game
+        buff = B"\n" + self.get_extension_header(B"Blender", B"PhysicsMaterial")
+        self.inc_indent()
+
+        # physics collision type
+        buff += self.get_extension_header(B"Blender", B"PM/type")
+        self.inc_indent()
+        buff += self.get_primitive_bytes(B"string", [B"\"" + bytes(props.physics_type, "UTF-8") + B"\""])
+        self.dec_indent()
+        buff += self.get_indent() + B"}\n"
+
+        if props.use_collision_bounds:
+            # export collision shape
+            buff += self.get_extension_header(B"Blender", B"PM/shape")
+            self.inc_indent()
+            shape_type = props.collision_bounds_type
+
+            buff += self.get_extension_header(B"Blender", self.SHAPE_TYPE_TO_EXTENSION[shape_type])
+            self.inc_indent()
+
+            if shape_type not in ['CONVEX_HULL', 'TRIANGLE_MESH']:
+                # export scale as half-extents
+                buff += self.get_primitive_bytes(B"float", map(self.to_float_byte, o.scale))
+            else:
+                # export geometry as triangle mesh
+                buff += self.get_primitive_bytes(B"ref", [B"$" + self.container.geometryArray[o.data]["structName"]])
+
+            # collision shape margin
+            buff += self.get_extension_header(B"Blender", B"PM/margin")
+            self.inc_indent()
+            buff += self.get_primitive_bytes(B"float", [self.to_float_byte(props.collision_margin)])
+            self.dec_indent()
+            buff += self.get_indent() + B"}\n"  #end PM/margin
+
+            self.dec_indent()
+            buff += self.get_indent() + B"}\n"  # end *Shape
+
+            self.dec_indent()
+            buff += self.get_indent() + B"}\n"  # end PM/shape
+
+        self.dec_indent()
+        self.write(buff + self.get_indent() + B"}\n")
 
     def export_skin(self, node, armature, export_vertex_array):
 
