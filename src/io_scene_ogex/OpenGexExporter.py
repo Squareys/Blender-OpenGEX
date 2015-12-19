@@ -1170,32 +1170,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
             # Export custom properties
             if len(nw.item.items()) != 0 and self.export_custom_properties:
-                indent = self.get_indent()
-                prefix = indent + B"Extension (applic = \"Blender\", type = \"Property\")\n" + indent + B"{\n"
-
-                indent_extra = self.get_indent(extra=1)
-                count = 0
-                for (name, value) in nw.item.items():
-                    if name == "_RNA_UI":
-                        continue  # for blender only
-
-                    count += 1
-
-                    if isinstance(value, int):
-                        type_name = B"int32"
-                        value_bytes = self.to_int_byte(value)
-                    elif isinstance(value, float):
-                        type_name = B"float"
-                        value_bytes = self.to_float_byte(value)
-                    elif isinstance(value, str):
-                        type_name = B"string"
-                        value_bytes = B"\"" + bytes(value, "UTF-8") + B"\""
-                    else:
-                        print("\nWARNING: Unknown custom property type for property \"{}\"".format(name))
-                        continue
-
-                    self.write(prefix + indent_extra + B"string {\"" + bytes(name, "UTF-8") + B"\"}\n"
-                               + indent_extra + type_name + B" {" + value_bytes + B"}\n" + indent + B"}\n")
+                self.export_properties(nw.item)
 
             # Export the object reference and material references.
 
@@ -1283,6 +1258,36 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         if nw.nodeRef:
             self.dec_indent()
             self.indent_write(B"}\n")
+
+    def export_properties(self, node):
+        prefix = self.get_extension_header(B"Blender", B"Property")
+
+        count = 0
+        for (name, value) in node.items():
+            if name == "_RNA_UI":
+                continue  # for blender only
+
+            count += 1
+
+            if isinstance(value, int):
+                type_name = B"int32"
+                value_bytes = self.to_int_byte(value)
+            elif isinstance(value, float):
+                type_name = B"float"
+                value_bytes = self.to_float_byte(value)
+            elif isinstance(value, str):
+                type_name = B"string"
+                value_bytes = B"\"" + bytes(value, "UTF-8") + B"\""
+            else:
+                print("\nWARNING: Unknown custom property type for property \"{}\"".format(name))
+                continue
+
+            self.inc_indent()
+            self.write(prefix +
+                       self.get_primitive_bytes(B"string", [B"\"" + bytes(name, "UTF-8") + B"\""]) +
+                       self.get_primitive_bytes(type_name, [value_bytes]))
+            self.dec_indent()
+            self.write(self.get_indent() + B"}\n")
 
     def export_skin(self, node, armature, export_vertex_array):
 
