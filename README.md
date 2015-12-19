@@ -15,6 +15,7 @@ Install instructions for all operating systems:
 * Faster geometry export, but:
   * No support for morphing
   * No support for vertex skin weights
+* Support for exporting object game physics as Extensions
 * Support for exporting custom properties as Extensions
 
 Properties can be exported as:
