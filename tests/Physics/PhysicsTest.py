@@ -15,7 +15,7 @@ class PhsyicsTest(TestUtils.OgexExporterTest):
     base_dir = os.path.dirname(os.path.realpath(__file__))
     filename = base_dir + os.sep + "Test.ogex"
 
-    def testLinkedObjects(self):
+    def testPhysics(self):
         bpy.ops.wm.open_mainfile(filepath=self.base_dir + os.sep + "Test.blend")
         bpy.ops.export_scene.ogex(filepath=self.filename)
 

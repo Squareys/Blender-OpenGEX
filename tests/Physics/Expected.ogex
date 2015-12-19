@@ -19,20 +19,24 @@ GeometryNode $node1
 		}
 	}
 
-	Extension (applic = "Blender", type = "PhysicsMaterial") {
-        Extension (applic = "Blender", type = "PM/type") {
-            string {"STATIC"}
-        }
-        Extension (applic = "Blender", type = "PM/shape") {
-            Extension (applic = "Blender", type = "TriangleMeshShape") {
-                string {"$geometry1"}
-                Extension (applic = "Blender", type = "PM/margin") {
-                    float {0.04}
-                }
-
-            }
-        }
-    }
+	Extension (applic = "Blender", type = "PhysicsMaterial")
+	{
+		Extension (applic = "Blender", type = "PM/type")
+		{
+			string {"STATIC"}
+		}
+		Extension (applic = "Blender", type = "PM/shape")
+		{
+			Extension (applic = "Blender", type = "TriangleMeshShape")
+			{
+				ref {$geometry1}
+				Extension (applic = "Blender", type = "PM/margin")
+				{
+					float {0.04}
+				}
+			}
+		}
+	}
 }
 
 Node $node2
@@ -66,22 +70,24 @@ Node $node3
 		}
 	}
 
-	Extension (applic = "Blender", type = "PhysicsMaterial") {
-        Extension (applic = "Blender", type = "PM/type") {
-            string {"RIGID_BODY"}
-        }
-        Extension (applic = "Blender", type = "PM/shape") {
-            Extension (applic = "Blender", type = "TriangleMeshShape") {
-                float
-                {
-                    1, 1, 1
-                }
-                Extension (applic = "Blender", type = "PM/margin") {
-                    float {0.04}
-                }
-            }
-        }
-    }
+	Extension (applic = "Blender", type = "PhysicsMaterial")
+	{
+		Extension (applic = "Blender", type = "PM/type")
+		{
+			string {"RIGID_BODY"}
+		}
+		Extension (applic = "Blender", type = "PM/shape")
+		{
+			Extension (applic = "Blender", type = "BoxShape")
+			{
+				float {1.0, 1.0, 1.0}
+				Extension (applic = "Blender", type = "PM/margin")
+				{
+					float {0.04}
+				}
+			}
+		}
+	}
 }
 
 GeometryObject $geometry1		// Plane
