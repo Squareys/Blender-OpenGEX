@@ -15,27 +15,8 @@ Install instructions for all operating systems:
 * Faster geometry export, but:
   * No support for morphing
   * No support for vertex skin weights
-* Support for exporting object game physics as Extensions
-* Support for exporting custom properties as Extensions
-
-Properties can be exported as:
-```
-	Extension (applic = "Blender", type = "Property")
-	{
-		string {"a_string"}
-		string {"Hello World"}
-	}
-	Extension (applic = "Blender", type = "Property")
-	{
-		string {"a_int"}
-		int32 {42}
-	}
-	Extension (applic = "Blender", type = "Property")
-	{
-		string {"a_float"}
-		float {3.14}
-	}
-```
+* Support for exporting object game physics as Extensions [=> documentation](https://github.com/Squareys/Blender-OpenGEX/wiki/PhysicsMaterial-Extension)
+* Support for exporting custom properties as Extensions [=> documentation](https://github.com/Squareys/Blender-OpenGEX/wiki/Property-Extension)
 
 Some of the broken features may be implemented if I start needing them.
 
