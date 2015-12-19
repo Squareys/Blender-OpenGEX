@@ -347,3 +347,24 @@ class Writer:
                 self.file.write(B", ")
             self.file.write(bytes(node.name, "UTF-8"))
             first = False
+
+    def get_primitive_bytes(self, ddl_type, p):
+        """
+        Write a OpenDDL primitive.
+        :param ddl_type: primitve type
+        :param p: list of values in byte form, eg [B"1", B"2", B"3"] or [B"\"Hello\"", B"\"World\""] or [B"1.0"]
+        :return: byte string representing the OpenDDL primitive
+        """
+        return self.get_indent() + ddl_type + B" {" + (B", ".join(p)) + B"}\n"
+
+    def write_primitive(self, ddl_type, p):
+        """
+        Write a OpenDDL primitive.
+        :param ddl_type: primitve type
+        :param p: list of values in byte form, eg [B"1", B"2", B"3"] or [B"\"Hello\"", B"\"World\""] or [B"1.0"]
+        """
+        self.write(self.get_primitive_bytes())
+
+    def get_extension_header(self, applic, type):
+        indent = self.get_indent()
+        return indent + B"Extension (applic = \"" + applic + B"\", type = \"" + type + B"\")\n" + indent + B"{\n"
