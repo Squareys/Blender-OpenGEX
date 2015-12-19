@@ -58,6 +58,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                                                       description="Export object custom properties to an OGEX" +
                                                                           "Extension structure",
                                                       default=False)
+    export_physics = bpy.props.BoolProperty(name="Export Game Physics",
+                                            description="Export game physics to an OGEX Extension structure",
+                                            default=False)
 
     def __init__(self):
 
