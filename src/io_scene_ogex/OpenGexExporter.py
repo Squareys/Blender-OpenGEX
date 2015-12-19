@@ -91,41 +91,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         return -1
 
     @staticmethod
-    def unify_vertices(export_vertex_array, index_table):
-
-        # This function looks for identical vertices having exactly the same position, normal,
-        # color, and texcoords. Duplicate vertices are unified, and a new index table is returned.
-
-        bucket_count = len(export_vertex_array) >> 3
-        if bucket_count > 1:
-
-            # Round down to nearest power of two.
-
-            while True:
-                count = bucket_count & (bucket_count - 1)
-                if count == 0:
-                    break
-                bucket_count = count
-        else:
-            bucket_count = 1
-
-        hash_table = [[] for i in range(bucket_count)]
-        unified_vertex_array = []
-
-        for i in range(len(export_vertex_array)):
-            ev = export_vertex_array[i]
-            bucket = ev.hash & (bucket_count - 1)
-            index = OpenGexExporter.find_export_vertex(hash_table[bucket], export_vertex_array, ev)
-            if index < 0:
-                index_table.append(len(unified_vertex_array))
-                unified_vertex_array.append(ev)
-                hash_table[bucket].append(i)
-            else:
-                index_table.append(index_table[index])
-
-        return unified_vertex_array
-
-    @staticmethod
     def classify_animation_curve(fcurve):
 
         linear_count = 0
