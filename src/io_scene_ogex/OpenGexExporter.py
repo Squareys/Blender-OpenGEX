@@ -630,6 +630,36 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             if node.type == 'CAMERA':
                 # handle Blenders unusual downward-facing camera rest pose
                 transformation = transformation * Matrix.Rotation(math.radians(-90.0), 4, 'X')
+
+            # FIXME: Pretty bad workaround for blender using scale as half extents
+            # if we export a rigid body later, which uses the scale as half extents,
+            # we need to make sure the scale is cancelled out. This is not the case
+            # for mesh shapes.
+            # This needs to be done for the object itself on the one hand and its
+            # children on the other
+            if self.export_physics and (node.parent is not None)\
+                    and node.parent.game.physics_type != 'NO_COLLISION':
+                # a child of a scale as half extent object
+                parent_props = node.parent.game
+                if parent_props.use_collision_bounds and parent_props.collision_bounds_type not in\
+                        ['CONVEX_HULL', 'TRIANGLE_MESH']:
+                    inverted_scale = Matrix()
+                    scale = node.parent.scale
+                    inverted_scale[0][0] = scale[0]
+                    inverted_scale[1][1] = scale[1]
+                    inverted_scale[2][2] = scale[2]
+                    transformation = inverted_scale * transformation
+            if self.export_physics and node.game.physics_type != 'NO_COLLISION':
+                # a child of a scale as half extent object
+                if node.game.use_collision_bounds and node.game.collision_bounds_type not in\
+                        ['CONVEX_HULL', 'TRIANGLE_MESH']:
+                    inverted_scale = Matrix()
+                    scale = node.scale
+                    inverted_scale[0][0] = 1/scale[0]
+                    inverted_scale[1][1] = 1/scale[1]
+                    inverted_scale[2][2] = 1/scale[2]
+                    transformation = inverted_scale * transformation
+
             self.handle_offset(transformation, nw.offset)
             self.indent_write(B"}\n")
 
