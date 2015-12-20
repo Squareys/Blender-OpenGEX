@@ -80,11 +80,27 @@ Node $node3
 		{
 			Extension (applic = "Blender", type = "BoxShape")
 			{
-				float {1.0, 1.0, 1.0}
+				float {1.0, 1.0, 0.5}
 				Extension (applic = "Blender", type = "PM/margin")
 				{
 					float {0.04}
 				}
+			}
+		}
+	}
+
+	Node $node4
+	{
+		Name {string {"Empty"}}
+
+		Transform
+		{
+			float[16]
+			{
+				{1.0, 0.0, 0.0, 0.0,
+				 0.0, 1.0, 0.0, 0.0,
+				 0.0, 0.0, 1.0, 0.0,
+				 0.0, 0.0, 5.0, 1.0}
 			}
 		}
 	}
