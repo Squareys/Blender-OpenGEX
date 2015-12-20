@@ -653,12 +653,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 # a child of a scale as half extent object
                 if node.game.use_collision_bounds and node.game.collision_bounds_type not in\
                         ['CONVEX_HULL', 'TRIANGLE_MESH']:
-                    inverted_scale = Matrix()
-                    scale = node.scale
-                    inverted_scale[0][0] = 1/scale[0]
-                    inverted_scale[1][1] = 1/scale[1]
-                    inverted_scale[2][2] = 1/scale[2]
-                    transformation = inverted_scale * transformation
+                    # simply remove scale
+                    transformation = Matrix.Translation(transformation.translation)\
+                                     * transformation.to_quaternion().to_matrix().to_4x4()
 
             self.handle_offset(transformation, nw.offset)
             self.indent_write(B"}\n")
