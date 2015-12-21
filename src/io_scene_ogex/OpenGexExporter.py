@@ -61,7 +61,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
     export_physics = bpy.props.BoolProperty(name="Export Game Physics",
                                             description="Export game physics to an OGEX Extension structure",
                                             default=False)
-
+    export_ambient = bpy.props.BoolProperty(name="Export Ambient Color",
+                                            description="Export world ambient color and material ambient factors as a"\
+                                                        "not officially specified Param.",
+                                            default=False)
     def __init__(self):
         super().__init__()
         self.progress = ProgressLog()
