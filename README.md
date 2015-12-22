@@ -17,6 +17,7 @@ Install instructions for all operating systems:
   * No support for vertex skin weights
 * Support for exporting object game physics as Extensions [=> documentation](https://github.com/Squareys/Blender-OpenGEX/wiki/PhysicsMaterial-Extension)
 * Support for exporting custom properties as Extensions [=> documentation](https://github.com/Squareys/Blender-OpenGEX/wiki/Property-Extension)
+* Support for exporting the worlds ambient color and material ambient factor [=> documentation](https://github.com/Squareys/Blender-OpenGEX/wiki/Ambient-Colors)
 
 Some of the broken features may be implemented if I start needing them.
 
