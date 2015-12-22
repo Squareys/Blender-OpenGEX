@@ -16,7 +16,6 @@ class AmbientTest(TestUtils.OgexExporterTest):
     filename = base_dir + os.sep + "Test.ogex"
 
     def testAmbient(self):
-        self.no_delete=True
         bpy.ops.wm.open_mainfile(filepath=self.base_dir + os.sep + "Test.blend")
         bpy.ops.export_scene.ogex(filepath=self.filename, export_ambient=True)
 
