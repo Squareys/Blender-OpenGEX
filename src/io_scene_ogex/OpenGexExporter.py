@@ -2181,6 +2181,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 self.write_color([emission, emission, emission])
                 self.file.write(B"}}\n")
 
+            # export ambient factor if enabled.
+            if self.export_ambient and material.ambient != 1.0:
+                self.indent_write(B"Param (attrib = \"ambient_factor\") {float {")
+                self.write_float(material.ambient)
+                self.file.write(B"}}\n")
+
             diffuse_texture = None
             specular_texture = None
             emission_texture = None
@@ -2261,6 +2267,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.container = ExporterState(export_all_flag, self.sample_animation, scene)
 
         self.export_metrics(scene)
+
+        # export the worlds ambient color, if enabled
+        if self.export_ambient:
+            buff = self.get_extension_header(B"Blender", B"AmbientColor")
+            buff += B"\tfloat[3] {{" + (B", ".join(map(self.to_float_byte, scene.world.ambient_color))) + B"}}\n"
+            buff += B"}\n"
+            self.write(buff)
 
         original_frame = scene.frame_current
         original_subframe = scene.frame_subframe
