@@ -2144,6 +2144,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         for materialRef in self.container.materialArray.items():
             material = materialRef[0]
 
+            if material is None:
+                print("WARNING - A material was None")
+                continue
+
             self.file.write(B"\nMaterial $")
             self.file.write(materialRef[1]["structName"])
             self.file.write(B"\n{\n")
