@@ -1751,7 +1751,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         # cleanup loose edges and vertices
         bmesh.ops.delete(m, geom=[v for v in m.verts if len(v.link_faces) == 0], context=1)  # 1 <=> DEL_VERTS
 
-        uv_layers = [layer.name for layer in mesh.uv_textures if layer.active_render]
+        uv_layers = [mesh.uv_textures.active_index] if mesh.uv_textures.active_index != -1 else None
 
         export_mesh = self.to_per_vertex_data(m, num_materials=len(mesh.materials), uv_layers=uv_layers)
         vertex_count = len(export_mesh["position"])
