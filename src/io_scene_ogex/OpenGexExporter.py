@@ -65,6 +65,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                                             description="Export world ambient color and material ambient factors as a"\
                                                         "not officially specified Param.",
                                             default=False)
+    export_only_first_material = bpy.props.BoolProperty(name="Export First Material Only",
+                                                        description="Only export the first material of any object. May"
+                                                                    "be useful for some game engines for example.",
+                                                        default=False)
+
     def __init__(self):
         super().__init__()
         self.progress = ProgressLog()
@@ -1218,8 +1223,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 self.file.write(self.container.geometryArray[obj]["structName"])
                 self.file.write(B"}}\n")
 
-                for i in range(len(nw.item.material_slots)):
-                    self.export_material_ref(nw.item.material_slots[i].material, i)
+                if self.export_only_first_material and len(nw.item.material_slots) > 0:
+                    self.export_material_ref(nw.item.material_slots[0].material, 0)
+                else:
+                    for (i, slot) in enumerate(nw.item.material_slots):
+                        self.export_material_ref(slot.material, i)
 
                 shape_keys = OpenGexExporter.get_shape_keys(obj)
                 if shape_keys:
