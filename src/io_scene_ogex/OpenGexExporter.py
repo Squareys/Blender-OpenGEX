@@ -2203,6 +2203,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 self.write_float(material.ambient)
                 self.file.write(B"}}\n")
 
+            # export shadeless flag
+            if material.use_shadeless:
+                self.write(self.get_extension_header(B"Blender", B"Shadeless") + B"\tbool {true}\n}\n")
+
             diffuse_texture = None
             specular_texture = None
             emission_texture = None
