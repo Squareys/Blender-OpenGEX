@@ -1351,6 +1351,30 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.dec_indent()
         buff += self.get_indent() + B"}\n"
 
+        # calculate collision group and mask
+        collision_mask = 0
+        collision_group = 0
+
+        for i in range(16):
+            if props.collision_group[i]:
+                collision_group |= 1 << i
+            if props.collision_mask[i]:
+                collision_mask |= 1 << i
+
+        if collision_group != 0x01:
+            buff += self.get_extension_header(B"Blender", B"PM/collision_group")
+            self.inc_indent()
+            buff += self.get_primitive_bytes(B"unsigned_int16", [self.to_int_byte(collision_group)])
+            self.dec_indent()
+            buff += self.get_indent() + B"}\n"
+
+        if collision_mask != 0xFF:
+            buff += self.get_extension_header(B"Blender", B"PM/collision_mask")
+            self.inc_indent()
+            buff += self.get_primitive_bytes(B"unsigned_int16", [self.to_int_byte(collision_mask)])
+            self.dec_indent()
+            buff += self.get_indent() + B"}\n"
+
         if props.use_collision_bounds and props.physics_type not in ['NAVMESH', 'OCCLUDER']:
             # export collision shape
             buff += self.get_extension_header(B"Blender", B"PM/shape")
