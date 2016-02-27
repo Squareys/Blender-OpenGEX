@@ -1332,7 +1332,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             self.write(self.get_indent() + B"}\n")
 
     SHAPE_TYPE_TO_EXTENSION = {"BOX": B"BoxShape",
-                               "SHPERE": B"SphereShape",
+                               "SPHERE": B"SphereShape",
                                "CYLINDER": B"CylinderShape",
                                "CONE": B"ConeShape",
                                "CONVEX_HULL": B"ConvexHullShape",
