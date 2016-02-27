@@ -2229,7 +2229,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
             # export shadeless flag
             if material.use_shadeless:
-                self.write(self.get_extension_header(B"Blender", B"Shadeless") + B"\tbool {true}\n}\n")
+                indent = self.get_indent()
+                self.write(self.get_extension_header(B"Blender", B"Shadeless") +
+                           indent + B"\tbool {true}\n" + indent + B"}\n")
 
             diffuse_texture = None
             specular_texture = None
