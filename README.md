@@ -1,3 +1,4 @@
+Travis [![Build Status](https://travis-ci.org/Squareys/Blender-OpenGEX.svg?branch=master)](https://travis-ci.org/Squareys/Blender-OpenGEX)
 # Blender-OpenGEX
 "Inofficial OpenGEX Exporter" for Blender 2.7x, based on the original exporter code by Eric Lengyel (can be found at http://opengex.org/).
 
