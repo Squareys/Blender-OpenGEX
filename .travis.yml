@@ -21,7 +21,4 @@ install:
 
   - sudo ln -s ${PWD}/src/io_scene_ogex ${PWD}/tmp/blender/2.77/scripts/addons/io_scene_ogex
 
-  # we cannot call "-m unittest discover" with blender so here is some equivalent python code:
-  - printf "import unittest\nsuite = unittest.TestLoader().discover('.', pattern='*Test.py', top_level_dir='.')\nunittest.TextTestRunner(verbosity=2).run(suite)" > discover.py
-
-script: ./tmp/blender/blender --background --python-exit-code 1 --python discover.py
+script: ./tmp/blender/blender --background --python-exit-code 1 --python run_tests.py
