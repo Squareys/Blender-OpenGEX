@@ -1,32 +1,30 @@
 import bpy
 import bmesh
 import math
-from mathutils import Matrix
 import time
-
+from mathutils import Matrix
 from bpy_extras.io_utils import ExportHelper
 from io_scene_ogex.NodeWrapper import NodeWrapper
 from io_scene_ogex.Writer import Writer
-
 from io_scene_ogex.ExporterState import *
 
 __author__ = 'Eric Lengyel, Jonathan Hale, Nicolas Wehrle'
 
-kAnimationSampled = 0
-kAnimationLinear = 1
-kAnimationBezier = 2
+k_animation_sampled = 0
+k_animation_linear = 1
+k_animation_bezier = 2
 
-kExportEpsilon = 1.0e-6
+k_export_epsilon = 1.0e-6
 
-structIdentifier = [B"Node $", B"BoneNode $", B"GeometryNode $", B"LightNode $", B"CameraNode $"]
+struct_identifier = [B"Node $", B"BoneNode $", B"GeometryNode $", B"LightNode $", B"CameraNode $"]
 
-subtranslationName = [B"xpos", B"ypos", B"zpos"]
-subrotationName = [B"xrot", B"yrot", B"zrot"]
-subscaleName = [B"xscl", B"yscl", B"zscl"]
-deltaSubtranslationName = [B"dxpos", B"dypos", B"dzpos"]
-deltaSubrotationName = [B"dxrot", B"dyrot", B"dzrot"]
+subtranslation_name = [B"xpos", B"ypos", B"zpos"]
+subrotation_name = [B"xrot", B"yrot", B"zrot"]
+subscale_name = [B"xscl", B"yscl", B"zscl"]
+delta_subtranslation_name = [B"dxpos", B"dypos", B"dzpos"]
+delta_subrotation_name = [B"dxrot", B"dyrot", B"dzrot"]
 delta_subscale_name = [B"dxscl", B"dyscl", B"dzscl"]
-axisName = [B"x", B"y", B"z"]
+axis_name = [B"x", B"y", B"z"]
 
 
 class ProgressLog:
@@ -62,7 +60,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                                             description="Export game physics to an OGEX Extension structure",
                                             default=False)
     export_ambient = bpy.props.BoolProperty(name="Export Ambient Color",
-                                            description="Export world ambient color and material ambient factors as a"\
+                                            description="Export world ambient color and material ambient factors as a"
                                                         "not officially specified Param.",
                                             default=False)
     export_only_first_material = bpy.props.BoolProperty(name="Export First Material Only",
@@ -113,14 +111,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             elif interp == "BEZIER":
                 bezier_count += 1
             else:
-                return kAnimationSampled
+                return k_animation_sampled
 
         if bezier_count == 0:
-            return kAnimationLinear
+            return k_animation_linear
         elif linear_count == 0:
-            return kAnimationBezier
+            return k_animation_bezier
 
-        return kAnimationSampled
+        return k_animation_sampled
 
     @staticmethod
     def animation_keys_differ(fcurve):
@@ -131,7 +129,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
             for i in range(1, key_count):
                 key2 = fcurve.keyframe_points[i].co[1]
-                if math.fabs(key2 - key1) > kExportEpsilon:
+                if math.fabs(key2 - key1) > k_export_epsilon:
                     return True
 
         return False
@@ -144,14 +142,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             key = fcurve.keyframe_points[0].co[1]
             left = fcurve.keyframe_points[0].handle_left[1]
             right = fcurve.keyframe_points[0].handle_right[1]
-            if (math.fabs(key - left) > kExportEpsilon) or (math.fabs(right - key) > kExportEpsilon):
+            if (math.fabs(key - left) > k_export_epsilon) or (math.fabs(right - key) > k_export_epsilon):
                 return True
 
             for i in range(1, key_count):
                 key = fcurve.keyframe_points[i].co[1]
                 left = fcurve.keyframe_points[i].handle_left[1]
                 right = fcurve.keyframe_points[i].handle_right[1]
-                if (math.fabs(key - left) > kExportEpsilon) or (math.fabs(right - key) > kExportEpsilon):
+                if (math.fabs(key - left) > k_export_epsilon) or (math.fabs(right - key) > k_export_epsilon):
                     return True
 
         return False
@@ -159,7 +157,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
     @staticmethod
     def animation_present(fcurve, kind):
 
-        if kind != kAnimationBezier:
+        if kind != k_animation_bezier:
             return OpenGexExporter.animation_keys_differ(fcurve)
 
         return (OpenGexExporter.animation_keys_differ(fcurve)) or (OpenGexExporter.animation_tangents_nonzero(fcurve))
@@ -169,7 +167,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         for i in range(4):
             for j in range(4):
-                if math.fabs(m1[i][j] - m2[i][j]) > kExportEpsilon:
+                if math.fabs(m1[i][j] - m2[i][j]) > k_export_epsilon:
                     return True
 
         return False
@@ -275,7 +273,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.indent_write(B"{\n")
         self.inc_indent()
 
-        if kind != kAnimationBezier:
+        if kind != k_animation_bezier:
             self.indent_write(B"Time\n")
             self.indent_write(B"{\n")
             self.inc_indent()
@@ -437,7 +435,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             if parent:
                 for i in range(self.container.beginFrame, self.container.endFrame):
                     scene.frame_set(i)
-                    if math.fabs(parent.matrix.determinant()) > kExportEpsilon:
+                    if math.fabs(parent.matrix.determinant()) > k_export_epsilon:
                         self.write_matrixFlat(parent.matrix.inverted() * pose_bone.matrix)
                     else:
                         self.write_matrixFlat(pose_bone.matrix)
@@ -445,7 +443,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     self.file.write(B",\n")
 
                 scene.frame_set(self.container.endFrame)
-                if math.fabs(parent.matrix.determinant()) > kExportEpsilon:
+                if math.fabs(parent.matrix.determinant()) > k_export_epsilon:
                     self.write_matrixFlat(parent.matrix.inverted() * pose_bone.matrix)
                 else:
                     self.write_matrixFlat(pose_bone.matrix)
@@ -557,7 +555,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             if action:
                 for fcurve in action.fcurves:
                     kind = OpenGexExporter.classify_animation_curve(fcurve)
-                    if kind != kAnimationSampled:
+                    if kind != k_animation_sampled:
                         if fcurve.data_path == "location":
                             for i in range(3):
                                 if (fcurve.array_index == i) and (not pos_anim_curve[i]):
@@ -645,11 +643,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             # for mesh shapes.
             # This needs to be done for the object itself on the one hand and its
             # children on the other
-            if self.export_physics and (node.parent is not None)\
+            if self.export_physics and (node.parent is not None) \
                     and node.parent.game.physics_type != 'NO_COLLISION':
                 # a child of a scale as half extent object
                 parent_props = node.parent.game
-                if parent_props.use_collision_bounds and parent_props.collision_bounds_type not in\
+                if parent_props.use_collision_bounds and parent_props.collision_bounds_type not in \
                         ['CONVEX_HULL', 'TRIANGLE_MESH']:
                     inverted_scale = Matrix()
                     scale = node.parent.scale
@@ -659,10 +657,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     transformation = inverted_scale * transformation
             if self.export_physics and node.game.physics_type != 'NO_COLLISION':
                 # a child of a scale as half extent object
-                if node.game.use_collision_bounds and node.game.collision_bounds_type not in\
+                if node.game.use_collision_bounds and node.game.collision_bounds_type not in \
                         ['CONVEX_HULL', 'TRIANGLE_MESH']:
                     # simply remove scale
-                    transformation = Matrix.Translation(transformation.translation)\
+                    transformation = Matrix.Translation(transformation.translation) \
                                      * transformation.to_quaternion().to_matrix().to_4x4()
 
             self.handle_offset(transformation, nw.offset)
@@ -685,11 +683,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
                 for i in range(3):
                     pos = delta_translation[i]
-                    if (delta_pos_animated[i]) or (math.fabs(pos) > kExportEpsilon):
+                    if (delta_pos_animated[i]) or (math.fabs(pos) > k_export_epsilon):
                         self.indent_write(B"Translation %", 0, struct_flag)
-                        self.file.write(deltaSubtranslationName[i])
+                        self.file.write(delta_subtranslation_name[i])
                         self.file.write(B" (kind = \"")
-                        self.file.write(axisName[i])
+                        self.file.write(axis_name[i])
                         self.file.write(B"\")\n")
                         self.indent_write(B"{\n")
                         self.indent_write(B"float {", 1)
@@ -699,9 +697,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
                         struct_flag = True
 
-            elif ((math.fabs(delta_translation[0]) > kExportEpsilon) or (
-                        math.fabs(delta_translation[1]) > kExportEpsilon) or (
-                        math.fabs(delta_translation[2]) > kExportEpsilon)):
+            elif ((math.fabs(delta_translation[0]) > k_export_epsilon) or (
+                        math.fabs(delta_translation[1]) > k_export_epsilon) or (
+                        math.fabs(delta_translation[2]) > k_export_epsilon)):
                 self.indent_write(B"Translation\n")
                 self.indent_write(B"{\n")
                 self.indent_write(B"float[3] {", 1)
@@ -719,11 +717,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
                 for i in range(3):
                     pos = translation[i]
-                    if (pos_animated[i]) or (math.fabs(pos) > kExportEpsilon):
+                    if (pos_animated[i]) or (math.fabs(pos) > k_export_epsilon):
                         self.indent_write(B"Translation %", 0, struct_flag)
-                        self.file.write(subtranslationName[i])
+                        self.file.write(subtranslation_name[i])
                         self.file.write(B" (kind = \"")
-                        self.file.write(axisName[i])
+                        self.file.write(axis_name[i])
                         self.file.write(B"\")\n")
                         self.indent_write(B"{\n")
                         self.indent_write(B"float {", 1)
@@ -733,8 +731,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
                         struct_flag = True
 
-            elif ((math.fabs(translation[0]) > kExportEpsilon) or (math.fabs(translation[1]) > kExportEpsilon) or (
-                        math.fabs(translation[2]) > kExportEpsilon)):
+            elif ((math.fabs(translation[0]) > k_export_epsilon) or (math.fabs(translation[1]) > k_export_epsilon) or (
+                        math.fabs(translation[2]) > k_export_epsilon)):
                 self.indent_write(B"Translation\n")
                 self.indent_write(B"{\n")
                 self.indent_write(B"float[3] {", 1)
@@ -752,11 +750,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 for i in range(3):
                     axis = ord(mode[2 - i]) - 0x58
                     angle = node.delta_rotation_euler[axis]
-                    if (delta_rot_animated[axis]) or (math.fabs(angle) > kExportEpsilon):
+                    if (delta_rot_animated[axis]) or (math.fabs(angle) > k_export_epsilon):
                         self.indent_write(B"Rotation %", 0, struct_flag)
-                        self.file.write(deltaSubrotationName[axis])
+                        self.file.write(delta_subrotation_name[axis])
                         self.file.write(B" (kind = \"")
-                        self.file.write(axisName[axis])
+                        self.file.write(axis_name[axis])
                         self.file.write(B"\")\n")
                         self.indent_write(B"{\n")
                         self.indent_write(B"float {", 1)
@@ -773,10 +771,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
                 if mode == "QUATERNION":
                     quaternion = node.delta_rotation_quaternion
-                    if ((math.fabs(quaternion[0] - 1.0) > kExportEpsilon) or (
-                                math.fabs(quaternion[1]) > kExportEpsilon) or (
-                                math.fabs(quaternion[2]) > kExportEpsilon) or (
-                                math.fabs(quaternion[3]) > kExportEpsilon)):
+                    if ((math.fabs(quaternion[0] - 1.0) > k_export_epsilon) or (
+                                math.fabs(quaternion[1]) > k_export_epsilon) or (
+                                math.fabs(quaternion[2]) > k_export_epsilon) or (
+                                math.fabs(quaternion[3]) > k_export_epsilon)):
                         self.indent_write(B"Rotation (kind = \"quaternion\")\n", 0, struct_flag)
                         self.indent_write(B"{\n")
                         self.indent_write(B"float[4] {", 1)
@@ -790,9 +788,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     for i in range(3):
                         axis = ord(mode[2 - i]) - 0x58
                         angle = node.delta_rotation_euler[axis]
-                        if math.fabs(angle) > kExportEpsilon:
+                        if math.fabs(angle) > k_export_epsilon:
                             self.indent_write(B"Rotation (kind = \"", 0, struct_flag)
-                            self.file.write(axisName[axis])
+                            self.file.write(axis_name[axis])
                             self.file.write(B"\")\n")
                             self.indent_write(B"{\n")
                             self.indent_write(B"float {", 1)
@@ -810,11 +808,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 for i in range(3):
                     axis = ord(mode[2 - i]) - 0x58
                     angle = node.rotation_euler[axis]
-                    if (rot_animated[axis]) or (math.fabs(angle) > kExportEpsilon):
+                    if (rot_animated[axis]) or (math.fabs(angle) > k_export_epsilon):
                         self.indent_write(B"Rotation %", 0, struct_flag)
-                        self.file.write(subrotationName[axis])
+                        self.file.write(subrotation_name[axis])
                         self.file.write(B" (kind = \"")
-                        self.file.write(axisName[axis])
+                        self.file.write(axis_name[axis])
                         self.file.write(B"\")\n")
                         self.indent_write(B"{\n")
                         self.indent_write(B"float {", 1)
@@ -831,10 +829,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
                 if mode == "QUATERNION":
                     quaternion = node.rotation_quaternion
-                    if ((math.fabs(quaternion[0] - 1.0) > kExportEpsilon) or (
-                                math.fabs(quaternion[1]) > kExportEpsilon) or (
-                                math.fabs(quaternion[2]) > kExportEpsilon) or (
-                                math.fabs(quaternion[3]) > kExportEpsilon)):
+                    if ((math.fabs(quaternion[0] - 1.0) > k_export_epsilon) or (
+                                math.fabs(quaternion[1]) > k_export_epsilon) or (
+                                math.fabs(quaternion[2]) > k_export_epsilon) or (
+                                math.fabs(quaternion[3]) > k_export_epsilon)):
                         self.indent_write(B"Rotation (kind = \"quaternion\")\n", 0, struct_flag)
                         self.indent_write(B"{\n")
                         self.indent_write(B"float[4] {", 1)
@@ -845,7 +843,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                         struct_flag = True
 
                 elif mode == "AXIS_ANGLE":
-                    if math.fabs(node.rotation_axis_angle[0]) > kExportEpsilon:
+                    if math.fabs(node.rotation_axis_angle[0]) > k_export_epsilon:
                         self.indent_write(B"Rotation (kind = \"axis\")\n", 0, struct_flag)
                         self.indent_write(B"{\n")
                         self.indent_write(B"float[4] {", 1)
@@ -859,9 +857,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     for i in range(3):
                         axis = ord(mode[2 - i]) - 0x58
                         angle = node.rotation_euler[axis]
-                        if math.fabs(angle) > kExportEpsilon:
+                        if math.fabs(angle) > k_export_epsilon:
                             self.indent_write(B"Rotation (kind = \"", 0, struct_flag)
-                            self.file.write(axisName[axis])
+                            self.file.write(axis_name[axis])
                             self.file.write(B"\")\n")
                             self.indent_write(B"{\n")
                             self.indent_write(B"float {", 1)
@@ -879,11 +877,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
                 for i in range(3):
                     scl = delta_scale[i]
-                    if (delta_scl_animated[i]) or (math.fabs(scl) > kExportEpsilon):
+                    if (delta_scl_animated[i]) or (math.fabs(scl) > k_export_epsilon):
                         self.indent_write(B"Scale %", 0, struct_flag)
                         self.file.write(delta_subscale_name[i])
                         self.file.write(B" (kind = \"")
-                        self.file.write(axisName[i])
+                        self.file.write(axis_name[i])
                         self.file.write(B"\")\n")
                         self.indent_write(B"{\n")
                         self.indent_write(B"float {", 1)
@@ -893,9 +891,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
                         struct_flag = True
 
-            elif ((math.fabs(delta_scale[0] - 1.0) > kExportEpsilon) or (
-                        math.fabs(delta_scale[1] - 1.0) > kExportEpsilon) or (
-                        math.fabs(delta_scale[2] - 1.0) > kExportEpsilon)):
+            elif ((math.fabs(delta_scale[0] - 1.0) > k_export_epsilon) or (
+                        math.fabs(delta_scale[1] - 1.0) > k_export_epsilon) or (
+                        math.fabs(delta_scale[2] - 1.0) > k_export_epsilon)):
                 self.indent_write(B"Scale\n", 0, struct_flag)
                 self.indent_write(B"{\n")
                 self.indent_write(B"float[3] {", 1)
@@ -913,11 +911,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
                 for i in range(3):
                     scl = scale[i]
-                    if (scl_animated[i]) or (math.fabs(scl) > kExportEpsilon):
+                    if (scl_animated[i]) or (math.fabs(scl) > k_export_epsilon):
                         self.indent_write(B"Scale %", 0, struct_flag)
-                        self.file.write(subscaleName[i])
+                        self.file.write(subscale_name[i])
                         self.file.write(B" (kind = \"")
-                        self.file.write(axisName[i])
+                        self.file.write(axis_name[i])
                         self.file.write(B"\")\n")
                         self.indent_write(B"{\n")
                         self.indent_write(B"float {", 1)
@@ -927,8 +925,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
                         struct_flag = True
 
-            elif ((math.fabs(scale[0] - 1.0) > kExportEpsilon) or (math.fabs(scale[1] - 1.0) > kExportEpsilon) or (
-                        math.fabs(scale[2] - 1.0) > kExportEpsilon)):
+            elif ((math.fabs(scale[0] - 1.0) > k_export_epsilon) or (math.fabs(scale[1] - 1.0) > k_export_epsilon) or (
+                        math.fabs(scale[2] - 1.0) > k_export_epsilon)):
                 self.indent_write(B"Scale\n", 0, struct_flag)
                 self.indent_write(B"{\n")
                 self.indent_write(B"float[3] {", 1)
@@ -953,21 +951,21 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             if position_animated:
                 for i in range(3):
                     if pos_animated[i]:
-                        self.export_animation_track(pos_anim_curve[i], pos_anim_kind[i], subtranslationName[i],
+                        self.export_animation_track(pos_anim_curve[i], pos_anim_kind[i], subtranslation_name[i],
                                                     struct_flag)
                         struct_flag = True
 
             if rotation_animated:
                 for i in range(3):
                     if rot_animated[i]:
-                        self.export_animation_track(rot_anim_curve[i], rot_anim_kind[i], subrotationName[i],
+                        self.export_animation_track(rot_anim_curve[i], rot_anim_kind[i], subrotation_name[i],
                                                     struct_flag)
                         struct_flag = True
 
             if scale_animated:
                 for i in range(3):
                     if scl_animated[i]:
-                        self.export_animation_track(scale_anim_curve[i], scale_anim_kind[i], subscaleName[i],
+                        self.export_animation_track(scale_anim_curve[i], scale_anim_kind[i], subscale_name[i],
                                                     struct_flag)
                         struct_flag = True
 
@@ -975,7 +973,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 for i in range(3):
                     if delta_pos_animated[i]:
                         self.export_animation_track(delta_pos_anim_curve[i], delta_pos_anim_kind[i],
-                                                    deltaSubtranslationName[i],
+                                                    delta_subtranslation_name[i],
                                                     struct_flag)
                         struct_flag = True
 
@@ -983,7 +981,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 for i in range(3):
                     if delta_rot_animated[i]:
                         self.export_animation_track(delta_rot_anim_curve[i], delta_rot_anim_kind[i],
-                                                    deltaSubrotationName[i],
+                                                    delta_subrotation_name[i],
                                                     struct_flag)
                         struct_flag = True
 
@@ -1015,14 +1013,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         transform = bw.item.matrix_local.copy()
         parent_bone_wrapper = bw.parent
-        if parent_bone_wrapper and (math.fabs(parent_bone_wrapper.item.matrix_local.determinant()) > kExportEpsilon):
+        if parent_bone_wrapper and (math.fabs(parent_bone_wrapper.item.matrix_local.determinant()) > k_export_epsilon):
             transform = parent_bone_wrapper.item.matrix_local.inverted() * transform
 
         pose_bone = nw.item.pose.bones.get(bw.item.name)
         if pose_bone:
             transform = pose_bone.matrix.copy()
             parent_pose_bone = pose_bone.parent
-            if parent_pose_bone and (math.fabs(parent_pose_bone.matrix.determinant()) > kExportEpsilon):
+            if parent_pose_bone and (math.fabs(parent_pose_bone.matrix.determinant()) > k_export_epsilon):
                 transform = parent_pose_bone.matrix.inverted() * transform
 
         self.indent_write(B"Transform")
@@ -1129,10 +1127,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
                 fcurve = curve_array[a]
                 kind = OpenGexExporter.classify_animation_curve(fcurve)
-                if (kind != kAnimationSampled) and (not self.container.sampleAnimationFlag):
+                if (kind != k_animation_sampled) and (not self.container.sampleAnimationFlag):
                     self.export_animation_track(fcurve, kind, target, struct_flag)
                 else:
-                    self.export_morph_weight_sampled_animation_track(shape_keys.key_blocks[k], target, scene, struct_flag)
+                    self.export_morph_weight_sampled_animation_track(shape_keys.key_blocks[k], target, scene,
+                                                                     struct_flag)
 
                 struct_flag = True
 
@@ -1142,7 +1141,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
     def export_bone(self, nw, bw, scene):  # armature, bone, scene):
 
         if nw.nodeRef:
-            self.indent_write(structIdentifier[nw.nodeRef["nodeType"]], 0, True)
+            self.indent_write(struct_identifier[nw.nodeRef["nodeType"]], 0, True)
             self.file.write(nw.nodeRef["structName"])
 
             self.indent_write(B"{\n", 0, True)
@@ -1182,7 +1181,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         if nw.nodeRef:
             type = nw.nodeRef["nodeType"]
-            self.indent_write(structIdentifier[type], 0, True)
+            self.indent_write(struct_identifier[type], 0, True)
             self.file.write(nw.nodeRef["structName"])
 
             if type == NodeType.geometry:
@@ -1268,7 +1267,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             if pose_bone:
                 # If the node is parented to a bone and is not relative, then undo the bone's transform.
 
-                if math.fabs(pose_bone.matrix.determinant()) > kExportEpsilon:
+                if math.fabs(pose_bone.matrix.determinant()) > k_export_epsilon:
                     self.indent_write(B"Transform\n")
                     self.indent_write(B"{\n")
                     self.inc_indent()
