@@ -1,0 +1,30 @@
+language: python
+
+python:
+  - "3.5"
+
+before_install:
+ # install blender and dependencies
+  - sudo apt-get update -qq
+  - sudo apt-get install blender
+
+install:
+  # create temp directory where we store a recent blender version
+  - mkdir tmp && cd tmp
+
+  # download the blender version you want to test against
+  - wget http://mirror.cs.umn.edu/blender.org/release/Blender2.76/blender-2.76b-linux-glibc211-x86_64.tar.bz2
+  # Extract the archive
+  - tar jxf blender-2.76b-linux-glibc211-x86_64.tar.bz2
+
+  # rename the extracted folder to "blender" for easier reference
+  - mv blender-2.76b-linux-glibc211-x86_64 blender
+
+  - cd ..
+
+  - sudo ln -s ${PWD}/src/io_scene_ogex ${PWD}/tmp/blender/2.76/scripts/addons/io_scene_ogex
+
+  # we cannot call "-m unittest discover" with blender so here is some equivalent python code:
+  - printf "import unittest\nsuite = unittest.TestLoader().discover('.', pattern='*Test.py', top_level_dir='.')\nunittest.TextTestRunner(verbosity=2).run(suite)" > discover.py
+
+script: ./tmp/blender/blender --background --python discover.py
