@@ -2299,10 +2299,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         # export the worlds ambient color, if enabled
         if self.export_ambient:
-            buff = self.get_extension_header(B"Blender", B"AmbientColor")
-            buff += B"\tfloat[3] {{" + (B", ".join(map(self.to_float_byte, scene.world.ambient_color))) + B"}}\n"
-            buff += B"}\n"
-            self.write(buff)
+            self.document.structures.append(B"Blender", B"AmbientColor", children=[
+                DdlPrimitive(DataType.float, data=[scene.world.ambient_color], vector_size=3)
+            ])
 
         original_frame = scene.frame_current
         original_subframe = scene.frame_subframe
