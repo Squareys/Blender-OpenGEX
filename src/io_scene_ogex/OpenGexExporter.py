@@ -2248,20 +2248,24 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             self.dec_indent()
             self.file.write(B"}\n")
 
-    def export_metrics(self, scene):
+    @staticmethod
+    def export_metrics(scene):
+        """
+        Get a list of Metric DdlStructures.
+        :param scene: scene to get the metrics from
+        :return: [io_scene_ogex.pygex.Metric]
+        """
 
         scale = scene.unit_settings.scale_length
-
         if scene.unit_settings.system == "IMPERIAL":
             scale *= 0.3048
 
-        self.file.write(B"Metric (key = \"distance\") {float {")
-        self.write_float(scale)
-        self.file.write(B"}}\n")
-
-        self.file.write(B"Metric (key = \"angle\") {float {1.0}}\n")
-        self.file.write(B"Metric (key = \"time\") {float {1.0}}\n")
-        self.file.write(B"Metric (key = \"up\") {string {\"z\"}}\n")
+        return [
+            Metric(B"distance", data_type=DataType.float, value=scale),
+            Metric(B"angle", data_type=DataType.float, value=1.0),
+            Metric(B"time", data_type=DataType.float, value=1.0),
+            Metric(B"up", data_type=DataType.string, value="z"),
+        ]
 
     def get_children_for_node(self, node):
 
@@ -2291,7 +2295,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.open(self.filepath)
         self.container = ExporterState(export_all_flag, self.sample_animation, scene)
 
-        self.export_metrics(scene)
+        self.document.structures.extend(self.export_metrics(scene))
 
         # export the worlds ambient color, if enabled
         if self.export_ambient:
