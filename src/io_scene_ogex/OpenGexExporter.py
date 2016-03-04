@@ -76,6 +76,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.progress = ProgressLog()
         self.container = None
 
+        self.document = DdlDocument()
+
     @staticmethod
     def get_shape_keys(mesh):
 
