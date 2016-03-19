@@ -76,7 +76,10 @@ class Transform(DdlStructure):
 
     def __init__(self, matrix):
         super().__init__(B"Transform", children=[
-            DdlPrimitive(DataType.float, data=[tuple(itertools.chain(*zip(*matrix)))], vector_size=16)
+            DdlTextWriter.set_max_elements_per_line(
+                DdlPrimitive(DataType.float, data=[tuple(itertools.chain(*zip(*matrix)))], vector_size=16),
+                elements=4
+            )
         ])
 
 
