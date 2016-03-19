@@ -349,8 +349,10 @@ class VertexArray(DdlStructure):
             props[B"morph"] = morph
 
         super().__init__(B"VertexArray", props=props, children=[
-            DdlTextWriter.set_comment(DdlPrimitive(DataType.float, data=data, vector_size=vector_size),
-                                      comment=str(vertex_count))
+            DdlTextWriter.set_max_elements_per_line(
+                DdlTextWriter.set_comment(DdlPrimitive(DataType.float, data=data, vector_size=vector_size),
+                                          comment=str(vertex_count)),
+                elements=8)
         ])
 
 
