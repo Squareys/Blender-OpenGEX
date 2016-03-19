@@ -37,7 +37,7 @@ class Param(DdlStructure):
 class Metric(DdlStructure):
 
     def __init__(self, key, data_type, value):
-        super().__init__(B"Metric", props={B"key": value}, children=[
+        super().__init__(B"Metric", props={B"key": key}, children=[
             DdlPrimitive(data_type, data=[value])
         ])
 
