@@ -25,11 +25,18 @@ GeometryNode $node1
 		{
 			string {"STATIC"}
 		}
+
+		Extension (applic = "Blender", type = "PM/collision_mask")
+		{
+			unsigned_int16 {65535}
+		}
+
 		Extension (applic = "Blender", type = "PM/shape")
 		{
 			Extension (applic = "Blender", type = "TriangleMeshShape")
 			{
 				ref {$geometry1}
+
 				Extension (applic = "Blender", type = "PM/margin")
 				{
 					float {0.04}
@@ -76,11 +83,18 @@ Node $node3
 		{
 			string {"RIGID_BODY"}
 		}
+
+		Extension (applic = "Blender", type = "PM/collision_mask")
+		{
+			unsigned_int16 {65535}
+		}
+
 		Extension (applic = "Blender", type = "PM/shape")
 		{
 			Extension (applic = "Blender", type = "BoxShape")
 			{
-				float {1.0, 1.0, 0.5}
+				float[3] {{1.0, 1.0, 0.5}}
+
 				Extension (applic = "Blender", type = "PM/margin")
 				{
 					float {0.04}
@@ -126,7 +140,7 @@ GeometryObject $geometry1		// Plane
 			}
 		}
 
-		IndexArray (material = 0)
+		IndexArray
 		{
 			unsigned_int32[3]		// 2
 			{
