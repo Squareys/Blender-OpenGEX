@@ -1581,7 +1581,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             Metric(B"up", data_type=DataType.string, value="z"),
         ]
 
-    # TODO: port to pyddl
     def get_children_for_node(self, node):
 
         if node in self.nodeChildren:
