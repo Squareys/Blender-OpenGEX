@@ -326,61 +326,36 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 has_animation = True
                 break
 
+        animation_struct = None
         if has_animation:
-            self.indent_write(B"Animation\n", 0, True)
-            self.indent_write(B"{\n")
-            self.inc_indent()
 
-            self.indent_write(B"Track (target = %transform)\n")
-            self.indent_write(B"{\n")
-            self.inc_indent()
-
-            self.indent_write(B"Time\n")
-            self.indent_write(B"{\n")
-            self.inc_indent()
-
-            self.indent_write(B"Key {float {")
-
-            for i in range(self.container.beginFrame, self.container.endFrame):
-                self.write_float((i - self.container.beginFrame) * self.container.frameTime)
-                self.file.write(B", ")
-
-            self.write_float(self.container.endFrame * self.container.frameTime)
-            self.file.write(B"}}\n")
-
-            self.indent_write(B"}\n\n", -1)
-            self.indent_write(B"Value\n", -1)
-            self.indent_write(B"{\n", -1)
-
-            self.indent_write(B"Key\n")
-            self.indent_write(B"{\n")
-            self.inc_indent()
-
-            self.indent_write(B"float[16]\n")
-            self.indent_write(B"{\n")
-
-            for i in range(self.container.beginFrame, self.container.endFrame):
+            def get_matrix_local_at_frame(i):
                 scene.frame_set(i)
-                self.write_matrixFlat(node.matrix_local)
-                self.file.write(B",\n")
+                return node.matrix_local
 
-            scene.frame_set(self.container.endFrame)
-            self.write_matrixFlat(node.matrix_local)
-            self.indent_write(B"}\n", 0, True)
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
+            animation_struct = DdlStructure(B"Animation", children=[
+                DdlStructure(B"Track", props={B"target", B"%transform"}, children=[
+                    DdlStructure(B"Time", children=[
+                        DdlStructure(B"Key", children=[
+                            DdlPrimitive(DataType.float, data=[
+                                ((i-self.container.beginFrame) * self.container.frameTime)
+                                for i in range(self.container.beginFrame, self.container.endFrame+1)
+                            ])
+                        ])
+                    ]),
+                    DdlStructure(B"Value", children=[
+                        DdlStructure(B"Key", children=[
+                            DdlTextWriter.set_max_elements_per_line(DdlPrimitive(DataType.float, vector_size=16, data=[
+                                get_matrix_local_at_frame(i)
+                                for i in range(self.container.beginFrame, self.container.endFrame + 1)
+                            ]), 1)
+                        ])
+                    ])
+                ])
+            ])
 
         scene.frame_set(current_frame, current_subframe)
+        return animation_struct
 
     def export_bone_sampled_animation(self, pose_bone, scene):
         # This function exports bone animation as full 4x4 matrices for each frame.
