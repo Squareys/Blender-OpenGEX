@@ -318,7 +318,7 @@ class Node(DdlStructure):
         self.children.extend(children)
 
     @staticmethod
-    def export_properties(self, node):
+    def export_properties(node):
         properties = []
 
         for (name, value) in node.items():
@@ -327,22 +327,19 @@ class Node(DdlStructure):
 
             if isinstance(value, int):
                 type_name = DataType.int32
-                value_bytes = self.to_int_byte(value)
             elif isinstance(value, float):
                 type_name = DataType.float
-                value_bytes = self.to_float_byte(value)
             elif isinstance(value, str):
                 type_name = DataType.string
-                value_bytes = B"\"" + bytes(value, "UTF-8") + B"\""
             else:
                 print("\nWARNING: Unknown custom property type for property \"{}\"".format(name))
                 continue
 
             properties.append(Extension(type=B"Property", children=[
                 # key
-                DdlPrimitive(data_type=DataType.string, value=[B"\"" + bytes(name, "UTF-8") + B"\""]),
+                DdlPrimitive(data_type=DataType.string, data=[B"\"" + bytes(name, "UTF-8") + B"\""]),
                 # value
-                DdlPrimitive(data_type=type_name, value=[value_bytes])
+                DdlPrimitive(data_type=type_name, data=[value])
             ]))
 
         return properties
