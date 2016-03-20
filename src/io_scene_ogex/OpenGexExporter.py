@@ -923,8 +923,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 if (kind != k_animation_sampled) and (not self.container.sampleAnimationFlag):
                     self.export_animation_track(fcurve, kind, target)
                 else:
-                    self.export_morph_weight_sampled_animation_track(shape_keys.key_blocks[k], target, scene,
-                                                                     struct_flag)
+                    self.export_morph_weight_sampled_animation_track(shape_keys.key_blocks[k], target, scene)
 
             self.dec_indent()
             self.indent_write(B"}\n")
@@ -1387,7 +1386,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         struct = GeometryObject(name=mesh.name)
         self.container.geometryArray[mesh] = {
             "struct": struct,
-            "nodeTable": [mesh]}
+            "nodeTable": [node]}
 
         # This function exports a single geometry object.]
 
