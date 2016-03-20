@@ -919,7 +919,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             self.dec_indent()
             self.indent_write(B"}\n")
 
-    # TODO: port to pyddl
     def export_node(self, nw, scene, pose_bone=None):
 
         # This function exports a single node in the scene and includes its name,
@@ -935,14 +934,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             if node_type == NodeType.geometry:
                 mesh = nw.item
 
-                geometry = self.export_geometry(node=mesh, mesh=mesh.data)
-
+                geometry = self.export_geometry(scene, node=mesh, mesh=mesh.data)
                 materials = self.export_materials(mesh, mesh.material_slots)
-
                 struct = GeometryNode(mesh=nw.item,
-                                      name=nw.nodeRef["struct"],
+                                      name=nw.nodeRef["structName"],
                                       materials=materials,
-                                      geometry=self.container.geometryArray[mesh.data],
+                                      geometry=geometry,
                                       use_custom_properties=self.export_custom_properties)
 
                 # TODO Shape Keys?
@@ -954,6 +951,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 struct = Node(struct_identifiers[node_type],
                               obj=nw.item,
                               name=nw.nodeRef["structName"],
+                              children=[],
                               use_custom_properties=self.export_custom_properties)
 
             if node_type == NodeType.light:
@@ -967,7 +965,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     struct.children.append(Transform(pose_bone.matrix.inverted()))
 
             # Export the transform. If the node is animated, then animation tracks are exported here.
-            self.export_node_transformation(nw, scene)
+            struct.children.extend(self.export_node_transformation(nw, scene))
 
             if nw.bones:
                 for bw in nw.bones:
@@ -975,11 +973,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         # export physics properties
         if self.export_physics and nw.item.game.physics_type != 'NO_COLLISION':
-            struct.children.append(self.export_physics_properties(nw.item))
+            struct.children.append(self.export_physics_properties(scene, nw.item))
 
         for subnode in nw.children:
             if subnode.parent.item.type != "BONE":
-                struct.children.append(self.export_node(subnode, scene))
+                substructure = self.export_node(subnode, scene)
+                struct.children.append(substructure)
+                substructure = None
 
         return struct
 
