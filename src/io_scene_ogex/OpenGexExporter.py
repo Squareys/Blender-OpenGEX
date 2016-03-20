@@ -1595,9 +1595,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
     def export_objects(self, scene):
         # TODO use itertools.chain()
-        self.document.structures.extend([item["struct"] for item in self.container.geometryArray.items()])
-        self.document.structures.extend([item["struct"] for item in self.container.lightArray.items()])
-        self.document.structures.extend([item["struct"] for item in self.container.cameraArray.items()])
+        self.document.structures.extend([
+                                            DdlTextWriter.set_comment(item["struct"], B", ".join(
+                                                [bytes(n.name, "UTF-8") for n in item["nodeTable"]]))
+                                            for item in itertools.chain(self.container.geometryArray.values(),
+                                                                        self.container.lightArray.values(),
+                                                                        self.container.cameraArray.values())
+                                            ])
 
     @staticmethod
     def export_metrics(scene):
