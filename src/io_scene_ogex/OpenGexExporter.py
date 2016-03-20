@@ -980,17 +980,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             if type == NodeType.geometry:
                 mesh = nw.item
 
-                if mesh.data not in self.container.geometryArray:
-                    self.container.geometryArray[mesh.data] = {
-                        "struct": self.export_geometry(mesh.data),
-                        "nodeTable": [mesh]}
-                else:
-                    self.container.geometryArray[mesh.data]["nodeTable"].append(mesh)
+                geometry = self.export_geometry(node=mesh, mesh=mesh.data)
 
                 materials = self.export_materials(mesh, mesh.material_slots)
 
                 struct = GeometryNode(mesh=nw.item,
-                                      name=nw.nodeRef["structName"],
+                                      name=nw.nodeRef["struct"],
                                       materials=materials,
                                       geometry=self.container.geometryArray[mesh.data],
                                       use_custom_properties=self.export_custom_properties)
@@ -1381,26 +1376,22 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             ret_value["color"] = colors
         return ret_value
 
-    # TODO: port to pyddl
-    def export_geometry(self, object_ref, scene):
-        self.progress.begin_task("Exporting geometry for " + object_ref[1]["nodeTable"][0].name + "...")
+    def export_geometry(self, scene, node, mesh):
+        if mesh in self.container.geometryArray:
+            entry = self.container.geometryArray[mesh]
+            entry["nodeTable"].append(node)
+            return entry["struct"]
 
-        # This function exports a single geometry object.
+        self.progress.begin_task("Exporting geometry for " + node.name + "...")
 
-        self.file.write(B"\nGeometryObject $")
-        self.file.write(object_ref[1]["structName"])
-        self.write_node_table(object_ref)
+        struct = GeometryObject(name=mesh.name)
+        self.container.geometryArray[mesh] = {
+            "struct": struct,
+            "nodeTable": [mesh]}
 
-        self.file.write(B"\n{\n")
-        self.inc_indent()
-
-        node = object_ref[1]["nodeTable"][0]
-        mesh = object_ref[0]
-
-        struct_flag = False
+        # This function exports a single geometry object.]
 
         # Save the morph state if necessary.
-
         active_shape_key_index = node.active_shape_key_index
         show_only_shape_key = node.show_only_shape_key
         current_morph_value = []
@@ -1427,29 +1418,20 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 block.value = 0.0
 
                 if block.name != "":
-                    self.indent_write(B"Morph (index = ", 0, struct_flag)
-                    self.write_int(morph_count)
-
+                    props = OrderedDict([(B"index", morph_count)])
                     if relative and (morph_count != base_index):
-                        self.file.write(B", base = ")
-                        self.write_int(base_index)
+                        props[B"base"] = base_index
 
-                    self.file.write(B")\n")
-                    self.indent_write(B"{\n")
-                    self.indent_write(B"Name {string {\"", 1)
-                    self.file.write(bytes(block.name, "UTF-8"))
-                    self.file.write(B"\"}}\n")
-                    self.indent_write(B"}\n")
-                    struct_flag = True
+                    struct.add_structure(B"Morph", props=props, children=[
+                        Name(block.name)
+                    ])
 
                 morph_count += 1
 
             shape_keys.key_blocks[0].value = 1.0
             mesh.update()
 
-        self.indent_write(B"Mesh (primitive = \"triangles\")\n", 0, struct_flag)
-        self.indent_write(B"{\n")
-        self.inc_indent()
+        # Mesh substructure
 
         armature = node.find_armature()
         apply_modifiers = (not armature)
@@ -1480,52 +1462,18 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         export_mesh = self.to_per_vertex_data(m, num_materials=len(mesh.materials), uv_layers=uv_layers)
         vertex_count = len(export_mesh["position"])
 
-        # Write the position array.
-
-        self.indent_write(B"VertexArray (attrib = \"position\")\n")
-        self.indent_write(B"{\n")
-        self.inc_indent()
-
-        self.indent_write(B"float[3]\t\t// ")
-        self.write_int(vertex_count)
-        self.indent_write(B"{\n", 0, True)
-        self.write_vertex_array3d(export_mesh["position"])
-        self.indent_write(B"}\n")
-
-        self.dec_indent()
-        self.indent_write(B"}\n\n")
+        struct.add_structure(B"Mesh", props={B"primitive": B"triangles"}, children=[
+            # position array
+            VertexArray(B"position", vertex_count=vertex_count, data=export_mesh["position"])
+        ])
 
         # Write the normal array.
         if "normal" in export_mesh:
-            self.indent_write(B"VertexArray (attrib = \"normal\")\n")
-            self.indent_write(B"{\n")
-            self.inc_indent()
-
-            self.indent_write(B"float[3]\t\t// ")
-            self.write_int(vertex_count)
-            self.indent_write(B"{\n", 0, True)
-            self.write_vertex_array3d(export_mesh["normal"])
-            self.indent_write(B"}\n")
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
+            struct.children.append(VertexArray(B"normal", vertex_count=vertex_count, data=export_mesh["normal"]))
 
         # Write the color array if it exists.
         if "color" in export_mesh:
-            self.indent_write(B"VertexArray (attrib = \"color\")\n", 0, True)
-            self.indent_write(B"{\n")
-            self.inc_indent()
-
-            self.indent_write(B"float[3]\t\t// ")
-            self.write_int(vertex_count)
-            self.indent_write(B"{\n", 0, True)
-
-            self.write_vertex_array3d(export_mesh["color"])
-
-            self.indent_write(B"}\n")
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
+            struct.children.append(VertexArray(B"color", vertex_count=vertex_count, data=export_mesh["color"]))
 
         # Write the texcoord arrays.
         if "texcoord" in export_mesh:
@@ -1534,18 +1482,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 name = B'texcoord'
                 if count > 0:
                     name += B'[' + self.to_int_byte(count) + B']'
-                self.indent_write(B"VertexArray (attrib = \"" + name + B"\")\n", 0, True)
-                self.indent_write(B"{\n")
-                self.inc_indent()
-                self.indent_write(B"float[2]\t\t// ")
-                self.write_int(vertex_count)
-                self.indent_write(B"{\n", 0, True)
 
-                self.write_vertex_array2d(texcoords)
-                self.indent_write(B"}\n")
-
-                self.dec_indent()
-                self.indent_write(B"}\n")
+                struct.children.append(
+                    VertexArray(attrib=name, vertex_count=vertex_count, data=texcoords, vector_size=2))
 
                 count += 1
                 if count > 2:
@@ -1561,39 +1500,19 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 node.active_shape_key_index = m
                 morph_mesh = node.to_mesh(scene, apply_modifiers, "RENDER", True, False)
 
-                # Write the morph target position array.
+                # morph target position array
+                struct.children.append(
+                    VertexArray(attrib=B"position", morph=m, data=[morph_mesh.vertices[i].co for i in export_mesh],
+                                vertex_count=vertex_count)) # TODO
 
-                self.indent_write(B"VertexArray (attrib = \"position\", morph = ", 0, True)
-                self.write_int(m)
-                self.file.write(B")\n")
-                self.indent_write(B"{\n")
-                self.inc_indent()
-
-                self.indent_write(B"float[3]\t\t// ")
-                self.write_int(vertex_count)
-                self.indent_write(B"{\n", 0, True)
-                self.write_morph_position_array3d(export_mesh, morph_mesh.vertices)  # TODO
-                self.indent_write(B"}\n")
-
-                self.dec_indent()
-                self.indent_write(B"}\n\n")
-
-                # Write the morph target normal array.
-
-                self.indent_write(B"VertexArray (attrib = \"normal\", morph = ")
-                self.write_int(m)
-                self.file.write(B")\n")
-                self.indent_write(B"{\n")
-                self.inc_indent()
-
-                self.indent_write(B"float[3]\t\t// ")
-                self.write_int(vertex_count)
-                self.indent_write(B"{\n", 0, True)
-                self.write_morph_normal_array3d(export_mesh, morph_mesh.vertices, morph_mesh.tessfaces)  # TODO
-                self.indent_write(B"}\n")
-
-                self.dec_indent()
-                self.indent_write(B"}\n")
+                # morph target normal array
+                struct.children.append(
+                    VertexArray(attrib=B"normal",
+                                morph=m,
+                                data=[vert.normal if face.use_smooth else face.normal for (face, vert) in
+                                      [(morph_mesh.tessfaces[v.faceIndex], morph_mesh.vertices[v.vertexIndex])
+                                       for v in export_mesh]],
+                                vertex_count=vertex_count)) # TODO
 
                 bpy.data.meshes.remove(morph_mesh)
 
@@ -1601,20 +1520,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         for material_index, indices in enumerate(export_mesh["tris"]):
             num_tris = len(indices)
             if num_tris != 0:
-                self.indent_write(B"IndexArray (material = ", 0, True)
-                self.write_int(material_index)
-                self.file.write(B")\n")
-                self.indent_write(B"{\n")
-                self.inc_indent()
-
-                self.indent_write(B"unsigned_int32[3]\t\t// ")
-                self.write_int(num_tris)
-                self.indent_write(B"{\n", 0, True)
-                self.write_triangle_array(indices)
-                self.write(B"\n" + self.get_indent() + B"}\n")
-
-                self.dec_indent()
-                self.indent_write(B"}\n")
+                struct.add_structure(B"IndexArray", props={B"material": material_index}, children=[
+                    DdlTextWriter.set_max_elements_per_line(
+                        DdlTextWriter.add_comment(
+                            DdlPrimitive(DataType.unsigned_int32, vector_size=3, data=indices), comment=str(num_tris)),
+                    elements=16)
+                ])
 
         # If the mesh is skinned, export the skinning data here.
         if armature and False:  # TODO
@@ -1631,13 +1542,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
             mesh.update()
 
-        self.dec_indent()
-        self.indent_write(B"}\n")
-
-        self.dec_indent()
-        self.file.write(B"}\n")
-
         self.progress.end_task()
+
+        return struct
 
     def export_light(self, node, light):
         """
