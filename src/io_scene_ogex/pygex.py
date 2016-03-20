@@ -22,7 +22,7 @@ class Color(DdlStructure):
 
     def __init__(self, attrib, value):
         super().__init__(B"Color", props={B"attrib": attrib}, children=[
-            DdlPrimitive(data_type=DataType.string, data=[value], vector_size=3)
+            DdlPrimitive(data_type=DataType.float, data=[value], vector_size=3)
         ])
 
 
