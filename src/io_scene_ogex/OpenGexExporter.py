@@ -1570,7 +1570,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         """
         if material not in self.container.materialArray:
             struct = Material(material,
-                              name=B"material" + bytes(str(len(self.container.materialArray) + 1), "UTF-8"))
+                              name=B"material" + bytes(str(len(self.container.materialArray) + 1), "UTF-8"),
+                              export_ambient=self.export_ambient)
             self.container.materialArray[material] = {"struct": struct, "nodeTable": [node]}
             return struct
         else:

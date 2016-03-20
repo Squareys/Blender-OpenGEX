@@ -133,7 +133,7 @@ class Texture(DdlStructure):
 
 class Material(DdlStructure):
 
-    def __init__(self, material, name):
+    def __init__(self, material, name, export_ambient=False):
         if material is None:
             raise ValueError("material cannot be None")
 
@@ -161,11 +161,9 @@ class Material(DdlStructure):
             self.children.append(Color("emission", [emission, emission, emission]))
 
         # export ambient factor if enabled.
-        # TODO: handle "export_ambient"
-        if self.export_ambient and material.ambient != 1.0:
+        if export_ambient and material.ambient != 1.0:
             self.children.append(Param("ambient_factor", material.ambient))
 
-        # TODO: handle "export_ambient"
         # export shadeless flag
         if material.use_shadeless:
             self.children.append(Extension(type=B"Shadeless", children=[
