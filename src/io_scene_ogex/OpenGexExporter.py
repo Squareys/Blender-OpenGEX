@@ -1544,7 +1544,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
     def export_camera(self, node, camera):
         if camera not in self.container.cameraArray:
-            struct = CameraObject(name=B"camera" + bytes(str(len(self.container.cameraArray) + 1), "UTF-8"), camera)
+            struct = CameraObject(B"camera" + bytes(str(len(self.container.cameraArray) + 1), "UTF-8"), camera)
             self.container.cameraArray[camera] = {"struct": struct, "nodeTable": [node]}
             return struct
         else:
