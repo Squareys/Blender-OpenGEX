@@ -1339,7 +1339,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         self.progress.begin_task("Exporting geometry for " + node.name + "...")
 
-        struct = GeometryObject(name=mesh.name)
+        struct = GeometryObject(name=B"geometry" + bytes(str(len(self.container.geometryArray) + 1), "UTF-8"))
         self.container.geometryArray[mesh] = {
             "struct": struct,
             "nodeTable": [node]}
