@@ -991,7 +991,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                                "TRIANGLE_MESH": B"TriangleMeshShape",
                                "CAPSULE": B"CapsuleShape"}
 
-    def export_physics_properties(self, o):
+    def export_physics_properties(self, scene, o):
         props = o.game
         struct = Extension(B"PhysicsMaterial", children=[
             Extension(B"PM/type", children=[
@@ -1034,7 +1034,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     shape_struct.add_primitive(DataType.float, o.scale)
             else:
                 # export geometry as triangle mesh
-                shape_struct.add_primitive(DataType.ref, [self.container.geometryArray[o.data]["struct"]])
+                shape_struct.add_primitive(DataType.ref, [self.export_geometry(scene, node=o, mesh=o.data)])
 
             # collision shape margin
             shape_struct.children.append(Extension(B"PM/margin", children=[
