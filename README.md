@@ -25,9 +25,9 @@ Some of the broken features may be implemented if I start needing them.
 # License
 
 ```
-Copyright 2015, Terathon Software LLC
-Copyright 2015, Jonathan Hale
-Copyright 2015, Nicolas Wehrle
+Copyright © 2015, 2016 Jonathan Hale
+Copyright © 2015 Terathon Software LLC
+Copyright © 2015 Nicolas Wehrle
 
 This software is licensed under the Creative Commons
 Attribution-ShareAlike 3.0 Unported License:
