@@ -340,6 +340,24 @@ class Node(DdlStructure):
         return properties
 
 
+class VertexArray(DdlStructure):
+
+    def __init__(self, attrib, data, vertex_count, vector_size=3, morph=None):
+        props = OrderedDict([(B"attrib", attrib)])
+        if morph is not None:
+            props[B"morph"] = morph
+
+        DdlStructure.__init__(self, B"VertexArray", props=props, children=[
+            DdlTextWriter.set_comment(DdlPrimitive(DataType.float, data=data, vector_size=vector_size), comment=str(vertex_count))
+        ])
+
+
+class GeometryObject(DdlStructure):
+
+    def __init__(self, name):
+        DdlStructure.__init__(self, B"GeometryObject", name=name)
+
+
 class GeometryNode(Node):
 
     def __init__(self, mesh, name, geometry, materials, use_custom_properties=False):
