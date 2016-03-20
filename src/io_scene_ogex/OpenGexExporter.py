@@ -1633,7 +1633,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.progress.begin_task("Exporting nodes...")
         for obj in self.container.nodes:
             if not obj.parent:
-                self.export_node(obj, scene)
+                self.document.structures.append(self.export_node(obj, scene))
         self.progress.end_task()
 
         # progress update is handled within ExportObjects()
