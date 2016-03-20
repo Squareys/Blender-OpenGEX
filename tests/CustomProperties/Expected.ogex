@@ -6,16 +6,19 @@ Metric (key = "up") {string {"z"}}
 Node $node1
 {
 	Name {string {"Empty"}}
+
 	Extension (applic = "Blender", type = "Property")
 	{
 		string {"a_string"}
 		string {"Hello World"}
 	}
+
 	Extension (applic = "Blender", type = "Property")
 	{
 		string {"a_int"}
 		int32 {42}
 	}
+
 	Extension (applic = "Blender", type = "Property")
 	{
 		string {"a_float"}
@@ -37,21 +40,25 @@ Node $node1
 CameraNode $node2
 {
 	Name {string {"Camera"}}
+
 	Extension (applic = "Blender", type = "Property")
 	{
 		string {"another_string"}
 		string {"Bye World"}
 	}
+
 	Extension (applic = "Blender", type = "Property")
 	{
 		string {"another_int"}
 		int32 {42}
 	}
+
 	Extension (applic = "Blender", type = "Property")
 	{
 		string {"another_float"}
 		float {31.4}
 	}
+
 	ObjectRef {ref {$camera1}}
 
 	Transform
