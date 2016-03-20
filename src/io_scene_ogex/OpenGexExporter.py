@@ -193,86 +193,44 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         return curve_array
 
-    # TODO: port to pyddl
     def export_key_times(self, fcurve):
+        """
+        :param fcurve:
+        :return: a Key DdlStructure
+        """
+        return Key(data=[(p.co[0] - self.container.beginFrame) * self.container.frameTime
+                         for p in fcurve.keyframe_points])
 
-        DdlStructure(B"Key", children=[DdlPrimitive()])
-        self.indent_write(B"Key {float {")
-
-        key_count = len(fcurve.keyframe_points)
-        for i in range(key_count):
-            if i > 0:
-                self.file.write(B", ")
-
-            time = fcurve.keyframe_points[i].co[0] - self.container.beginFrame
-            self.write_float(time * self.container.frameTime)
-
-        self.file.write(B"}}\n")
-
-    # TODO: port to pyddl
     def export_key_time_control_points(self, fcurve):
+        """
+        :param fcurve:
+        :return: a list of Key DdlStructures
+        """
+        return [
+            Key(kind=B"-control",
+                data=[(point.handle_left[0] - self.container.beginFrame) * self.container.frameTime
+                      for point in fcurve.keyframe_points]),
+            Key(kind=B"+control",
+                data=[(point.handle_right[0] - self.container.beginFrame) * self.container.frameTime
+                      for point in fcurve.keyframe_points])
+        ]
 
-        self.indent_write(B"Key (kind = \"-control\") {float {")
-
-        key_count = len(fcurve.keyframe_points)
-        for i in range(key_count):
-            if i > 0:
-                self.file.write(B", ")
-
-            ctrl = fcurve.keyframe_points[i].handle_left[0] - self.container.beginFrame
-            self.write_float(ctrl * self.container.frameTime)
-
-        self.file.write(B"}}\n")
-        self.indent_write(B"Key (kind = \"+control\") {float {")
-
-        for i in range(key_count):
-            if i > 0:
-                self.file.write(B", ")
-
-            ctrl = fcurve.keyframe_points[i].handle_right[0] - self.container.beginFrame
-            self.write_float(ctrl * self.container.frameTime)
-
-        self.file.write(B"}}\n")
-
-    # TODO: port to pyddl
     def export_key_values(self, fcurve):
+        """
+        :param fcurve:
+        :return: a Key DdlStructure
+        """
+        return Key(data=[p.co[1] for p in fcurve.keyframe_points])
 
-        self.indent_write(B"Key {float {")
-
-        key_count = len(fcurve.keyframe_points)
-        for i in range(key_count):
-            if i > 0:
-                self.file.write(B", ")
-
-            value = fcurve.keyframe_points[i].co[1]
-            self.write_float(value)
-
-        self.file.write(B"}}\n")
-
-    # TODO: port to pyddl
     def export_key_value_control_points(self, fcurve):
-
-        self.indent_write(B"Key (kind = \"-control\") {float {")
-
-        key_count = len(fcurve.keyframe_points)
-        for i in range(key_count):
-            if i > 0:
-                self.file.write(B", ")
-
-            ctrl = fcurve.keyframe_points[i].handle_left[1]
-            self.write_float(ctrl)
-
-        self.file.write(B"}}\n")
-        self.indent_write(B"Key (kind = \"+control\") {float {")
-
-        for i in range(key_count):
-            if i > 0:
-                self.file.write(B", ")
-
-            ctrl = fcurve.keyframe_points[i].handle_right[1]
-            self.write_float(ctrl)
-
-        self.file.write(B"}}\n")
+        """
+        :param fcurve:
+        :return: a list of Key DdlStructures
+        """
+        return [
+            Key(kind=B"-control", data=[p.handle_left[1] for p in fcurve.keyframe_points]),
+            Key(kind=B"+control", data=[p.handle_right[1] for p in fcurve.keyframe_points])
+        ]
 
     def export_animation_track(self, fcurve, kind, target):
         # This function exports a single animation track. The curve types for the
@@ -286,10 +244,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             track_struct.add_structure(B"Value", children=self.export_key_values(fcurve))
         else:
             track_struct.add_structure(B"Time", props={B"curve": B"bezier"}, children=
-                                       self.export_key_times(fcurve) + self.export_key_time_control_points(fcurve))
-            self.indent_write(B"Value (curve = \"bezier\")\n", -1)
+                                       [self.export_key_times(fcurve)] + self.export_key_time_control_points(fcurve))
             track_struct.add_structure(B"Value", props={B"curve": B"bezier"}, children=
-                                       self.export_key_values(fcurve) + self.export_key_value_control_points(fcurve))
+                                       [self.export_key_values(fcurve)] + self.export_key_value_control_points(fcurve))
 
         return track_struct
 
