@@ -305,7 +305,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         animation_struct = None
         if has_animation:
-
             def get_matrix_local_at_frame(i):
                 scene.frame_set(i)
                 return node.matrix_local
@@ -315,9 +314,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     DdlStructure(B"Time", children=[
                         DdlStructure(B"Key", children=[
                             DdlPrimitive(DataType.float, data=[
-                                ((i-self.container.beginFrame) * self.container.frameTime)
-                                for i in range(self.container.beginFrame, self.container.endFrame+1)
-                            ])
+                                ((i - self.container.beginFrame) * self.container.frameTime)
+                                for i in range(self.container.beginFrame, self.container.endFrame + 1)
+                                ])
                         ])
                     ]),
                     DdlStructure(B"Value", children=[
@@ -325,7 +324,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                             DdlTextWriter.set_max_elements_per_line(DdlPrimitive(DataType.float, vector_size=16, data=[
                                 get_matrix_local_at_frame(i)
                                 for i in range(self.container.beginFrame, self.container.endFrame + 1)
-                            ]), 1)
+                                ]), 1)
                         ])
                     ])
                 ])
