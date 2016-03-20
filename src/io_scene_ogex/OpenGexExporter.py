@@ -1606,6 +1606,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         start_time = time.time()
 
+        self.document = DdlDocument()
         scene = context.scene
         export_all_flag = not self.export_selection
         self.container = ExporterState(export_all_flag, self.sample_animation, scene)
