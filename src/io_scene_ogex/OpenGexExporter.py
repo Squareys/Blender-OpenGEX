@@ -1334,7 +1334,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
     def export_geometry(self, scene, node, mesh):
         if mesh in self.container.geometryArray:
             entry = self.container.geometryArray[mesh]
-            entry["nodeTable"].append(node)
+            if node not in entry["nodeTable"]:
+                entry["nodeTable"].append(node)
             return entry["struct"]
 
         self.progress.begin_task("Exporting geometry for " + node.name + "...")
@@ -1517,7 +1518,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             return struct
         else:
             entry = self.container.lightArray[light]
-            entry["nodeTable"].append(node)
+            if node not in entry["nodeTable"]:
+                entry["nodeTable"].append(node)
             return entry["struct"]
 
     def export_material(self, node, material):
@@ -1549,7 +1551,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             return struct
         else:
             entry = self.container.cameraArray[camera]
-            entry["nodeTable"].append(node)
+            if node not in entry["nodeTable"]:
+                entry["nodeTable"].append(node)
             return entry["struct"]
 
     def export_objects(self):
