@@ -34,6 +34,15 @@ class Param(DdlStructure):
         ])
 
 
+class Key(DdlStructure):
+
+    def __init__(self, kind=None, data=[]):
+        props = dict() if kind is None else {B"kind": kind}
+        super().__init__(B"Key", props=props, children=[
+            DdlPrimitive(data_type=DataType.float, data=data)
+        ])
+
+
 class Metric(DdlStructure):
 
     def __init__(self, key, data_type, value):
