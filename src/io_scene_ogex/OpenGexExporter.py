@@ -1028,10 +1028,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             if shape_type not in ['CONVEX_HULL', 'TRIANGLE_MESH']:
                 if shape_type == 'SPHERE':
                     # export radius
-                    shape_struct.add_primitive(DataType.float, [props.radius])
+                    shape_struct.add_primitive(DataType.float, data=[props.radius])
                 else:
                     # export scale as half-extents
-                    shape_struct.add_primitive(DataType.float, o.scale)
+                    shape_struct.add_primitive(DataType.float, data=[o.scale], vector_size=3)
             else:
                 # export geometry as triangle mesh
                 shape_struct.add_primitive(DataType.ref, [self.export_geometry(scene, node=o, mesh=o.data)])
