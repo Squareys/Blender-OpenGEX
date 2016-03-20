@@ -268,52 +268,24 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         self.file.write(B"}}\n")
 
-    def export_animation_track(self, fcurve, kind, target, newline):
+    def export_animation_track(self, fcurve, kind, target):
         # This function exports a single animation track. The curve types for the
         # Time and Value structures are given by the kind parameter.
 
-        self.indent_write(B"Track (target = %", 0, newline)
-        self.file.write(target)
-        self.file.write(B")\n")
-        self.indent_write(B"{\n")
-        self.inc_indent()
+        track_struct = DdlStructure(B"Track", props={B"target", B"%" + target}) # TODO how to handle ref in parameter?
 
         if kind != k_animation_bezier:
-            self.indent_write(B"Time\n")
-            self.indent_write(B"{\n")
-            self.inc_indent()
-
-            self.export_key_times(fcurve)
-
-            self.indent_write(B"}\n\n", -1)
-            self.indent_write(B"Value\n", -1)
-            self.indent_write(B"{\n", -1)
-
-            self.export_key_values(fcurve)
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
-
+            # TODO simplify to one iteration over fcurve
+            track_struct.add_structure(B"Time", children=self.export_key_times(fcurve))
+            track_struct.add_structure(B"Value", children=self.export_key_values(fcurve))
         else:
-            self.indent_write(B"Time (curve = \"bezier\")\n")
-            self.indent_write(B"{\n")
-            self.inc_indent()
-
-            self.export_key_times(fcurve)
-            self.export_key_time_control_points(fcurve)
-
-            self.indent_write(B"}\n\n", -1)
+            track_struct.add_structure(B"Time", props={B"curve": B"bezier"}, children=
+                                       self.export_key_times(fcurve) + self.export_key_time_control_points(fcurve))
             self.indent_write(B"Value (curve = \"bezier\")\n", -1)
-            self.indent_write(B"{\n", -1)
+            track_struct.add_structure(B"Value", props={B"curve": B"bezier"}, children=
+                                       self.export_key_values(fcurve) + self.export_key_value_control_points(fcurve))
 
-            self.export_key_values(fcurve)
-            self.export_key_value_control_points(fcurve)
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
-
-        self.dec_indent()
-        self.indent_write(B"}\n")
+        return track_struct
 
     def export_node_sampled_animation(self, node, scene):
         # This function exports animation as full 4x4 matrices for each frame.
