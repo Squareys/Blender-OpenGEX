@@ -278,7 +278,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         # This function exports a single animation track. The curve types for the
         # Time and Value structures are given by the kind parameter.
 
-        track_struct = DdlStructure(B"Track", props={B"target", B"%" + target}) # TODO how to handle ref in parameter?
+        track_struct = DdlStructure(B"Track", props={B"target", B"%" + target})  # TODO how to handle ref in parameter?
 
         if kind != k_animation_bezier:
             # TODO simplify to one iteration over fcurve
@@ -692,7 +692,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     axis = ord(mode[2 - i]) - 0x58
                     angle = node.rotation_euler[axis]
                     if (rot_animated[axis]) or (math.fabs(angle) > k_export_epsilon):
-                        structs.append(Rotation(name=subrotation_name[axis],kind=axis_name[axis], value=angle))
+                        structs.append(Rotation(name=subrotation_name[axis], kind=axis_name[axis], value=angle))
 
             else:
 
@@ -745,7 +745,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
             elif ((math.fabs(scale[0] - 1.0) > k_export_epsilon) or (math.fabs(scale[1] - 1.0) > k_export_epsilon) or (
                         math.fabs(scale[2] - 1.0) > k_export_epsilon)):
-                 structs.append(Scale(value=scl, vector_size=3))
+                structs.append(Scale(value=scl, vector_size=3))
 
             # Export the animation tracks.
             animation_struct = DdlStructure(B"Animation", props=OrderedDict([
@@ -780,7 +780,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     if delta_pos_animated[i]:
                         animation_struct.children.append(
                             self.export_animation_track(delta_pos_anim_curve[i], delta_pos_anim_kind[i],
-                                                    delta_subtranslation_name[i])
+                                                        delta_subtranslation_name[i])
                         )
 
             if delta_rotation_animated:
@@ -788,7 +788,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     if delta_rot_animated[i]:
                         animation_struct.children.append(
                             self.export_animation_track(delta_rot_anim_curve[i], delta_rot_anim_kind[i],
-                                                    delta_subrotation_name[i])
+                                                        delta_subrotation_name[i])
                         )
 
             if delta_scale_animated:
@@ -796,7 +796,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     if delta_scl_animated[i]:
                         animation_struct.children.append(
                             self.export_animation_track(delta_scale_anim_curve[i], delta_scale_anim_kind[i],
-                                                    delta_subscale_name[i])
+                                                        delta_subscale_name[i])
                         )
         return structs
 
@@ -1015,7 +1015,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
             if nw.bones:
                 for bw in nw.bones:
-                    self.export_bone(nw, bw, scene) # TODO
+                    self.export_bone(nw, bw, scene)  # TODO
 
         # export physics properties
         if self.export_physics and nw.item.game.physics_type != 'NO_COLLISION':
