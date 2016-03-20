@@ -1417,18 +1417,18 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         export_mesh = self.to_per_vertex_data(m, num_materials=len(mesh.materials), uv_layers=uv_layers)
         vertex_count = len(export_mesh["position"])
 
-        struct.add_structure(B"Mesh", props={B"primitive": B"triangles"}, children=[
+        mesh_struct = struct.add_structure(B"Mesh", props={B"primitive": B"triangles"}, children=[
             # position array
             VertexArray(B"position", vertex_count=vertex_count, data=export_mesh["position"])
         ])
 
         # Write the normal array.
         if "normal" in export_mesh:
-            struct.children.append(VertexArray(B"normal", vertex_count=vertex_count, data=export_mesh["normal"]))
+            mesh_struct.children.append(VertexArray(B"normal", vertex_count=vertex_count, data=export_mesh["normal"]))
 
         # Write the color array if it exists.
         if "color" in export_mesh:
-            struct.children.append(VertexArray(B"color", vertex_count=vertex_count, data=export_mesh["color"]))
+            mesh_struct.children.append(VertexArray(B"color", vertex_count=vertex_count, data=export_mesh["color"]))
 
         # Write the texcoord arrays.
         if "texcoord" in export_mesh:
@@ -1438,7 +1438,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 if count > 0:
                     name += B'[' + self.to_int_byte(count) + B']'
 
-                struct.children.append(
+                mesh_struct.children.append(
                     VertexArray(attrib=name, vertex_count=vertex_count, data=texcoords, vector_size=2))
 
                 count += 1
@@ -1446,7 +1446,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     break
 
         # If there are multiple morph targets, export them here.
-        if shape_keys and False:  # TODO
+        if shape_keys and False:  # TODO currently no shape key support
             shape_keys.key_blocks[0].value = 0.0
             for m in range(1, len(current_morph_value)):
                 shape_keys.key_blocks[m].value = 1.0
@@ -1456,18 +1456,18 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 morph_mesh = node.to_mesh(scene, apply_modifiers, "RENDER", True, False)
 
                 # morph target position array
-                struct.children.append(
+                mesh_struct.children.append(
                     VertexArray(attrib=B"position", morph=m, data=[morph_mesh.vertices[i].co for i in export_mesh],
-                                vertex_count=vertex_count)) # TODO
+                                vertex_count=vertex_count))  # TODO currently no shape key support
 
                 # morph target normal array
-                struct.children.append(
+                mesh_struct.children.append(
                     VertexArray(attrib=B"normal",
                                 morph=m,
                                 data=[vert.normal if face.use_smooth else face.normal for (face, vert) in
                                       [(morph_mesh.tessfaces[v.faceIndex], morph_mesh.vertices[v.vertexIndex])
                                        for v in export_mesh]],
-                                vertex_count=vertex_count)) # TODO
+                                vertex_count=vertex_count))  # TODO currently no shape key support
 
                 bpy.data.meshes.remove(morph_mesh)
 
@@ -1475,11 +1475,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         for material_index, indices in enumerate(export_mesh["tris"]):
             num_tris = len(indices)
             if num_tris != 0:
-                struct.add_structure(B"IndexArray", props={B"material": material_index}, children=[
+                props = dict()
+                if material_index != 0:
+                    props[B"material"] = material_index
+                mesh_struct.add_structure(B"IndexArray", props=props, children=[
                     DdlTextWriter.set_max_elements_per_line(
-                        DdlTextWriter.add_comment(
+                        DdlTextWriter.set_comment(
                             DdlPrimitive(DataType.unsigned_int32, vector_size=3, data=indices), comment=str(num_tris)),
-                    elements=16)
+                        elements=16)
                 ])
 
         # If the mesh is skinned, export the skinning data here.
