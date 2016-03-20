@@ -1552,15 +1552,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             entry["nodeTable"].append(node)
             return entry["struct"]
 
-    def export_objects(self, scene):
-        # TODO use itertools.chain()
+    def export_objects(self):
         self.document.structures.extend([
-                                            DdlTextWriter.set_comment(item["struct"], B", ".join(
-                                                [bytes(n.name, "UTF-8") for n in item["nodeTable"]]))
-                                            for item in itertools.chain(self.container.geometryArray.values(),
-                                                                        self.container.lightArray.values(),
-                                                                        self.container.cameraArray.values())
-                                            ])
+            DdlTextWriter.set_comment(item["struct"], B", ".join([bytes(n.name, "UTF-8") for n in item["nodeTable"]]))
+            for item in itertools.chain(self.container.geometryArray.values(),
+                                        self.container.lightArray.values(),
+                                        self.container.cameraArray.values(),
+                                        self.container.materialArray.values())
+            ])
 
     @staticmethod
     def export_metrics(scene):
@@ -1637,12 +1636,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 self.export_node(obj, scene)
         self.progress.end_task()
 
-        # progress update is handled withing ExportObjects()
-        self.export_objects(scene)
-
-        self.progress.begin_task("Exporting materials...")
-        self.document.structures.extend([entry["struct"] for entry in self.container.materialArray])
-        self.progress.end_task()
+        # progress update is handled within ExportObjects()
+        self.export_objects()
 
         restore_frame = False
         if restore_frame:
