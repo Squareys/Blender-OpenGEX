@@ -192,8 +192,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         return curve_array
 
+    # TODO: port to pyddl
     def export_key_times(self, fcurve):
 
+        DdlStructure(B"Key", children=[DdlPrimitive()])
         self.indent_write(B"Key {float {")
 
         key_count = len(fcurve.keyframe_points)
@@ -206,6 +208,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         self.file.write(B"}}\n")
 
+    # TODO: port to pyddl
     def export_key_time_control_points(self, fcurve):
 
         self.indent_write(B"Key (kind = \"-control\") {float {")
@@ -230,6 +233,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         self.file.write(B"}}\n")
 
+    # TODO: port to pyddl
     def export_key_values(self, fcurve):
 
         self.indent_write(B"Key {float {")
@@ -244,6 +248,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         self.file.write(B"}}\n")
 
+    # TODO: port to pyddl
     def export_key_value_control_points(self, fcurve):
 
         self.indent_write(B"Key (kind = \"-control\") {float {")
@@ -333,6 +338,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         scene.frame_set(current_frame, current_subframe)
         return animation_struct
 
+    # TODO: port to pyddl
     def export_bone_sampled_animation(self, pose_bone, scene):
         # This function exports bone animation as full 4x4 matrices for each frame.
 
@@ -425,6 +431,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         scene.frame_set(current_frame, current_subframe)
 
+    # TODO: port to pyddl
     def export_morph_weight_sampled_animation_track(self, block, target, scene, newline):
 
         current_frame = scene.frame_current
@@ -957,6 +964,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         m.translation -= offset
         self.write_matrix(m)
 
+    # TODO: port to pyddl
     def export_bone_transform(self, nw, bw, scene):  # armature, bone, scene):
 
         curve_array = self.export_bone_animation(nw.item, bw.item.name)
@@ -993,6 +1001,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         if animation and pose_bone:
             self.export_bone_sampled_animation(pose_bone, scene)
 
+    # TODO: port to pyddl
     def export_material_ref(self, material, index):
 
         if material not in self.container.materialArray:
@@ -1089,6 +1098,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             self.dec_indent()
             self.indent_write(B"}\n")
 
+    # TODO: port to pyddl
     def export_bone(self, nw, bw, scene):  # armature, bone, scene):
 
         if nw.nodeRef:
@@ -1124,6 +1134,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             self.dec_indent()
             self.indent_write(B"}\n")
 
+    # TODO: port to pyddl
     def export_node(self, nw, scene, pose_bone=None):
 
         # This function exports a single node in the scene and includes its name,
@@ -1361,6 +1372,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.dec_indent()
         self.write(buff + self.get_indent() + B"}\n")
 
+    # TODO: port to pyddl
     def export_skin(self, node, armature, export_vertex_array):
 
         # This function exports all skinning data, which includes the skeleton
@@ -1644,6 +1656,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             ret_value["color"] = colors
         return ret_value
 
+    # TODO: port to pyddl
     def export_geometry(self, object_ref, scene):
         self.progress.begin_task("Exporting geometry for " + object_ref[1]["nodeTable"][0].name + "...")
 
@@ -2238,6 +2251,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             Metric(B"up", data_type=DataType.string, value="z"),
         ]
 
+    # TODO: port to pyddl
     def get_children_for_node(self, node):
 
         if node in self.nodeChildren:
@@ -2245,6 +2259,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         else:
             return node.children
 
+    # TODO: port to pyddl
     def process_skinned_meshes(self):
 
         for nw in self.container.nodes:
@@ -2257,6 +2272,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                             # If a node is used as a bone, then we force its type to be a bone.
                             bone_ref.dict["nodeType"] = NodeType.bone
 
+    # TODO: port to pyddl
     def execute(self, context):
 
         start_time = time.time()
