@@ -62,7 +62,7 @@ GeometryObject $geometry1		// Cube
 	}
 }
 
-Material $material1
+Material $material1		// Cube
 {
 	Name {string {"Material"}}
 	Color (attrib = "diffuse") {float[3] {{0.64, 0.64, 0.64}}}
