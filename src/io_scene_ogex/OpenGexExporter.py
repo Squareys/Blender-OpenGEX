@@ -1023,7 +1023,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         if props.use_collision_bounds and props.physics_type not in ['NAVMESH', 'OCCLUDER']:
             # export collision shape
             shape_type = props.collision_bounds_type
-            shape_struct = Extension(self.SHAPE_TYPE_TO_EXTENSION[shape_type])
+            shape_struct = Extension(self.SHAPE_TYPE_TO_EXTENSION[shape_type], children=[])
 
             if shape_type not in ['CONVEX_HULL', 'TRIANGLE_MESH']:
                 if shape_type == 'SPHERE':
