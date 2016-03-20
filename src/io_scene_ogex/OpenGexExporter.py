@@ -930,8 +930,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
             # Export the object reference and material references.
             obj = nw.item.data
+            node_type = nw.nodeRef["nodeType"]
 
-            if type == NodeType.geometry:
+            if node_type == NodeType.geometry:
                 mesh = nw.item
 
                 geometry = self.export_geometry(node=mesh, mesh=mesh.data)
@@ -950,14 +951,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                     # FIXME Wrapper or item?
                     self.export_morph_weights(mesh, shape_keys, scene)
             else:
-                struct = Node(struct_identifiers[nw.nodeRef["nodeType"]],
+                struct = Node(struct_identifiers[node_type],
                               obj=nw.item,
                               name=nw.nodeRef["structName"],
                               use_custom_properties=self.export_custom_properties)
 
-            if type == NodeType.light:
+            if node_type == NodeType.light:
                 struct.children.append(ObjectRef(ref_object=self.export_light(nw.item, obj)))
-            elif type == NodeType.camera:
+            elif node_type == NodeType.camera:
                 struct.children.append(ObjectRef(ref_object=self.export_camera(nw.item, obj)))
 
             if pose_bone:
