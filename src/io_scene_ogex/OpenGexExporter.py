@@ -1646,7 +1646,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         scene = context.scene
         export_all_flag = not self.export_selection
-        self.open(self.filepath)
         self.container = ExporterState(export_all_flag, self.sample_animation, scene)
 
         self.document.structures.extend(self.export_metrics(scene))
@@ -1679,14 +1678,16 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         self.export_objects(scene)
 
         self.progress.begin_task("Exporting materials...")
-        self.export_materials()
+        self.document.structures.extend([entry["struct"] for entry in self.container.materialArray])
         self.progress.end_task()
 
         restore_frame = False
         if restore_frame:
             scene.frame_set(original_frame, original_subframe)
 
-        self.close()
+        self.progress.begin_task("Writing file...")
+        DdlTextWriter(self.document).write(self.filepath)
+        self.progress.end_task()
 
         print('-- Successfully exported to "{}". ({:.2f} sec)'.format(self.filepath, time.time() - start_time))
 
