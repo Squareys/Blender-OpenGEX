@@ -757,12 +757,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                         )
         return structs
 
-    # TODO: port to pyddl
-    def handle_offset(self, matrix, offset):
-
+    @staticmethod
+    def handle_offset(matrix, offset):
         if not offset:
-            self.write_matrix(matrix)
-            return
+            return matrix
 
         m = matrix.copy()
         m.translation -= offset
