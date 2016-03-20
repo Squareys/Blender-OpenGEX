@@ -137,7 +137,7 @@ class Material(DdlStructure):
         if material is None:
             raise ValueError("material cannot be None")
 
-        super().__init__(B"Material", name=name)
+        super().__init__(B"Material", name=name, children=[])
 
         if material.name != "":
             self.children.append(Name(material.name))
