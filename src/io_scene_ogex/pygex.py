@@ -30,17 +30,35 @@ class Param(DdlStructure):
         ])
 
 
-class Key(DdlStructure):
+class Track(DdlStructure):
+    def __init__(self, children=[], target=None):
+        props = dict() if target is None else {B"target": target}
+        super().__init__(B"Track", props=props, children=children)
 
-    def __init__(self, kind=None, data=[]):
+
+class Time(DdlStructure):
+    def __init__(self, children=[]):
+        super().__init__(B"Time", children=children)
+
+
+class Key(DdlStructure):
+    def __init__(self, kind=None, data=[], vector_size=0):
         props = dict() if kind is None else {B"kind": kind}
-        super().__init__(B"Key", props=props, children=[
-            DdlPrimitive(data_type=DataType.float, data=data)
-        ])
+
+        primitive = DdlPrimitive(data_type=DataType.float, data=data, vector_size=vector_size)
+        if vector_size == 16:
+            # special case for matrices which should be displayed one per line
+            DdlTextWriter.set_max_elements_per_line(primitive, 1)
+
+        super().__init__(B"Key", props=props, children=[primitive])
+
+
+class Value(DdlStructure):
+    def __init__(self, children=[]):
+        super().__init__(B"Value", children=children)
 
 
 class Metric(DdlStructure):
-
     def __init__(self, key, data_type, value):
         super().__init__(B"Metric", props={B"key": key}, children=[
             DdlPrimitive(data_type, data=[value])
