@@ -89,7 +89,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         return None
 
     def find_node(self, name):
-
+        # TODO this does not seem very efficient...
         for nodeRef in self.nodeArray.items():
             if nodeRef[0].name == name:
                 return nodeRef
@@ -233,20 +233,33 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         ]
 
     def export_animation_track(self, fcurve, kind, target):
+        # TODO doc
+        """
+        :param fcurve:
+        :param kind:
+        :param target:
+        :return: a Track DdlStructure
+        """
         # This function exports a single animation track. The curve types for the
         # Time and Value structures are given by the kind parameter.
 
-        track_struct = DdlStructure(B"Track", props={B"target", B"%" + target})  # TODO how to handle ref in parameter?
+        track_struct = Track(target=B"%" + target)  # TODO how to handle ref in parameter?
 
         if kind != k_animation_bezier:
             # TODO simplify to one iteration over fcurve
-            track_struct.add_structure(B"Time", children=self.export_key_times(fcurve))
-            track_struct.add_structure(B"Value", children=self.export_key_values(fcurve))
+            track_struct.children.extend([
+                Time(children=self.export_key_times(fcurve)),
+                Value(children=self.export_key_values(fcurve))
+            ])
         else:
-            track_struct.add_structure(B"Time", props={B"curve": B"bezier"}, children=
-                                       [self.export_key_times(fcurve)] + self.export_key_time_control_points(fcurve))
-            track_struct.add_structure(B"Value", props={B"curve": B"bezier"}, children=
-                                       [self.export_key_values(fcurve)] + self.export_key_value_control_points(fcurve))
+            track_struct.children.extend([
+                Time(curve=B"bezier", children=[
+                    Key(data=[self.export_key_times(fcurve)] + self.export_key_time_control_points(fcurve))
+                ]),
+                Value(curve=B"bezier", children=[
+                    Key(data=[self.export_key_values(fcurve)] + self.export_key_value_control_points(fcurve))
+                ])
+            ])
 
         return track_struct
 
@@ -273,22 +286,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 return node.matrix_local
 
             animation_struct = DdlStructure(B"Animation", children=[
-                DdlStructure(B"Track", props={B"target", B"%transform"}, children=[
-                    DdlStructure(B"Time", children=[
-                        DdlStructure(B"Key", children=[
-                            DdlPrimitive(DataType.float, data=[
-                                ((i - self.container.beginFrame) * self.container.frameTime)
-                                for i in range(self.container.beginFrame, self.container.endFrame + 1)
-                                ])
-                        ])
+                Track(target=B"%transform", children=[
+                    Time(children=[
+                        Key(data=[((i - self.container.beginFrame) * self.container.frameTime)
+                                  for i in range(self.container.beginFrame, self.container.endFrame + 1)])
                     ]),
-                    DdlStructure(B"Value", children=[
-                        DdlStructure(B"Key", children=[
-                            DdlTextWriter.set_max_elements_per_line(DdlPrimitive(DataType.float, vector_size=16, data=[
-                                get_matrix_local_at_frame(i)
-                                for i in range(self.container.beginFrame, self.container.endFrame + 1)
-                                ]), 1)
-                        ])
+                    Value(children=[
+                        Key(data=[get_matrix_local_at_frame(i)
+                                  for i in range(self.container.beginFrame, self.container.endFrame + 1)])
                     ])
                 ])
             ])
@@ -296,8 +301,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         scene.frame_set(current_frame, current_subframe)
         return animation_struct
 
-    # TODO: port to pyddl
     def export_bone_sampled_animation(self, pose_bone, scene):
+        """
+        :param pose_bone: bone to export the animation of
+        :param scene: scene of the bone
+        :return: an optional Animation DdlStructure
+        """
+
         # This function exports bone animation as full 4x4 matrices for each frame.
 
         current_frame = scene.frame_current
@@ -306,6 +316,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         has_animation = False
         m1 = pose_bone.matrix.copy()
 
+        # search for a frame which has a different bone matrix than in an other frame
         for i in range(self.container.beginFrame, self.container.endFrame):
             scene.frame_set(i)
             m2 = pose_bone.matrix
@@ -313,129 +324,74 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 has_animation = True
                 break
 
+        animation_structure = None
+
         if has_animation:
-            self.indent_write(B"Animation\n", 0, True)
-            self.indent_write(B"{\n")
-            self.inc_indent()
-
-            self.indent_write(B"Track (target = %transform)\n")
-            self.indent_write(B"{\n")
-            self.inc_indent()
-
-            self.indent_write(B"Time\n")
-            self.indent_write(B"{\n")
-            self.inc_indent()
-
-            self.indent_write(B"Key {float {")
-
-            for i in range(self.container.beginFrame, self.container.endFrame):
-                self.write_float((i - self.container.beginFrame) * self.container.frameTime)
-                self.file.write(B", ")
-
-            self.write_float(self.container.endFrame * self.container.frameTime)
-            self.file.write(B"}}\n")
-
-            self.indent_write(B"}\n\n", -1)
-            self.indent_write(B"Value\n", -1)
-            self.indent_write(B"{\n", -1)
-
-            self.indent_write(B"Key\n")
-            self.indent_write(B"{\n")
-            self.inc_indent()
-
-            self.indent_write(B"float[16]\n")
-            self.indent_write(B"{\n")
-
             parent = pose_bone.parent
-            if parent:
-                for i in range(self.container.beginFrame, self.container.endFrame):
-                    scene.frame_set(i)
-                    if math.fabs(parent.matrix.determinant()) > k_export_epsilon:
-                        self.write_matrixFlat(parent.matrix.inverted() * pose_bone.matrix)
-                    else:
-                        self.write_matrixFlat(pose_bone.matrix)
 
-                    self.file.write(B",\n")
+            # -----
+            # Helpers for the generator of the Value structure data
+            def get_matrix_at_frame(frame_index):
+                scene.frame_set(frame_index)
+                return pose_bone.matrix
 
-                scene.frame_set(self.container.endFrame)
+            def get_matrix_at_frame_with_parent(frame_index):
+                scene.frame_set(frame_index)
                 if math.fabs(parent.matrix.determinant()) > k_export_epsilon:
-                    self.write_matrixFlat(parent.matrix.inverted() * pose_bone.matrix)
+                    return parent.matrix.inverted() * pose_bone.matrix
                 else:
-                    self.write_matrixFlat(pose_bone.matrix)
+                    return pose_bone.matrix
+            # -----
 
-                self.indent_write(B"}\n", 0, True)
+            get_value_for_frame = get_matrix_at_frame_with_parent if parent is not None else get_matrix_at_frame
 
-            else:
-                for i in range(self.container.beginFrame, self.container.endFrame):
-                    scene.frame_set(i)
-                    self.write_matrixFlat(pose_bone.matrix)
-                    self.file.write(B",\n")
-
-                scene.frame_set(self.container.endFrame)
-                self.write_matrixFlat(pose_bone.matrix)
-                self.indent_write(B"}\n", 0, True)
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
-
-            self.dec_indent()
-            self.indent_write(B"}\n")
+            animation_structure = DdlStructure(B"Animation", children=[
+                Track(target=B"%transform", children=[
+                    Time(children=[
+                        Key(data=[(i - self.container.beginFrame) * self.container.frameTime
+                                  for i in range(self.container.beginFrame, self.container.endFrame + 1)])
+                    ]),
+                    Value(children=[
+                        Key(data=[get_value_for_frame(i)
+                                  for i in range(self.container.beginFrame, self.container.endFrame + 1)],
+                            vector_size=16)
+                    ])
+                ])
+            ])
 
         scene.frame_set(current_frame, current_subframe)
 
-    # TODO: port to pyddl
-    def export_morph_weight_sampled_animation_track(self, block, target, scene, newline):
+        return animation_structure
 
+    def export_morph_weight_sampled_animation_track(self, block, target, scene):
+        # TODO doc
+        """
+        :param block:
+        :param target:
+        :param scene:
+        :return: a Track DdlStructure
+        """
         current_frame = scene.frame_current
         current_subframe = scene.frame_subframe
 
-        self.indent_write(B"Track (target = %", 0, newline)
-        self.file.write(target)
-        self.file.write(B")\n")
-        self.indent_write(B"{\n")
-        self.inc_indent()
+        # helper function for generater of Value Key data
+        def get_frame_value(frame_index):
+            scene.frame_set(frame_index)
+            return block.value
 
-        self.indent_write(B"Time\n")
-        self.indent_write(B"{\n")
-        self.inc_indent()
-
-        self.indent_write(B"Key {float {")
-
-        for i in range(self.container.beginFrame, self.container.endFrame):
-            self.write_float((i - self.container.beginFrame) * self.container.frameTime)
-            self.file.write(B", ")
-
-        self.write_float(self.container.endFrame * self.container.frameTime)
-        self.file.write(B"}}\n")
-
-        self.indent_write(B"}\n\n", -1)
-        self.indent_write(B"Value\n", -1)
-        self.indent_write(B"{\n", -1)
-
-        self.indent_write(B"Key {float {")
-
-        for i in range(self.container.beginFrame, self.container.endFrame):
-            scene.frame_set(i)
-            self.write_float(block.value)
-            self.file.write(B", ")
-
-        scene.frame_set(self.container.endFrame)
-        self.write_float(block.value)
-        self.file.write(B"}}\n")
-
-        self.dec_indent()
-        self.indent_write(B"}\n")
-
-        self.dec_indent()
-        self.indent_write(B"}\n")
+        track_struct = Track(target=B"%" + target, children=[
+            Time(children=[
+                Key(data=[(i - self.container.beginFrame) * self.container.frameTime
+                          for i in range(self.container.beginFrame, self.container.endFrame + 1)])
+            ]),
+            Value(children=[
+                Key(data=[get_frame_value(i) for i in range(self.container.beginFrame, self.container.endFrame + 1)])
+            ])
+        ])
 
         scene.frame_set(current_frame, current_subframe)
+
+        return track_struct
 
     def export_node_transformation(self, nw, scene):
         node = nw.item
@@ -766,8 +722,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         m.translation -= offset
         return m
 
-    # TODO: port to pyddl
-    def export_bone_transform(self, nw, bw, scene):  # armature, bone, scene):
+    def export_bone_transform(self, nw, bw, scene):
+        # TODO doc!
+        """
+        :return: a Transform DdlStructure
+        """
 
         curve_array = self.export_bone_animation(nw.item, bw.item.name)
         animation = ((len(curve_array) != 0) or self.container.sampleAnimationFlag)
@@ -784,26 +743,20 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
             if parent_pose_bone and (math.fabs(parent_pose_bone.matrix.determinant()) > k_export_epsilon):
                 transform = parent_pose_bone.matrix.inverted() * transform
 
-        self.indent_write(B"Transform")
+        transform_struct = Transform(matrix=transform)
 
         if animation:
-            self.file.write(B" %transform")
+            transform_struct.name = B"transform"
+            transform_struct.name_is_global = False
 
-        self.indent_write(B"{\n", 0, True)
-        self.inc_indent()
+            if pose_bone:
+                animation_struct = self.export_bone_sampled_animation(pose_bone, scene)
 
-        self.indent_write(B"float[16]\n")
-        self.indent_write(B"{\n")
-        self.write_matrix(transform)
-        self.indent_write(B"}\n")
+                if animation_struct is not None:
+                    transform_struct.children.append(animation_struct)
 
-        self.dec_indent()
-        self.indent_write(B"}\n")
+        return transform_struct
 
-        if animation and pose_bone:
-            self.export_bone_sampled_animation(pose_bone, scene)
-
-    # TODO: port to pyddl
     def export_morph_weights(self, node, shape_keys, scene):
 
         action = None
@@ -844,30 +797,22 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         animated = (len(curve_array) != 0)
         reference_name = shape_keys.reference_key.name if shape_keys.use_relative else ""
 
-        for k in range(len(shape_keys.key_blocks)):
-            self.indent_write(B"MorphWeight", 0, (k == 0))
+        structs = []
+        for (k, block) in enumerate(shape_keys.key_blocks):
+            morph_weight_struct = DdlStructure(B"MorphWeight", props={B"index": k}, children=[
+                DdlPrimitive(data_type=DataType.float, data=[block.value if (block.name != reference_name) else 1.0])
+            ])
 
             if animated:
-                self.file.write(B" %mw")
-                self.write_int(k)
+                morph_weight_struct.name = B"mw"
+                morph_weight_struct.name_is_global = False
 
-            self.file.write(B" (index = ")
-            self.write_int(k)
-            self.file.write(B") {float {")
-
-            block = shape_keys.key_blocks[k]
-            self.write_float(block.value if (block.name != reference_name) else 1.0)
-
-            self.file.write(B"}}\n")
+            structs.append(morph_weight_struct)
 
         if animated:
-            self.indent_write(B"Animation (begin = ", 0, True)
-            self.write_float((action.frame_range[0] - self.container.beginFrame) * self.container.frameTime)
-            self.file.write(B", end = ")
-            self.write_float((action.frame_range[1] - self.container.beginFrame) * self.container.frameTime)
-            self.file.write(B")\n")
-            self.indent_write(B"{\n")
-            self.inc_indent()
+            animation_struct = DdlStructure(B"Animation", props=OrderedDict[
+                (B"begin", (action.frame_range[0] - self.container.beginFrame) * self.container.frameTime),
+                (B"end", (action.frame_range[1] - self.container.beginFrame) * self.container.frameTime)], children=[])
 
             for a in range(len(curve_array)):
                 k = index_array[a]
@@ -876,36 +821,32 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 fcurve = curve_array[a]
                 kind = OpenGexExporter.classify_animation_curve(fcurve)
                 if (kind != k_animation_sampled) and (not self.container.sampleAnimationFlag):
-                    self.export_animation_track(fcurve, kind, target)
+                    animation_struct.children.append(self.export_animation_track(fcurve, kind, target))
                 else:
-                    self.export_morph_weight_sampled_animation_track(shape_keys.key_blocks[k], target, scene)
+                    animation_struct.children.append(
+                        self.export_morph_weight_sampled_animation_track(shape_keys.key_blocks[k], target, scene))
 
             self.dec_indent()
             self.indent_write(B"}\n")
 
-    # TODO: port to pyddl
     def export_bone(self, nw, bw, scene):  # armature, bone, scene):
+        bone_struct = None
+        structs = []
 
         if nw.nodeRef:
-            self.indent_write(struct_identifier[nw.nodeRef["nodeType"]], 0, True)
-            self.file.write(nw.nodeRef["structName"])
+            bone_struct = DdlStructure(struct_identifier[nw.nodeRef["nodeType"]], name=nw.nodeRef["structName"],
+                                       children=[Name(name=bw.item.name)])
+            structs.append(bone_struct)
 
-            self.indent_write(B"{\n", 0, True)
-            self.inc_indent()
+            bone_struct.children.append(self.export_bone_transform(nw, bw, scene))
 
-            name = bw.item.name
-            if name != "":
-                self.indent_write(B"Name {string {\"")
-                self.file.write(bytes(name, "UTF-8"))
-                self.file.write(B"\"}}\n\n")
-
-            self.export_bone_transform(nw, bw, scene)
-
-        for child in bw.children:
-            self.export_bone(nw, child, scene)
+            for child in bw.children:
+                bone_struct.children.extend(self.export_bone(nw, child, scene))
+        else:
+            for child in bw.children:
+                structs.extend(self.export_bone(nw, child, scene))
 
         # Export any ordinary nodes that are parented to this bone.
-
         bone_subnode_array = self.container.boneParentArray.get(bw.item.name)
         if bone_subnode_array:
             pose_bone = None
@@ -913,11 +854,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                 pose_bone = nw.item.pose.bones.get(bw.item.name)
 
             for subnode_wrapper in bone_subnode_array:
-                self.export_node(subnode_wrapper, scene, pose_bone)
+                node = self.export_node(subnode_wrapper, scene, pose_bone)
+                if bone_struct is None:
+                    structs.append(node)
+                else:
+                    bone_struct.children.append(node)
 
-        if nw.nodeRef:
-            self.dec_indent()
-            self.indent_write(B"}\n")
+        return structs
 
     def export_node(self, nw, scene, pose_bone=None):
 
@@ -1047,91 +990,23 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         return struct
 
-    # TODO: port to pyddl
     def export_skin(self, node, armature, export_vertex_array):
 
         # This function exports all skinning data, which includes the skeleton
         # and per-vertex bone influence data.
 
-        self.indent_write(B"Skin\n", 0, True)
-        self.indent_write(B"{\n")
-        self.inc_indent()
+        skin_struct = DdlStructure(B"Skin\n", children=[
+            Transform(node.matrix_world)
+        ])
 
-        # Write the skin bind pose transform.
-
-        self.indent_write(B"Transform\n")
-        self.indent_write(B"{\n")
-        self.inc_indent()
-
-        self.indent_write(B"float[16]\n")
-        self.indent_write(B"{\n")
-        self.write_matrix(node.matrix_world)
-        self.indent_write(B"}\n")
-
-        self.dec_indent()
-        self.indent_write(B"}\n\n")
-
-        # Export the skeleton, which includes an array of bone node references
-        # and and array of per-bone bind pose transforms.
-
-        self.indent_write(B"Skeleton\n")
-        self.indent_write(B"{\n")
-        self.inc_indent()
-
-        # Write the bone node reference array.
-
-        self.indent_write(B"bone_refArray\n")
-        self.indent_write(B"{\n")
-        self.inc_indent()
-
-        bone_array = armature.data.bones
-        bone_count = len(bone_array)
-
-        self.indent_write(B"ref\t\t\t// ")
-        self.write_int(bone_count)
-        self.indent_write(B"{\n", 0, True)
-        self.indent_write(B"", 1)
-
-        for i in range(bone_count):
-            bone_ref = self.find_node(bone_array[i].name)
-            if bone_ref:
-                self.file.write(B"$")
-                self.file.write(bone_ref[1]["structName"])
-            else:
-                self.file.write(B"null")
-
-            if i < bone_count - 1:
-                self.file.write(B", ")
-            else:
-                self.file.write(B"\n")
-
-        self.indent_write(B"}\n")
-
-        self.dec_indent()
-        self.indent_write(B"}\n\n")
-
-        # Write the bind pose transform array.
-
-        self.indent_write(B"Transform\n")
-        self.indent_write(B"{\n")
-        self.inc_indent()
-
-        self.indent_write(B"float[16]\t// ")
-        self.write_int(bone_count)
-        self.indent_write(B"{\n", 0, True)
-
-        for i in range(bone_count):
-            self.write_matrixFlat(armature.matrix_world * bone_array[i].matrix_local)
-            if i < bone_count - 1:
-                self.file.write(B",\n")
-
-        self.indent_write(B"}\n", 0, True)
-
-        self.dec_indent()
-        self.indent_write(B"}\n")
-
-        self.dec_indent()
-        self.indent_write(B"}\n\n")
+        skeleton_struct = DdlStructure(B"Skeleton", children=[
+            DdlStructure(B"BoneRefArray", children=[
+                DdlPrimitive(data_type=DataType.ref, data=[self.find_node(bone.name)[1]["struct"]
+                                                           for bone in armature.data.bones])
+            ]),
+            Transform(matrices=[armature.matrix_world * bone.matrix_local for bone in armature.data.bones])
+        ])
+        skin_struct.children.append(skeleton_struct)
 
         # Export the per-vertex bone influence data.
 
@@ -1139,8 +1014,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         for group in node.vertex_groups:
             group_name = group.name
-            for i in range(bone_count):
-                if bone_array[i].name == group_name:
+            for (i, bone) in enumerate(armature.data.bones):
+                if bone.name == group_name:
                     group_remap.append(i)
                     break
             else:
@@ -1171,51 +1046,15 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
 
         # Write the bone count array. There is one entry per vertex.
 
-        self.indent_write(B"bone_countArray\n")
-        self.indent_write(B"{\n")
-        self.inc_indent()
-
-        self.indent_write(B"unsigned_int16\t\t// ")
-        self.write_int(len(bone_count_array))
-        self.indent_write(B"{\n", 0, True)
-        self.write_intArray(bone_count_array)
-        self.indent_write(B"}\n")
-
-        self.dec_indent()
-        self.indent_write(B"}\n\n")
-
-        # Write the bone index array. The number of entries is the sum of the bone counts for all vertices.
-
-        self.indent_write(B"BoneIndexArray\n")
-        self.indent_write(B"{\n")
-        self.inc_indent()
-
-        self.indent_write(B"unsigned_int16\t\t// ")
-        self.write_int(len(bone_index_array))
-        self.indent_write(B"{\n", 0, True)
-        self.write_intArray(bone_index_array)
-        self.indent_write(B"}\n")
-
-        self.dec_indent()
-        self.indent_write(B"}\n\n")
-
-        # Write the bone weight array. The number of entries is the sum of the bone counts for all vertices.
-
-        self.indent_write(B"BoneWeightArray\n")
-        self.indent_write(B"{\n")
-        self.inc_indent()
-
-        self.indent_write(B"float\t\t// ")
-        self.write_int(len(bone_weight_array))
-        self.indent_write(B"{\n", 0, True)
-        self.write_floatArray(bone_weight_array)
-        self.indent_write(B"}\n")
-
-        self.dec_indent()
-        self.indent_write(B"}\n")
-
-        self.dec_indent()
-        self.indent_write(B"}\n")
+        skin_struct.children.append(DdlStructure(B"BoneCountArray", children=[
+            DdlPrimitive(data_type=DataType.unsigned_int16, data=bone_count_array)
+        ]))
+        skin_struct.children.append(DdlStructure(B"BoneIndexArray", children=[
+            DdlPrimitive(data_type=DataType.unsigned_int16, data=bone_index_array)
+        ]))
+        skin_struct.children.append(DdlStructure(B"BoneWeightArray", children=[
+            DdlPrimitive(data_type=DataType.float, data=bone_weight_array)
+        ]))
 
     @staticmethod
     def to_per_vertex_data(m, num_materials=1, uv_layers=None):
@@ -1590,7 +1429,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
         else:
             return node.children
 
-    # TODO: port to pyddl
     def process_skinned_meshes(self):
 
         for nw in self.container.nodes:
@@ -1603,7 +1441,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
                             # If a node is used as a bone, then we force its type to be a bone.
                             bone_ref.dict["nodeType"] = NodeType.bone
 
-    # TODO: port to pyddl
     def execute(self, context):
 
         start_time = time.time()
