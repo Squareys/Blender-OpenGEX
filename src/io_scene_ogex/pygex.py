@@ -1,7 +1,6 @@
 import collections
 from collections import OrderedDict
 import itertools
-
 from io_scene_ogex.pyddl import DdlPrimitiveDataType as DataType
 from io_scene_ogex.pyddl import *
 
@@ -11,7 +10,6 @@ DdlStructure subclasses for structures of OpenGEX for easier use.
 
 
 class Name(DdlStructure):
-
     def __init__(self, name):
         super().__init__(B"Name", children=[
             DdlPrimitive(data_type=DataType.string, data=[name])
@@ -19,7 +17,6 @@ class Name(DdlStructure):
 
 
 class Color(DdlStructure):
-
     def __init__(self, attrib, value):
         super().__init__(B"Color", props={B"attrib": attrib}, children=[
             DdlPrimitive(data_type=DataType.float, data=[value], vector_size=3)
@@ -27,7 +24,6 @@ class Color(DdlStructure):
 
 
 class Param(DdlStructure):
-
     def __init__(self, attrib, value):
         super().__init__(B"Param", props={B"attrib": attrib}, children=[
             DdlPrimitive(data_type=DataType.float, data=[value])
@@ -52,7 +48,6 @@ class Metric(DdlStructure):
 
 
 class Translation(DdlStructure):
-
     def __init__(self, value, kind=None, name=None, vector_size=0):
         props = dict if kind is None else {B"kind": kind}
         super().__init__(B"Translation", name=name, props=props, children=[
@@ -62,7 +57,6 @@ class Translation(DdlStructure):
 
 
 class Rotation(DdlStructure):
-
     def __init__(self, value, kind=None, name=None, vector_size=0):
         props = dict if kind is None else {B"kind": kind}
         super().__init__(B"Rotation", name=name, props=props, children=[
@@ -72,7 +66,6 @@ class Rotation(DdlStructure):
 
 
 class Scale(DdlStructure):
-
     def __init__(self, value, kind=None, name=None, vector_size=0):
         props = dict if kind is None else {B"kind": kind}
         super().__init__(B"Scale", name=name, props=props, children=[
@@ -82,25 +75,26 @@ class Scale(DdlStructure):
 
 
 class Transform(DdlStructure):
-
     def __init__(self, matrix):
+        self.__init__(matrices=[matrix])
+
+    def __init__(self, matrices):
         super().__init__(B"Transform", children=[
             DdlTextWriter.set_max_elements_per_line(
-                DdlPrimitive(DataType.float, data=[tuple(itertools.chain(*zip(*matrix)))], vector_size=16),
+                DdlPrimitive(DataType.float, data=[tuple(itertools.chain(*zip(*matrix))) for matrix in matrices],
+                             vector_size=16),
                 elements=4
             )
         ])
 
 
 class Extension(DdlStructure):
-
     def __init__(self, type, applic=B"Blender", children=[]):
         super().__init__(B"Extension",
-                              props=OrderedDict([(B"applic", applic), (B"type", type)]), children=children)
+                         props=OrderedDict([(B"applic", applic), (B"type", type)]), children=children)
 
 
 class ObjectRef(DdlStructure):
-
     def __init__(self, ref_object):
         if not isinstance(ref_object, DdlStructure):
             raise TypeError("Cannot create a ObjectRef for a non DdlStructure object.")
@@ -111,7 +105,6 @@ class ObjectRef(DdlStructure):
 
 
 class MaterialRef(DdlStructure):
-
     def __init__(self, ref_material, index):
         super().__init__(B"MaterialRef", props={B"index": index}, children=[
             DdlPrimitive(DataType.ref, data=[ref_material])
@@ -119,7 +112,6 @@ class MaterialRef(DdlStructure):
 
 
 class Texture(DdlStructure):
-
     def __init__(self, texture_slot, attrib):
         super().__init__(B"Texture", props={B"attrib": attrib}, children=[
             DdlPrimitive(DataType.string, data=[texture_slot.texture.image.filepath.replace("//", "")])
@@ -141,7 +133,6 @@ class Texture(DdlStructure):
 
 
 class Material(DdlStructure):
-
     def __init__(self, material, name, export_ambient=False):
         if material is None:
             raise ValueError("material cannot be None")
@@ -223,7 +214,6 @@ class Material(DdlStructure):
 
 
 class LightObject(DdlStructure):
-
     def __init__(self, name, light):
         is_point = False
         is_spot = False
@@ -294,7 +284,6 @@ class LightObject(DdlStructure):
 
 
 class CameraObject(DdlStructure):
-
     def __init__(self, name, camera):
         super().__init__(B"CameraObject", name=name, children=[
             Param(B"fov", camera.angle_x),
@@ -304,7 +293,6 @@ class CameraObject(DdlStructure):
 
 
 class Node(DdlStructure):
-
     def __init__(self, identifier, obj, name, props=dict(), children=[], use_custom_properties=False):
         super().__init__(identifier, name=name, props=props, children=[])
 
@@ -346,7 +334,6 @@ class Node(DdlStructure):
 
 
 class VertexArray(DdlStructure):
-
     def __init__(self, attrib, data, vertex_count, vector_size=3, morph=None):
         props = OrderedDict([(B"attrib", attrib)])
         if morph is not None:
@@ -361,13 +348,11 @@ class VertexArray(DdlStructure):
 
 
 class GeometryObject(DdlStructure):
-
     def __init__(self, name):
         super().__init__(B"GeometryObject", name=name)
 
 
 class GeometryNode(Node):
-
     def __init__(self, mesh, name, geometry, materials, use_custom_properties=False):
         props = {B"visible", False} if mesh.hide_render else dict()
         super().__init__(B"GeometryNode", mesh, name, props=props, children=[],
@@ -377,4 +362,3 @@ class GeometryNode(Node):
 
         for (i, material) in enumerate(materials):
             self.children.append(MaterialRef(material, index=i))
-
