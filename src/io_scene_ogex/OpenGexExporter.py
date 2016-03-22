@@ -19,7 +19,6 @@ k_animation_bezier = 2
 k_export_epsilon = 1.0e-6
 
 struct_identifiers = [B"Node", B"BoneNode", B"GeometryNode", B"LightNode", B"CameraNode"]
-struct_identifier = [B"Node $", B"BoneNode $", B"GeometryNode $", B"LightNode $", B"CameraNode $"]
 
 subtranslation_name = [B"xpos", B"ypos", B"zpos"]
 subrotation_name = [B"xrot", B"yrot", B"zrot"]
@@ -833,7 +832,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         structs = []
 
         if nw.nodeRef:
-            bone_struct = DdlStructure(struct_identifier[nw.nodeRef["nodeType"]], name=nw.nodeRef["structName"],
+            bone_struct = DdlStructure(struct_identifiers[nw.nodeRef["nodeType"]], name=nw.nodeRef["structName"],
                                        children=[Name(name=bw.item.name)])
             structs.append(bone_struct)
 
