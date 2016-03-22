@@ -1248,10 +1248,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         export_mesh = self.to_per_vertex_data(m, num_materials=len(mesh.materials), uv_layers=uv_layers)
         vertex_count = len(export_mesh["position"])
 
-        mesh_struct = struct.add_structure(B"Mesh", props={B"primitive": B"triangles"}, children=[
+        mesh_struct = Mesh(mesh=m, children=[
             # position array
             VertexArray(B"position", vertex_count=vertex_count, data=export_mesh["position"])
         ])
+        struct.children.append(mesh_struct)
 
         # Write the normal array.
         if "normal" in export_mesh:

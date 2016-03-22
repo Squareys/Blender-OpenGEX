@@ -128,6 +128,14 @@ class MaterialRef(DdlStructure):
         ])
 
 
+class Mesh(DdlStructure):
+    def __init__(self, mesh=None, primitive=B"triangles", children=[]):
+        super().__init__(B"Mesh", props={B"primitive": primitive}, children=children)
+
+        # a reference to a blender mesh to keep it in memory for referring VertexArrays
+        self.mesh = mesh
+
+
 class Texture(DdlStructure):
     def __init__(self, texture_slot, attrib):
         super().__init__(B"Texture", props={B"attrib": attrib}, children=[
