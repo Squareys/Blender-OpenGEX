@@ -5,7 +5,6 @@ import time
 from mathutils import Matrix
 from bpy_extras.io_utils import ExportHelper
 from io_scene_ogex.NodeWrapper import NodeWrapper
-from io_scene_ogex.Writer import Writer
 from io_scene_ogex.ExporterState import *
 from io_scene_ogex.pyddl import DdlPrimitiveDataType as DataType
 from io_scene_ogex.pyddl import *
@@ -44,7 +43,7 @@ class ProgressLog:
         print(" done! ({:.2f} ms)".format((time.time() - self.lastTime) * 1000))
 
 
-class OpenGexExporter(bpy.types.Operator, ExportHelper, Writer):
+class OpenGexExporter(bpy.types.Operator, ExportHelper):
     """Export to OpenGEX format"""
     bl_idname = "export_scene.ogex"
     bl_label = "Export OpenGEX"
