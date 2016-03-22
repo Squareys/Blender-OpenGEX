@@ -93,10 +93,9 @@ class Scale(DdlStructure):
 
 
 class Transform(DdlStructure):
-    def __init__(self, matrix):
-        self.__init__(matrices=[matrix])
-
-    def __init__(self, matrices):
+    def __init__(self, matrix=None, matrices=None):
+        if matrices is None:
+            matrices = [] if matrix is None else [matrix]
         super().__init__(B"Transform", children=[
             DdlTextWriter.set_max_elements_per_line(
                 DdlPrimitive(DataType.float, data=[tuple(itertools.chain(*zip(*matrix))) for matrix in matrices],
