@@ -1280,22 +1280,22 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         # If there are multiple morph targets, export them here.
         if shape_keys and False:  # TODO currently no shape key support
             shape_keys.key_blocks[0].value = 0.0
-            for m in range(1, len(current_morph_value)):
-                shape_keys.key_blocks[m].value = 1.0
+            for i in range(1, len(current_morph_value)):
+                shape_keys.key_blocks[i].value = 1.0
                 mesh.update()
 
-                node.active_shape_key_index = m
+                node.active_shape_key_index = i
                 morph_mesh = node.to_mesh(scene, apply_modifiers, "RENDER", True, False)
 
                 # morph target position array
                 mesh_struct.children.append(
-                    VertexArray(attrib=B"position", morph=m, data=[morph_mesh.vertices[i].co for i in export_mesh],
+                    VertexArray(attrib=B"position", morph=i, data=[morph_mesh.vertices[i].co for i in export_mesh],
                                 vertex_count=vertex_count))  # TODO currently no shape key support
 
                 # morph target normal array
                 mesh_struct.children.append(
                     VertexArray(attrib=B"normal",
-                                morph=m,
+                                morph=i,
                                 data=[vert.normal if face.use_smooth else face.normal for (face, vert) in
                                       [(morph_mesh.tessfaces[v.faceIndex], morph_mesh.vertices[v.vertexIndex])
                                        for v in export_mesh]],
@@ -1327,8 +1327,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             node.active_shape_key_index = active_shape_key_index
             node.show_only_shape_key = show_only_shape_key
 
-            for m in range(len(current_morph_value)):
-                shape_keys.key_blocks[m].value = current_morph_value[m]
+            for i in range(len(current_morph_value)):
+                shape_keys.key_blocks[i].value = current_morph_value[i]
 
             mesh.update()
 
@@ -1462,11 +1462,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         self.progress.end_task()
 
-        self.progress.begin_task("Exporting nodes...")
         for obj in self.container.nodes:
             if not obj.parent:
                 self.document.structures.append(self.export_node(obj, scene))
-        self.progress.end_task()
 
         # progress update is handled within ExportObjects()
         self.export_objects()
