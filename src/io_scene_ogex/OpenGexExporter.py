@@ -19,13 +19,6 @@ k_animation_bezier = 2
 k_export_epsilon = 1.0e-6
 
 struct_identifiers = [B"Node", B"BoneNode", B"GeometryNode", B"LightNode", B"CameraNode"]
-
-subtranslation_name = [B"xpos", B"ypos", B"zpos"]
-subrotation_name = [B"xrot", B"yrot", B"zrot"]
-subscale_name = [B"xscl", B"yscl", B"zscl"]
-delta_subtranslation_name = [B"dxpos", B"dypos", B"dzpos"]
-delta_subrotation_name = [B"dxrot", B"dyrot", B"dzrot"]
-delta_subscale_name = [B"dxscl", B"dyscl", B"dzscl"]
 axis_name = [B"x", B"y", B"z"]
 
 
@@ -543,7 +536,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 for i in range(3):
                     pos = delta_translation[i]
                     if (delta_pos_animated[i]) or (math.fabs(pos) > k_export_epsilon):
-                        structs.append(Translation(name=delta_subtranslation_name[i], kind=axis_name[i], value=pos))
+                        structs.append(Translation(name=B"d" + axis_name[i] + B"pos", kind=axis_name[i], value=pos))
 
             elif ((math.fabs(delta_translation[0]) > k_export_epsilon) or (
                         math.fabs(delta_translation[1]) > k_export_epsilon) or (
@@ -557,7 +550,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 for i in range(3):
                     pos = translation[i]
                     if (pos_animated[i]) or (math.fabs(pos) > k_export_epsilon):
-                        structs.append(Translation(name=subtranslation_name[i], kind=axis_name[i], value=pos))
+                        structs.append(Translation(name=axis_name[i] + B"pos", kind=axis_name[i], value=pos))
 
             elif ((math.fabs(translation[0]) > k_export_epsilon) or (math.fabs(translation[1]) > k_export_epsilon) or (
                         math.fabs(translation[2]) > k_export_epsilon)):
@@ -572,7 +565,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     axis = ord(mode[2 - i]) - 0x58
                     angle = node.delta_rotation_euler[axis]
                     if (delta_rot_animated[axis]) or (math.fabs(angle) > k_export_epsilon):
-                        structs.append(Rotation(name=delta_subrotation_name[axis], kind=axis_name[axis], value=angle))
+                        structs.append(Rotation(name=B"d" + axis_name[axis] + B"rot", kind=axis_name[axis], value=angle))
 
             else:
 
@@ -603,7 +596,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     axis = ord(mode[2 - i]) - 0x58
                     angle = node.rotation_euler[axis]
                     if (rot_animated[axis]) or (math.fabs(angle) > k_export_epsilon):
-                        structs.append(Rotation(name=subrotation_name[axis], kind=axis_name[axis], value=angle))
+                        structs.append(Rotation(name=axis_name[axis] + B"rot", kind=axis_name[axis], value=angle))
 
             else:
 
@@ -638,7 +631,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 for i in range(3):
                     scl = delta_scale[i]
                     if (delta_scl_animated[i]) or (math.fabs(scl) > k_export_epsilon):
-                        structs.append(Scale(name=delta_subscale_name[i], kind=axis_name[i], value=scl))
+                        structs.append(Scale(name=B"d" + axis_name[i] + B"scl", kind=axis_name[i], value=scl))
 
             elif ((math.fabs(delta_scale[0] - 1.0) > k_export_epsilon) or (
                         math.fabs(delta_scale[1] - 1.0) > k_export_epsilon) or (
@@ -652,7 +645,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 for i in range(3):
                     scl = scale[i]
                     if (scl_animated[i]) or (math.fabs(scl) > k_export_epsilon):
-                        structs.append(Scale(name=subscale_name[i], kind=axis_name[i], value=scl))
+                        structs.append(Scale(name=axis_name[i] + B"scl", kind=axis_name[i], value=scl))
 
             elif ((math.fabs(scale[0] - 1.0) > k_export_epsilon) or (math.fabs(scale[1] - 1.0) > k_export_epsilon) or (
                         math.fabs(scale[2] - 1.0) > k_export_epsilon)):
@@ -669,21 +662,21 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 for i in range(3):
                     if pos_animated[i]:
                         animation_struct.children.append(
-                            self.export_animation_track(pos_anim_curve[i], pos_anim_kind[i], subtranslation_name[i])
+                            self.export_animation_track(pos_anim_curve[i], pos_anim_kind[i], axis_name[i] + B"pos")
                         )
 
             if rotation_animated:
                 for i in range(3):
                     if rot_animated[i]:
                         animation_struct.children.append(
-                            self.export_animation_track(rot_anim_curve[i], rot_anim_kind[i], subrotation_name[i])
+                            self.export_animation_track(rot_anim_curve[i], rot_anim_kind[i], axis_name[i] + B"rot")
                         )
 
             if scale_animated:
                 for i in range(3):
                     if scl_animated[i]:
                         animation_struct.children.append(
-                            self.export_animation_track(scale_anim_curve[i], scale_anim_kind[i], subscale_name[i])
+                            self.export_animation_track(scale_anim_curve[i], scale_anim_kind[i], axis_name[i] + B"scl")
                         )
 
             if delta_position_animated:
@@ -691,7 +684,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     if delta_pos_animated[i]:
                         animation_struct.children.append(
                             self.export_animation_track(delta_pos_anim_curve[i], delta_pos_anim_kind[i],
-                                                        delta_subtranslation_name[i])
+                                                        B"d" + axis_name[i] + B"pos")
                         )
 
             if delta_rotation_animated:
@@ -699,7 +692,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     if delta_rot_animated[i]:
                         animation_struct.children.append(
                             self.export_animation_track(delta_rot_anim_curve[i], delta_rot_anim_kind[i],
-                                                        delta_subrotation_name[i])
+                                                        B"d" + axis_name[i] + B"rot")
                         )
 
             if delta_scale_animated:
@@ -707,7 +700,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     if delta_scl_animated[i]:
                         animation_struct.children.append(
                             self.export_animation_track(delta_scale_anim_curve[i], delta_scale_anim_kind[i],
-                                                        delta_subscale_name[i])
+                                                        B"d" + axis_name[i] + B"scl")
                         )
         return structs
 
