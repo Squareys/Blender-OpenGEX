@@ -13,9 +13,9 @@ install:
   - mkdir tmp && cd tmp && mkdir blender
 
   # download the blender version you want to test against
-  - wget http://download.blender.org/release/Blender2.77/blender-2.77-rc1-linux-glibc211-x86_64.tar.bz2
+  - wget http://download.blender.org/release/Blender2.77/blender-2.77-linux-glibc211-x86_64.tar.bz2
   # Extract the archive
-  - tar jxf blender-2.77-rc1-linux-glibc211-x86_64.tar.bz2 -C blender --strip-components 1
+  - tar jxf blender-2.77-linux-glibc211-x86_64.tar.bz2 -C blender --strip-components 1
 
   - cd ..
 
