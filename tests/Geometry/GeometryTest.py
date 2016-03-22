@@ -1,14 +1,10 @@
 import bpy
 import os
 import unittest
-import io_scene_ogex
 
 from tests import TestUtils
 
 __author__ = 'Jonathan Hale'
-
-# Currently not running, because vertex export order has changed because of the
-# new way of exporting geometry.
 
 
 # Regression test for exporting meshes
