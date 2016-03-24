@@ -15,7 +15,7 @@ class LinkedObjectsTest(TestUtils.OgexExporterTest):
 
     def testLinkedObjects(self):
         bpy.ops.wm.open_mainfile(filepath=self.base_dir + os.sep + "Test.blend")
-        bpy.ops.export_scene.ogex(filepath=self.filename)
+        bpy.ops.export_scene.ogex(filepath=self.filename, rounding=3)
 
         self.assertFilesEqual(self.filename, self.base_dir + os.sep + "Expected.ogex")
 
