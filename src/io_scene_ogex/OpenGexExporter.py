@@ -62,6 +62,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                                                         description="Only export the first material of any object. May"
                                                                     "be useful for some game engines for example.",
                                                         default=False)
+    rounding = bpy.props.IntProperty(name="Float Rounding Decimal Places",
+                                     description="Amount of decimal places to round floating point values to.",
+                                     default=6)
 
     def __init__(self):
         super().__init__()
@@ -1474,7 +1477,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             scene.frame_set(original_frame, original_subframe)
 
         self.progress.begin_task("Writing file...")
-        DdlTextWriter(self.document).write(self.filepath)
+        DdlTextWriter(self.document, rounding=self.rounding).write(self.filepath)
         self.progress.end_task()
 
         print('-- Successfully exported to "{}". ({:.2f} sec)'.format(self.filepath, time.time() - start_time))
