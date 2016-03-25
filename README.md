@@ -5,7 +5,7 @@ Travis [![Build Status](https://travis-ci.org/Squareys/Blender-OpenGEX.svg?branc
 # How to install
 
 Install instructions for all operating systems:
- 1. Download the latest release as a .zip from "releases".
+ 1. Download the latest release as a .zip from ["releases"](https://github.com/Squareys/Blender-OpenGEX/releases).
  2. Open Blender and under `File > User Preferences... > Addons` select `Install from File...` and locate the zip file.
  Finally click `Install from File..` to close the file browser.
  3. Search for "OpenGEX" and enable the addon.
@@ -13,16 +13,22 @@ Install instructions for all operating systems:
 # Differences from the original
 
 * Support for exporting linked objects and linked groups
-* Faster geometry export, but:
+* Faster geometry export, but: \*
   * No support for morphing
   * No support for vertex skin weights
 * Support for exporting object game physics as Extensions [=> documentation](https://github.com/Squareys/Blender-OpenGEX/wiki/PhysicsMaterial-Extension)
 * Support for exporting custom properties as Extensions [=> documentation](https://github.com/Squareys/Blender-OpenGEX/wiki/Property-Extension)
 * Support for exporting the worlds ambient color and material ambient factor [=> documentation](https://github.com/Squareys/Blender-OpenGEX/wiki/Ambient-Colors)
+* Option for rounding floating point number to n decimal places
+* Option to export only the first material slot of each object
 
-Some of the broken features may be implemented if I start needing them.
+\* Some of the broken features may be implemented in the future if I start needing them.
 
-# License
+# Version Semantics
+
+OpenGEX Exporter Addon versions are built up as:
+
+`<OpenGEX specification version>.<1 digit for OpenGEX Exporter Addon version>`
 
 ```
 Copyright © 2015, 2016 Jonathan Hale
