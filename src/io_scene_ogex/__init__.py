@@ -3,20 +3,26 @@
 #  Open Game Engine Exchange
 #  http://opengex.org/
 #
-#  Export plugin for Blender
-#  by Eric Lengyel
+#  Inofficial Export plugin for Blender by Jonathan Hale,
+#  based on the official Export plugin by Eric Lengyel
 #
 #  Version 1.1.2.0
 #
-#  Copyright 2015, Terathon Software LLC
-#  Copyright 2015, Jonathan Hale
-#  Copyright 2015, Nicolas Wehrle
+# Copyright © 2015, 2016 Jonathan Hale
+# Copyright © 2015 Terathon Software LLC
+# Copyright © 2015 Nicolas Wehrle
 #
-#  This software is licensed under the Creative Commons
-#  Attribution-ShareAlike 3.0 Unported License:
+# This software is licensed under the Creative Commons
+# Attribution-ShareAlike 3.0 Unported License:
 #
-#  http://creativecommons.org/licenses/by-sa/3.0/deed.en_US
+# http://creativecommons.org/licenses/by-sa/3.0/deed.en_US
 #
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+# PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+# FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+# OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
 # =============================================================
 
 import bpy
