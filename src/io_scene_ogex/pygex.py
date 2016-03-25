@@ -374,7 +374,7 @@ class VertexArray(DdlStructure):
 
 class GeometryObject(DdlStructure):
     def __init__(self, name):
-        super().__init__(B"GeometryObject", name=name)
+        super().__init__(B"GeometryObject", name=name, children=[])
 
 
 class GeometryNode(Node):
