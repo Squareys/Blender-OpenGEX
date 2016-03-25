@@ -2,8 +2,6 @@ import bpy
 import os
 import unittest
 
-import io_scene_ogex
-
 from tests import TestUtils
 
 __author__ = 'Jonathan Hale'
@@ -17,7 +15,7 @@ class PhsyicsTest(TestUtils.OgexExporterTest):
 
     def testPhysics(self):
         bpy.ops.wm.open_mainfile(filepath=self.base_dir + os.sep + "Test.blend")
-        bpy.ops.export_scene.ogex(filepath=self.filename, export_physics=True)
+        bpy.ops.export_scene.ogex(filepath=self.filename, export_physics=True, rounding=3)
 
         self.assertFilesEqual(self.filename, self.base_dir + os.sep + "Expected.ogex")
 

@@ -29,7 +29,7 @@ class NodeWrapper(BaseWrapper):
     def process_node(self):
         if self.container.exportAll or self.item.select:
             self.nodeRef["nodeType"] = self.get_node_type()
-            self.nodeRef["structName"] = bytes("node" + str(len(self.container.nodes)), "UTF-8")
+            self.nodeRef["structName"] = B"node" + bytes(str(len(self.container.nodes)), "UTF-8")
 
             if self.item.parent_type == "BONE":
                 bone_subnode_array = self.container.boneParentArray.get(self.item.parent_bone)

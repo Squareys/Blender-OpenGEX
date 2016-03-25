@@ -2,8 +2,6 @@ import bpy
 import os
 import unittest
 
-import io_scene_ogex
-
 from tests import TestUtils
 
 __author__ = 'Jonathan Hale'
