@@ -6,7 +6,7 @@
 #  Export plugin for Blender
 #  by Eric Lengyel
 #
-#  Version 1.2.0.0
+#  Version 1.1.2.0
 #
 #  Copyright 2015, Terathon Software LLC
 #  Copyright 2015, Jonathan Hale
@@ -29,7 +29,7 @@ bl_info = {
     "name": "OpenGEX format (.ogex)",
     "description": "OpenGEX Exporter",
     "author": "Eric Lengyel, Jonathan Hale, Nicolas Wehrle",
-    "version": (1, 2, 0, 0),
+    "version": (1, 1, 2, 0),
     "location": "File > Import-Export",
     "category": "Import-Export"}
 
