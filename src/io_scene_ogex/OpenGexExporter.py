@@ -70,8 +70,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         super().__init__()
         self.progress = ProgressLog()
         self.container = None
-
-        self.document = DdlDocument()
+        self.document = None
 
     @staticmethod
     def get_shape_keys(mesh):
@@ -1479,6 +1478,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.progress.begin_task("Writing file...")
         DdlTextWriter(self.document, rounding=self.rounding).write(self.filepath)
         self.progress.end_task()
+
+        # cleanup
+        del self.document
+        del self.container
 
         print('-- Successfully exported to "{}". ({:.2f} sec)'.format(self.filepath, time.time() - start_time))
 
