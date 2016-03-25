@@ -30,6 +30,8 @@ OpenGEX Exporter Addon versions are built up as:
 
 `<OpenGEX specification version>.<1 digit for OpenGEX Exporter Addon version>`
 
+# License
+
 ```
 Copyright © 2015, 2016 Jonathan Hale
 Copyright © 2015 Terathon Software LLC
