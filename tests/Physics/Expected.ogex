@@ -84,6 +84,11 @@ Node $node3
 			string {"RIGID_BODY"}
 		}
 
+		Extension (applic = "Blender", type = "PM/mass")
+		{
+			float {0.01}
+		}
+
 		Extension (applic = "Blender", type = "PM/collision_mask")
 		{
 			unsigned_int16 {65535}

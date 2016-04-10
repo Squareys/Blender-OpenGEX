@@ -936,6 +936,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             ])
         ])
 
+        # export mass
+        if props.mass != 1.0:
+            struct.children.append(Extension(B"PM/mass", children=[
+                # physics collision type
+                DdlPrimitive(DataType.float, data=[props.mass])
+            ]))
+
         # calculate collision group and mask
         collision_mask = 0
         collision_group = 0
