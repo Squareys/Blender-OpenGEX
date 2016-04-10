@@ -243,7 +243,7 @@ class LightObject(DdlStructure):
         is_point = False
         is_spot = False
 
-        super().__init__(B"LightObject", name=name, props=OrderedDict())
+        super().__init__(B"LightObject", name=name, props=OrderedDict(), children=[])
 
         if light.type == "SUN":
             self.properties[B"type"] = B"infinite"
