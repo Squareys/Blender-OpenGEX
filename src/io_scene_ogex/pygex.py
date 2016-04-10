@@ -192,7 +192,7 @@ class Material(DdlStructure):
         # export shadeless flag
         if material.use_shadeless:
             self.children.append(Extension(type=B"Shadeless", children=[
-                DdlPrimitive(DataType.bool, value=[True])
+                DdlPrimitive(DataType.bool, data=[True])
             ]))
 
         diffuse_texture = None
