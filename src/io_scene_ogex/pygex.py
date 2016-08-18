@@ -379,7 +379,7 @@ class GeometryObject(DdlStructure):
 
 class GeometryNode(Node):
     def __init__(self, mesh, name, geometry, materials, use_custom_properties=False):
-        props = {B"visible", False} if mesh.hide_render else dict()
+        props = {B"visible": False} if mesh.hide_render else dict()
         super().__init__(B"GeometryNode", mesh, name, props=props, children=[],
                          use_custom_properties=use_custom_properties)
 
