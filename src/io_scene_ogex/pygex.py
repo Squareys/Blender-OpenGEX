@@ -1,4 +1,4 @@
-import collections
+import os
 from collections import OrderedDict
 import itertools
 from io_scene_ogex.pyddl import DdlPrimitiveDataType as DataType
@@ -137,9 +137,9 @@ class Mesh(DdlStructure):
 
 
 class Texture(DdlStructure):
-    def __init__(self, texture_slot, attrib):
+    def __init__(self, texture_slot, attrib, path_prefix=""):
         super().__init__(B"Texture", props={B"attrib": attrib}, children=[
-            DdlPrimitive(DataType.string, data=[texture_slot.texture.image.filepath.replace("//", "")])
+            DdlPrimitive(DataType.string, data=[path_prefix + os.sep + texture_slot.texture.image.filepath.replace("//", "")])
         ])
         # If the texture has a scale and/or offset, then export a coordinate transform.
 
@@ -158,7 +158,7 @@ class Texture(DdlStructure):
 
 
 class Material(DdlStructure):
-    def __init__(self, material, name, export_ambient=False):
+    def __init__(self, material, name, export_ambient=False, texture_path_prefix="", export_images=False):
         if material is None:
             raise ValueError("material cannot be None")
 
@@ -218,24 +218,29 @@ class Material(DdlStructure):
                     normal_texture = textureSlot
 
         if diffuse_texture:
-            self.export_texture(diffuse_texture, B"diffuse")
+            self.export_texture(diffuse_texture, B"diffuse", texture_path_prefix, export_images)
         if specular_texture:
-            self.export_texture(specular_texture, B"specular")
+            self.export_texture(specular_texture, B"specular", texture_path_prefix, export_images)
         if emission_texture:
-            self.export_texture(emission_texture, B"emission")
+            self.export_texture(emission_texture, B"emission", texture_path_prefix, export_images)
         if transparency_texture:
-            self.export_texture(transparency_texture, B"transparency")
+            self.export_texture(transparency_texture, B"transparency", texture_path_prefix, export_images)
         if normal_texture:
-            self.export_texture(normal_texture, B"normal")
+            self.export_texture(normal_texture, B"normal", texture_path_prefix, export_images)
 
-    def export_texture(self, texture_slot, layer):
+    def export_texture(self, texture_slot, layer, path_prefix, export_image):
         if texture_slot.texture.type != 'IMAGE':
             return  # only image textures supported.
 
         if texture_slot.texture.image is None:
             return  # cannot export no image.
 
-        self.children.append(Texture(texture_slot, layer))
+        self.children.append(Texture(texture_slot, layer, path_prefix=path_prefix))
+
+        if export_image:
+            import bpy
+            path = os.path.relpath(path_prefix + os.sep + texture_slot.texture.image.filepath.replace("//", ""))
+            texture_slot.texture.image.save_render(path, scene=bpy.context.scene)
 
 
 class LightObject(DdlStructure):

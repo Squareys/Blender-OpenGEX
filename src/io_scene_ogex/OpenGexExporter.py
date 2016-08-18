@@ -1396,7 +1396,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         if material not in self.container.materialArray:
             struct = Material(material,
                               name=B"material" + bytes(str(len(self.container.materialArray) + 1), "UTF-8"),
-                              export_ambient=self.export_ambient)
+                              export_ambient=self.export_ambient, export_images=self.export_image_textures,
+                              texture_path_prefix=self.image_path_prefix)
             self.container.materialArray[material] = {"struct": struct, "nodeTable": [node]}
             return struct
         else:
@@ -1470,6 +1471,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         start_time = time.time()
 
+        previous_file_format = context.scene.render.image_settings.file_format
+        context.scene.render.image_settings.file_format = self.image_format
+        self.image_path_prefix = self.image_path_prefix.replace("//", "")
+        if self.image_path_prefix.endswith("/"):
+            self.image_path_prefix = self.image_path_prefix[:-1]
+
         self.document = DdlDocument()
         scene = context.scene
         export_all_flag = not self.export_selection
@@ -1513,6 +1520,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         # cleanup
         del self.document
         del self.container
+
+        context.scene.render.image_settings.file_format = previous_file_format
 
         print('-- Successfully exported to "{}". ({:.2f} sec)'.format(self.filepath, time.time() - start_time))
 
