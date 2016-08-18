@@ -21,6 +21,21 @@ k_export_epsilon = 1.0e-6
 struct_identifiers = [B"Node", B"BoneNode", B"GeometryNode", B"LightNode", B"CameraNode"]
 axis_name = [B"x", B"y", B"z"]
 
+image_format_items = [
+    ('BMP', 'BMP', '', 0),
+    ('IRIS', 'Iris', '', 1),
+    ('PNG', 'PNG', '', 2),
+    ('JPEG', 'JPEG', '', 3),
+    ('JPEG2000', 'JPEG 2000', '', 4),
+    ('TARGA', 'Targa', '', 5),
+    ('TARGA_RAW', 'Targa Raw', '', 6),
+    ('CINEON', 'Cineon', '', 7),
+    ('DPX', 'DPX', '', 8),
+    ('OPEN_EXR_MULTILAYER', 'OpenEXR MultiLayer', '', 9),
+    ('OPEN_EXR', 'OpenEXR', '', 10),
+    ('HDR', 'Radiance HDR', '', 11),
+    ('TIFF', 'TIFF', '', 12)]
+
 
 class ProgressLog:
     def __init__(self):
@@ -65,6 +80,15 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     rounding = bpy.props.IntProperty(name="Float Rounding Decimal Places",
                                      description="Amount of decimal places to round floating point values to.",
                                      default=6)
+
+    # image texture export properties
+    export_image_textures = bpy.props.BoolProperty(name="Export Image Textures",
+                                                   description="Whether to export images for exported textures.")
+    image_path_prefix = bpy.props.StringProperty(name="Image Path Prefix", default='//',
+                                                 description="Prefix relative to the exported scene file\n"
+                                                             "to export image textures to.")
+    image_format = bpy.props.EnumProperty(name="Image Format", items=image_format_items, default='PNG',
+                                          description="Format for exported image textures.")
 
     def __init__(self):
         super().__init__()
@@ -1501,6 +1525,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         col.label("General")
         col.prop(self, "export_selection")
         col.prop(self, "sample_animation")
+        col.prop(self, "export_image_textures")
+
+        if self.export_image_textures:
+            col.prop(self, "image_path_prefix")
+            col.prop(self, "image_format")
         col.separator()
 
         col.label("Extensions")
