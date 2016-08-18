@@ -1493,3 +1493,22 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         print('-- Successfully exported to "{}". ({:.2f} sec)'.format(self.filepath, time.time() - start_time))
 
         return {'FINISHED'}
+
+    def draw(self, context):
+        layout = self.layout
+
+        col = layout.column()
+        col.label("General")
+        col.prop(self, "export_selection")
+        col.prop(self, "sample_animation")
+        col.separator()
+
+        col.label("Extensions")
+        col.prop(self, "export_custom_properties")
+        col.prop(self, "export_physics")
+        col.prop(self, "export_ambient")
+        col.separator()
+
+        col.label("Advanced")
+        col.prop(self, "rounding")
+        col.prop(self, "export_only_first_material")
