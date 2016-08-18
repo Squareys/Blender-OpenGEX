@@ -1528,7 +1528,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         col.prop(self, "export_image_textures")
 
         if self.export_image_textures:
-            col.prop(self, "image_path_prefix")
             col.prop(self, "image_format")
         col.separator()
 
@@ -1541,3 +1540,4 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         col.label("Advanced")
         col.prop(self, "rounding")
         col.prop(self, "export_only_first_material")
+        col.prop(self, "image_path_prefix")
