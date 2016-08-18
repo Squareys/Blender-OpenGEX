@@ -137,9 +137,9 @@ class Mesh(DdlStructure):
 
 
 class Texture(DdlStructure):
-    def __init__(self, texture_slot, attrib, path_prefix=""):
+    def __init__(self, texture_slot, attrib, path):
         super().__init__(B"Texture", props={B"attrib": attrib}, children=[
-            DdlPrimitive(DataType.string, data=[path_prefix + os.sep + texture_slot.texture.image.filepath.replace("//", "")])
+            DdlPrimitive(DataType.string, data=[path])
         ])
         # If the texture has a scale and/or offset, then export a coordinate transform.
 
@@ -235,12 +235,17 @@ class Material(DdlStructure):
         if texture_slot.texture.image is None:
             return  # cannot export no image.
 
-        self.children.append(Texture(texture_slot, layer, path_prefix=path_prefix))
+        path = path_prefix + os.sep + texture_slot.texture.image.filepath.replace("//", "")
 
         if export_image:
             import bpy
-            path = os.path.relpath(path_prefix + os.sep + texture_slot.texture.image.filepath.replace("//", ""))
-            texture_slot.texture.image.save_render(path, scene=bpy.context.scene)
+            scene = bpy.context.scene
+            path = path_prefix + os.sep + texture_slot.texture.image.filepath.replace("//", "")
+            (path, _) = path.split('.')
+            path = path + scene.render.file_extension
+            texture_slot.texture.image.save_render(path, scene=scene)
+
+        self.children.append(Texture(texture_slot, layer, path=path))
 
 
 class LightObject(DdlStructure):
