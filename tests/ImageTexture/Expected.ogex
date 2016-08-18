@@ -4349,5 +4349,5 @@ Material $material1		// Suzanne
 	Color (attrib = "diffuse") {float[3] {{0.8, 0.8, 0.0}}}
 	Color (attrib = "specular") {float[3] {{0.5, 0.5, 0.5}}}
 	Param (attrib = "specular_power") {float {50}}
-	Texture (attrib = "diffuse") {string {"textures\Test.png"}}
+	Texture (attrib = "diffuse") {string {"textures\Test.bmp"}}
 }
