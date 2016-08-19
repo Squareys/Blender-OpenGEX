@@ -1547,7 +1547,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         # OpenGEX uses only '/', may not contain \
         # Remove blender // prefix
         path_prefix = self.image_path_prefix.replace("//", "").replace("\\", "/")
-        if len(path_prefix) <= 1 and not path_prefix.endswith('/'):
+        if len(path_prefix) > 1 and not path_prefix.endswith('/'):
             self.image_path_prefix = path_prefix + "/"
         else:
             self.image_path_prefix = path_prefix
