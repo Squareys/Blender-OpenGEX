@@ -33,6 +33,12 @@ image_format_items = [
     ('HDR', 'Radiance HDR', '', 11),
     ('TIFF', 'TIFF', '', 12)]
 
+oddl_format_items = [
+    ('TEXT', 'Text', 'Human readable text.', 0),
+    ('COMPRESSED_TEXT', 'Compressed Text',
+     'Text without whitespaces, tabs or newlines.\nSmaller and faster to export.', 1)
+]
+
 
 class ProgressLog:
     def __init__(self):
@@ -67,6 +73,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     rounding = bpy.props.IntProperty(name="Float Rounding Decimal Places",
                                      description="Amount of decimal places to round floating point values to.",
                                      default=6)
+    oddl_format = bpy.props.EnumProperty(name="OpenDDL Format", items=oddl_format_items, default='TEXT',
+                                         description="Format for the exported OpenGEX (based on OpenDDL) file.")
 
     # Extension settings
     export_custom_properties = bpy.props.BoolProperty(name="Export Custom Properties",
@@ -1582,7 +1590,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             scene.frame_set(original_frame, original_subframe)
 
         self.progress.begin_task("Writing file...")
-        DdlTextWriter(self.document, rounding=self.rounding).write(self.filepath)
+        if self.oddl_format == 'TEXT':
+            DdlTextWriter(self.document, rounding=self.rounding).write(self.filepath)
+        if self.oddl_format == 'COMPRESSED_TEXT':
+            DdlCompressedTextWriter(self.document, rounding=self.rounding).write(self.filepath)
         self.progress.end_task()
 
         # cleanup
@@ -1618,3 +1629,4 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         col.prop(self, "rounding")
         col.prop(self, "export_only_first_material")
         col.prop(self, "image_path_prefix")
+        col.prop(self, "oddl_format")
