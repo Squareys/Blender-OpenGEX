@@ -446,5 +446,137 @@ class DdlTextWriter(DdlWriter):
             raise TypeError("set_comment can only be set for DdlPrimitive or DdlStructure")
 
 
+class DdlCompressedTextWriter(DdlTextWriter):
+    """
+    OpenDdlWriter which writes OpenDdlDocuments in compressed (probably not human-readable) text form.
+
+    Making use of "Whitespace never has any meaning, so OpenDDL files can be formatted in any manner preferred.", see
+    OpenDDL specification.
+
+    Faster than DdlTextWriter and produces smaller files.
+    """
+
+    def __init__(self, document, rounding=6):
+        """
+        Constructor
+        :param document: document to write
+        :param rounding: number of decimal places to keep or None to keep all
+        """
+        super().__init__(document, rounding)
+
+    def write(self, filename):
+        self.file = open(filename, "wb")
+
+        if len(self.get_document().structures) != 0:
+            for structure in self.get_document().structures:
+                self.file.write(self.structure_as_text(structure))
+
+        self.file.close()
+
+    def property_as_text(self, prop):
+        """
+        Create a text representation for a key-value-pair. E.g.: "key=value".
+        :param prop: a pair to represent as text
+        :return: a byte-string in the form "key=value"
+        """
+        value = prop[1]
+        if isinstance(value, bool):
+            value_bytes = self.to_bool_byte(value)
+        elif isinstance(value, int):
+            value_bytes = self.to_int_byte(value)
+        elif isinstance(value, float):
+            value_bytes = self.to_float_byte(value)
+        elif isinstance(value, str):
+            value_bytes = B"\"" + bytes(value, "UTF-8") + B"\""
+        elif isinstance(value, bytes):
+            value_bytes = B"\"" + value + B"\""
+        else:
+            raise TypeError("ERROR: Unknown property type for property \"{}\"".format(prop[0]))
+
+        return prop[0] + B"=" + value_bytes
+
+    def primitive_as_text(self, primitive):
+        """
+        Get a text representation of the given primitive structure
+        :param primitive: primitive structure to get the text representation for
+        :return: a byte string representing the primitive structure
+        """
+        lines = [bytes(primitive.data_type.name, "UTF-8")]
+
+        if primitive.vector_size > 0:
+            lines.append(B"[" + self.to_int_byte(primitive.vector_size) + B"]")
+
+        if primitive.name is not None:
+            lines.append(B"$"+ primitive.name)
+
+        # find appropriate conversion function
+        if primitive.data_type in [DdlPrimitiveDataType.bool]:
+            # bool
+            to_bytes = self.to_bool_byte
+        elif primitive.data_type in [DdlPrimitiveDataType.double, DdlPrimitiveDataType.float]:
+            # float/double
+            to_bytes = self.to_float_byte if self.rounding is None else self.to_float_byte_rounded
+        elif primitive.data_type in [DdlPrimitiveDataType.int8, DdlPrimitiveDataType.int16, DdlPrimitiveDataType.int32,
+                                     DdlPrimitiveDataType.int64, DdlPrimitiveDataType.unsigned_int8,
+                                     DdlPrimitiveDataType.unsigned_int16, DdlPrimitiveDataType.unsigned_int32,
+                                     DdlPrimitiveDataType.unsigned_int64, DdlPrimitiveDataType.half]:
+            # integer types
+            to_bytes = self.to_int_byte
+        elif primitive.data_type in [DdlPrimitiveDataType.string]:
+            # string
+            if primitive.vector_size == 0 and len(primitive.data) > 0:
+                to_bytes = self.id if isinstance(primitive.data[0], bytes) else self.to_string_byte
+            else:
+                if len(primitive.data) > 0:
+                    to_bytes = self.id if isinstance(primitive.data[0][0], bytes) else self.to_string_byte
+        elif primitive.data_type in [DdlPrimitiveDataType.ref]:
+            to_bytes = self.to_ref_byte
+        else:
+            raise TypeError("Encountered unknown primitive type.")
+
+        if len(primitive.data) == 0:
+            lines.append(B"{}")
+        elif primitive.is_simple_primitive():
+            if primitive.vector_size == 0:
+                lines.append(B"{" + to_bytes(primitive.data[0]) + B"}")
+            else:
+                lines.append(B"{{" + (B",".join(map(to_bytes, primitive.data[0]))) + B"}}")
+        else:
+            if primitive.vector_size == 0:
+                lines.append(B",".join(map(to_bytes, primitive.data)))
+            else:
+                lines.append(B"{" + (B"},{".join(B",".join(map(to_bytes, vec)) for vec in primitive.data)) + B"}")
+            lines.append(B"}")
+
+        return lines
+
+    def structure_as_text(self, structure):
+        """
+        Get a text representation of the given structure
+        :param structure: structure to get the text representation for
+        :return: a byte string representing the structure
+        """
+        lines = [structure.identifier]
+
+        if structure.name:
+            lines.append(B"$" if structure.name_is_global else B"%")
+            lines.append(structure.name)
+
+        if len(structure.properties) != 0:
+            lines.append(B"(" + B",".join(self.property_as_text(prop) for prop in structure.properties.items()) + B")")
+
+        lines.append(B"{")
+
+        for sub in structure.children:
+            if isinstance(sub, DdlPrimitive):
+                lines.extend(self.primitive_as_text(sub))
+            else:
+                lines.append(self.structure_as_text(sub))
+
+        lines.append(B"}")
+
+        return B''.join(lines)
+
+
 # Space reserved for a specification based OpenDdlBinaryWriter ;)
 # Hope there will be some specification for it some day.
