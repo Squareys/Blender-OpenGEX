@@ -1,5 +1,7 @@
 from enum import IntEnum
 
+from collections import OrderedDict
+
 __author__ = 'Eric Lengyel, Jonathan Hale, Nicolas Wehrle'
 
 
@@ -23,7 +25,7 @@ class ExporterState:
         self.frameTime = 1.0 / (scene.render.fps_base * scene.render.fps)
 
         self.geometryArray = {}
-        self.lightArray = {}
+        self.lightArray = OrderedDict()
         self.cameraArray = {}
         self.materialArray = {}
 
