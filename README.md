@@ -22,6 +22,11 @@ Install instructions for all operating systems:
 * Option for rounding floating point number to n decimal places
 * Option to export only the first material slot of each object
 
+Bleeding-edge (on master, but not released):
+* Ability to specify prefix for exported texture paths
+* Image texture export
+* Export OpenGEX in an compressed text format (without whitespaces)
+
 \* Some of the broken features may be implemented in the future if I start needing them.
 
 # Version Semantics
