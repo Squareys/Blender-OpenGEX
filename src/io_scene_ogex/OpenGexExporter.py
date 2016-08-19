@@ -1386,6 +1386,35 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 entry["nodeTable"].append(node)
             return entry["struct"]
 
+    def export_texture(self, texture_slot, layer):
+        if texture_slot.texture.type != 'IMAGE':
+            return None  # only image textures supported.
+
+        if texture_slot.texture.image is None:
+            return None  # cannot export no image.
+
+        # get filename from blender path
+        import bpy
+        (_, path) = os.path.split(bpy.path.abspath(texture_slot.texture.image.filepath))
+        # prepend path prefix
+        path = os.path.relpath(self.image_path_prefix + path).replace("\\", "/")
+
+        if self.export_image_textures:
+            context = bpy.context
+            scene = context.scene
+
+            # Replace file ending
+            (path, _) = path.split('.')
+            path = path + scene.render.file_extension
+
+            # Convert ogex relative path of image to .blend relative path or absolute path
+            (ogex_filepath, _) = os.path.split(self.filepath)
+            image_path = ogex_filepath + path
+
+            texture_slot.texture.image.save_render(image_path, scene=scene)
+
+        return Texture(texture_slot, layer, path)
+
     def export_material(self, node, material):
         """
         Create a DdlStructure from material data
@@ -1394,11 +1423,45 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         :return: the created DdlStructure
         """
         if material not in self.container.materialArray:
-            struct = Material(material,
-                              name=B"material" + bytes(str(len(self.container.materialArray) + 1), "UTF-8"),
-                              export_ambient=self.export_ambient, export_images=self.export_image_textures,
-                              texture_path_prefix=self.image_path_prefix)
+            diffuse_texture = None
+            specular_texture = None
+            emission_texture = None
+            transparency_texture = None
+            normal_texture = None
+
+            textures = []
+
+            for textureSlot in material.texture_slots:
+                if textureSlot and textureSlot.use and (textureSlot.texture.type == "IMAGE"):
+                    if (textureSlot.use_map_color_diffuse or textureSlot.use_map_diffuse and (
+                            not diffuse_texture)):
+                        diffuse_texture = textureSlot
+                    elif (
+                                textureSlot.use_map_color_spec or textureSlot.use_map_specular and (
+                                    not specular_texture)):
+                        specular_texture = textureSlot
+                    elif textureSlot.use_map_emit and (not emission_texture):
+                        emission_texture = textureSlot
+                    elif textureSlot.use_map_translucency and (not transparency_texture):
+                        transparency_texture = textureSlot
+                    elif textureSlot.use_map_normal and (not normal_texture):
+                        normal_texture = textureSlot
+
+            if diffuse_texture:
+                textures.append(self.export_texture(diffuse_texture, B"diffuse"))
+            if specular_texture:
+                textures.append(self.export_texture(specular_texture, B"specular"))
+            if emission_texture:
+                textures.append(self.export_texture(emission_texture, B"emission"))
+            if transparency_texture:
+                textures.append(self.export_texture(transparency_texture, B"transparency"))
+            if normal_texture:
+                textures.append(self.export_texture(normal_texture, B"normal"))
+
+            name = B"material" + bytes(str(len(self.container.materialArray) + 1), "UTF-8")
+            struct = Material(material, name, self.export_ambient, list(filter(None, textures)))
             self.container.materialArray[material] = {"struct": struct, "nodeTable": [node]}
+
             return struct
         else:
             return self.container.materialArray[material]["struct"]
