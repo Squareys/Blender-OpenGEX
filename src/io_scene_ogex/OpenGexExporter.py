@@ -59,6 +59,16 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                                               description="Always export animation as per-frame samples",
                                               default=False)
 
+    # Advanced settings
+    export_only_first_material = bpy.props.BoolProperty(name="Export First Material Only",
+                                                        description="Only export the first material of any object. May"
+                                                                    "be useful for some game engines for example.",
+                                                        default=False)
+    rounding = bpy.props.IntProperty(name="Float Rounding Decimal Places",
+                                     description="Amount of decimal places to round floating point values to.",
+                                     default=6)
+
+    # Extension settings
     export_custom_properties = bpy.props.BoolProperty(name="Export Custom Properties",
                                                       description="Export object custom properties to an OGEX" +
                                                                   "Extension structure",
@@ -70,13 +80,6 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                                             description="Export world ambient color and material ambient factors as a"
                                                         "not officially specified Param.",
                                             default=False)
-    export_only_first_material = bpy.props.BoolProperty(name="Export First Material Only",
-                                                        description="Only export the first material of any object. May"
-                                                                    "be useful for some game engines for example.",
-                                                        default=False)
-    rounding = bpy.props.IntProperty(name="Float Rounding Decimal Places",
-                                     description="Amount of decimal places to round floating point values to.",
-                                     default=6)
 
     # image texture export properties
     export_image_textures = bpy.props.BoolProperty(name="Export Image Textures",
