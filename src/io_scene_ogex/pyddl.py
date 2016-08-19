@@ -543,10 +543,9 @@ class DdlCompressedTextWriter(DdlTextWriter):
                 lines.append(B"{{" + (B",".join(map(to_bytes, primitive.data[0]))) + B"}}")
         else:
             if primitive.vector_size == 0:
-                lines.append(B",".join(map(to_bytes, primitive.data)))
+                lines.append(B"{" + B",".join(map(to_bytes, primitive.data)) + B"}")
             else:
-                lines.append(B"{" + (B"},{".join(B",".join(map(to_bytes, vec)) for vec in primitive.data)) + B"}")
-            lines.append(B"}")
+                lines.append(B"{{" + (B"},{".join(B",".join(map(to_bytes, vec)) for vec in primitive.data)) + B"}}")
 
         return lines
 
