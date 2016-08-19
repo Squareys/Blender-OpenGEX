@@ -1417,7 +1417,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             # Convert ogex relative path of image to .blend relative path or absolute path
             (ogex_filepath, _) = os.path.split(self.filepath)
-            image_path = ogex_filepath + path
+            image_path = ogex_filepath + os.sep + path
 
             texture_slot.texture.image.save_render(image_path, scene=scene)
 
