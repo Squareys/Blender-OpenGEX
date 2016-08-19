@@ -17,7 +17,7 @@ class ImageTextureTest(TestUtils.OgexExporterTest):
     def testImageTextureExport(self):
         bpy.ops.wm.open_mainfile(filepath=self.base_dir + os.sep + "Test.blend")
         bpy.ops.export_scene.ogex(filepath=self.filename, rounding=3,
-                                  export_image_textures=True, image_path_prefix="//textures/",
+                                  export_image_textures=True, image_path_prefix="textures/",
                                   image_format='BMP')
 
         self.assertFilesEqual(self.filename, self.base_dir + os.sep + "Expected.ogex")

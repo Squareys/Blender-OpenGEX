@@ -1536,12 +1536,17 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         previous_file_format = context.scene.render.image_settings.file_format
         context.scene.render.image_settings.file_format = self.image_format
-        self.image_path_prefix = self.image_path_prefix.replace("//", "")
-        if self.image_path_prefix.endswith("/"):
-            self.image_path_prefix = self.image_path_prefix[:-1]
+        # OpenGEX uses only '/', may not contain \
+        # Remove blender // prefix
+        path_prefix = self.image_path_prefix.replace("//", "").replace("\\", "/")
+        if len(path_prefix) <= 1 and not path_prefix.endswith('/'):
+            self.image_path_prefix = path_prefix + "/"
+        else:
+            self.image_path_prefix = path_prefix
 
         self.document = DdlDocument()
         scene = context.scene
+
         export_all_flag = not self.export_selection
         self.container = ExporterState(export_all_flag, self.sample_animation, scene)
 
