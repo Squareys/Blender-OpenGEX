@@ -44,7 +44,7 @@ LightNode $node2
 
 LightNode $node3
 {
-	Name {string {"Point"}}
+	Name {string {"Spot"}}
 	ObjectRef {ref {$light3}}
 
 	Transform
@@ -59,6 +59,12 @@ LightNode $node3
 	}
 }
 
+LightObject $light1 (type = "infinite", shadow = false)		// IDontHaveAPoint
+{
+	Color (attrib = "light") {float[3] {{1.0, 0.0, 0.0}}}
+	Param (attrib = "intensity") {float {0.9}}
+}
+
 LightObject $light2 (type = "point", shadow = false)		// AnotherPoint
 {
 	Color (attrib = "light") {float[3] {{0.0, 0.0, 1.0}}}
@@ -69,7 +75,7 @@ LightObject $light2 (type = "point", shadow = false)		// AnotherPoint
 	}
 }
 
-LightObject $light3 (type = "spot")		// Point
+LightObject $light3 (type = "spot")		// Spot
 {
 	Color (attrib = "light") {float[3] {{0.0, 1.0, 0.0}}}
 
@@ -83,10 +89,4 @@ LightObject $light3 (type = "spot")		// Point
 		Param (attrib = "begin") {float {0.334}}
 		Param (attrib = "end") {float {0.393}}
 	}
-}
-
-LightObject $light1 (type = "infinite", shadow = false)		// IDontHaveAPoint
-{
-	Color (attrib = "light") {float[3] {{1.0, 0.0, 0.0}}}
-	Param (attrib = "intensity") {float {0.9}}
 }
