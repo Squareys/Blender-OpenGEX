@@ -84,9 +84,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     # image texture export properties
     export_image_textures = bpy.props.BoolProperty(name="Export Image Textures",
                                                    description="Whether to export images for exported textures.")
-    image_path_prefix = bpy.props.StringProperty(name="Image Path Prefix", default='//',
+    image_path_prefix = bpy.props.StringProperty(name="Image Path Prefix", default='',
                                                  description="Prefix relative to the exported scene file\n"
-                                                             "to export image textures to.")
+                                                             "to export image textures to.\n\nExample: textures/")
     image_format = bpy.props.EnumProperty(name="Image Format", items=image_format_items, default='PNG',
                                           description="Format for exported image textures.")
 
