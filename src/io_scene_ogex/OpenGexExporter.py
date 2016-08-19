@@ -1,13 +1,10 @@
 import bpy
 import bmesh
-import math
 import time
 from mathutils import Matrix
 from bpy_extras.io_utils import ExportHelper
 from io_scene_ogex.NodeWrapper import NodeWrapper
 from io_scene_ogex.ExporterState import *
-from io_scene_ogex.pyddl import DdlPrimitiveDataType as DataType
-from io_scene_ogex.pyddl import *
 from io_scene_ogex.pygex import *
 
 __author__ = 'Eric Lengyel, Jonathan Hale, Nicolas Wehrle'
