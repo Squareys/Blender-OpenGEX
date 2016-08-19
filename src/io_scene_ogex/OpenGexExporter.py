@@ -1411,9 +1411,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             context = bpy.context
             scene = context.scene
 
-            # Replace file ending
-            (path, _) = path.split('.')
-            path = path + scene.render.file_extension
+            # The written file should have the same name as the blender image
+            (prefix, _) = os.path.split(path)
+            if len(prefix) > 1:
+                prefix += "/"
+            path = bpy.path.ensure_ext(prefix + bpy.path.clean_name(texture_slot.texture.image.name),
+                                       scene.render.file_extension, case_sensitive=True)
 
             # Convert ogex relative path of image to .blend relative path or absolute path
             (ogex_filepath, _) = os.path.split(self.filepath)
