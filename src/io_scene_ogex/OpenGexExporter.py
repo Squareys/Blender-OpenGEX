@@ -1401,30 +1401,37 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         if texture_slot.texture.image is None:
             return None  # cannot export no image.
 
-        # get filename from blender path
-        import bpy
-        (_, path) = os.path.split(bpy.path.abspath(texture_slot.texture.image.filepath))
-        # prepend path prefix
-        path = os.path.relpath(self.image_path_prefix + path).replace("\\", "/")
+        img = texture_slot.texture.image
+        if img not in self.container.texture_array:
+            # get filename from blender path
+            import bpy
+            (_, path) = os.path.split(bpy.path.abspath(img.filepath))
+            # prepend path prefix
+            path = os.path.relpath(self.image_path_prefix + path).replace("\\", "/")
 
-        if self.export_image_textures:
-            context = bpy.context
-            scene = context.scene
+            if self.export_image_textures:
+                context = bpy.context
+                scene = context.scene
 
-            # The written file should have the same name as the blender image
-            (prefix, _) = os.path.split(path)
-            if len(prefix) > 1:
-                prefix += "/"
-            path = bpy.path.ensure_ext(prefix + bpy.path.clean_name(texture_slot.texture.image.name),
-                                       scene.render.file_extension, case_sensitive=True)
+                # The written file should have the same name as the blender image
+                (prefix, _) = os.path.split(path)
+                if len(prefix) > 1:
+                    prefix += "/"
+                path = bpy.path.ensure_ext(prefix + bpy.path.clean_name(img.name),
+                                           scene.render.file_extension, case_sensitive=True)
 
-            # Convert ogex relative path of image to .blend relative path or absolute path
-            (ogex_filepath, _) = os.path.split(self.filepath)
-            image_path = ogex_filepath + os.sep + path
+                # Convert ogex relative path of image to .blend relative path or absolute path
+                (ogex_filepath, _) = os.path.split(self.filepath)
+                image_path = ogex_filepath + os.sep + path
 
-            texture_slot.texture.image.save_render(image_path, scene=scene)
+                img.save_render(image_path, scene=scene)
 
-        return Texture(texture_slot, layer, path)
+            struct = Texture(texture_slot, layer, path)
+            self.container.texture_array[img] = {"struct": struct, "nodeTable": [img]}
+
+            return struct
+        else:
+            return self.container.texture_array[img]["struct"]
 
     def export_material(self, node, material):
         """

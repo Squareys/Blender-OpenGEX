@@ -28,6 +28,7 @@ class ExporterState:
         self.light_array = OrderedDict()
         self.camera_array = {}
         self.material_array = {}
+        self.texture_array = {}
 
     def find_node_wrapper_by_name(self, node_name):
         for nw in self.nodes:
