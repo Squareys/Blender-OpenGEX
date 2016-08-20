@@ -115,7 +115,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def find_node(self, name):
         # TODO this does not seem very efficient...
-        for nodeRef in self.nodeArray.items():
+        for nodeRef in self.node_array.items():
             if nodeRef[0].name == name:
                 return nodeRef
         return None
@@ -872,7 +872,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 structs.extend(self.export_bone(nw, child, scene))
 
         # Export any ordinary nodes that are parented to this bone.
-        bone_subnode_array = self.container.boneParentArray.get(bw.item.name)
+        bone_subnode_array = self.container.boneParent_array.get(bw.item.name)
         if bone_subnode_array:
             pose_bone = None
             if not bw.item.use_relative_parent:
@@ -1203,16 +1203,16 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         return ret_value
 
     def export_geometry(self, scene, node, mesh):
-        if mesh in self.container.geometryArray:
-            entry = self.container.geometryArray[mesh]
+        if mesh in self.container.geometry_array:
+            entry = self.container.geometry_array[mesh]
             if node not in entry["nodeTable"]:
                 entry["nodeTable"].append(node)
             return entry["struct"]
 
         self.progress.begin_task("Exporting geometry for " + node.name + "...")
 
-        struct = GeometryObject(name=B"geometry" + bytes(str(len(self.container.geometryArray) + 1), "UTF-8"))
-        self.container.geometryArray[mesh] = {
+        struct = GeometryObject(name=B"geometry" + bytes(str(len(self.container.geometry_array) + 1), "UTF-8"))
+        self.container.geometry_array[mesh] = {
             "struct": struct,
             "nodeTable": [node]}
 
@@ -1379,17 +1379,17 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def export_light(self, node, light):
         """
-        Export a light as a DdlStructure into self.container.lightArray to later add to the DdlDocument.
+        Export a light as a DdlStructure into self.container.light_array to later add to the DdlDocument.
         :param node: node for which this light is being exported, which will be added to the list of referring nodes
         :param light: light data to export
         :return: the created DdlStructure
         """
-        if light not in self.container.lightArray:
-            struct = LightObject(name=B"light" + bytes(str(len(self.container.lightArray) + 1), "UTF-8"), light=light)
-            self.container.lightArray[light] = {"struct": struct, "nodeTable": [node]}
+        if light not in self.container.light_array:
+            struct = LightObject(name=B"light" + bytes(str(len(self.container.light_array) + 1), "UTF-8"), light=light)
+            self.container.light_array[light] = {"struct": struct, "nodeTable": [node]}
             return struct
         else:
-            entry = self.container.lightArray[light]
+            entry = self.container.light_array[light]
             if node not in entry["nodeTable"]:
                 entry["nodeTable"].append(node)
             return entry["struct"]
@@ -1433,7 +1433,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         :param material: the material data
         :return: the created DdlStructure
         """
-        if material not in self.container.materialArray:
+        if material not in self.container.material_array:
             diffuse_texture = None
             specular_texture = None
             emission_texture = None
@@ -1469,13 +1469,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             if normal_texture:
                 textures.append(self.export_texture(normal_texture, B"normal"))
 
-            name = B"material" + bytes(str(len(self.container.materialArray) + 1), "UTF-8")
+            name = B"material" + bytes(str(len(self.container.material_array) + 1), "UTF-8")
             struct = Material(material, name, self.export_ambient, list(filter(None, textures)))
-            self.container.materialArray[material] = {"struct": struct, "nodeTable": [node]}
+            self.container.material_array[material] = {"struct": struct, "nodeTable": [node]}
 
             return struct
         else:
-            return self.container.materialArray[material]["struct"]
+            return self.container.material_array[material]["struct"]
 
     def export_materials(self, node, material_slots):
         if self.export_only_first_material and len(material_slots) > 0:
@@ -1484,12 +1484,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             return [self.export_material(node, slot.material) for slot in material_slots]
 
     def export_camera(self, node, camera):
-        if camera not in self.container.cameraArray:
-            struct = CameraObject(B"camera" + bytes(str(len(self.container.cameraArray) + 1), "UTF-8"), camera)
-            self.container.cameraArray[camera] = {"struct": struct, "nodeTable": [node]}
+        if camera not in self.container.camera_array:
+            struct = CameraObject(B"camera" + bytes(str(len(self.container.camera_array) + 1), "UTF-8"), camera)
+            self.container.camera_array[camera] = {"struct": struct, "nodeTable": [node]}
             return struct
         else:
-            entry = self.container.cameraArray[camera]
+            entry = self.container.camera_array[camera]
             if node not in entry["nodeTable"]:
                 entry["nodeTable"].append(node)
             return entry["struct"]
@@ -1497,10 +1497,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
     def export_objects(self):
         self.document.structures.extend([
             DdlTextWriter.set_comment(item["struct"], B", ".join([bytes(n.name, "UTF-8") for n in item["nodeTable"]]))
-            for item in itertools.chain(self.container.geometryArray.values(),
-                                        self.container.lightArray.values(),
-                                        self.container.cameraArray.values(),
-                                        self.container.materialArray.values())
+            for item in itertools.chain(self.container.geometry_array.values(),
+                                        self.container.light_array.values(),
+                                        self.container.camera_array.values(),
+                                        self.container.material_array.values())
             ])
 
     @staticmethod

@@ -24,10 +24,10 @@ class ExporterState:
         self.endFrame = scene.frame_end
         self.frameTime = 1.0 / (scene.render.fps_base * scene.render.fps)
 
-        self.geometryArray = {}
-        self.lightArray = OrderedDict()
-        self.cameraArray = {}
-        self.materialArray = {}
+        self.geometry_array = {}
+        self.light_array = OrderedDict()
+        self.camera_array = {}
+        self.material_array = {}
 
     def find_node_wrapper_by_name(self, node_name):
         for nw in self.nodes:
