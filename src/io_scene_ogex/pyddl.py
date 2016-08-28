@@ -49,7 +49,11 @@ class DdlPrimitive:
         self.data = data
 
     def is_simple_primitive(self):
-        return len(self.data) == 1 and self.vector_size <= 4
+        if len(self.data) == 1:
+            return self.vector_size <= 4
+        elif len(self.data) <= 4:
+            return self.vector_size == 0
+        return False
 
 
 class DdlStructure:
@@ -261,6 +265,8 @@ class DdlTextWriter(DdlWriter):
             value_bytes = self.to_int_byte(value)
         elif isinstance(value, float):
             value_bytes = self.to_float_byte(value)
+        elif isinstance(value, DdlStructure):
+            value_bytes = self.to_ref_byte(value)
         elif isinstance(value, str):
             value_bytes = B"\"" + bytes(value, "UTF-8") + B"\""
         elif isinstance(value, bytes):
@@ -320,7 +326,7 @@ class DdlTextWriter(DdlWriter):
         elif primitive.is_simple_primitive():
             lines.append(B"\n" if has_comment else B" ")
             if primitive.vector_size == 0:
-                lines.append(B"{" + to_bytes(primitive.data[0]) + B"}")
+                lines.append(B"{" + B", ".join(map(to_bytes, primitive.data)) + B"}")
             else:
                 lines.append(B"{{" + (B", ".join(map(to_bytes, primitive.data[0]))) + B"}}")
         else:
