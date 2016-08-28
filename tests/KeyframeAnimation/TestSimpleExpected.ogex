@@ -1,0 +1,56 @@
+Metric (key = "distance") {float {1.0}}
+Metric (key = "angle") {float {1.0}}
+Metric (key = "time") {float {1.0}}
+Metric (key = "up") {string {"z"}}
+
+Node $node1
+{
+	Name {string {"Empty"}}
+
+	Translation %xpos (kind = "x")
+	{
+		float {5.5}
+	}
+
+	Translation %zpos (kind = "z")
+	{
+		float {5.0}
+	}
+
+	Animation (begin = 0.0, end = 0.7916666666666666)
+	{
+		Track (target = %xpos)
+		{
+			Time (curve = "bezier")
+			{
+				Key {float {0.0, 0.375, 0.791667}}
+				Key (kind = "-control") {float {-0.146404, 0.228596, 0.628995}}
+				Key (kind = "+control") {float {0.146404, 0.537671, 0.954338}}
+			}
+
+			Value (curve = "bezier")
+			{
+				Key {float {0.0, 0.0, 5.5}}
+				Key (kind = "-control") {float {0.0, 0.0, 5.5}}
+				Key (kind = "+control") {float {0.0, 0.0, 5.5}}
+			}
+		}
+
+		Track (target = %zpos)
+		{
+			Time (curve = "bezier")
+			{
+				Key {float {0.0, 0.375, 0.791667}}
+				Key (kind = "-control") {float {-0.146404, 0.228596, 0.628995}}
+				Key (kind = "+control") {float {0.146404, 0.537671, 0.954338}}
+			}
+
+			Value (curve = "bezier")
+			{
+				Key {float {0.0, 5.0, 5.0}}
+				Key (kind = "-control") {float {0.0, 5.0, 5.0}}
+				Key (kind = "+control") {float {0.0, 5.0, 5.0}}
+			}
+		}
+	}
+}
