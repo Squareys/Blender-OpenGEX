@@ -201,7 +201,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     @staticmethod
     def matrices_differ(m1, m2):
-
+        """
+        Compare matrices using the export epsilon.
+        :param m1: Matrix A
+        :param m2: Matrix B
+        :return: True if at least one component of A differs significantly form the analog component in B
+        """
         for i in range(4):
             for j in range(4):
                 if math.fabs(m1[i][j] - m2[i][j]) > k_export_epsilon:
@@ -224,108 +229,130 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         return curve_array
 
-    def export_key_times(self, fcurve):
+    def export_key_times(self, function_curve):
         """
-        :param fcurve:
+        Export points of a time curve. Each value on the curve will be offset to the begin frame.
+        :param function_curve: the curve
         :return: a Key DdlStructure
         """
         return Key(data=[(p.co[0] - self.container.beginFrame) * self.container.frameTime
-                         for p in fcurve.keyframe_points])
+                         for p in function_curve.keyframe_points])
 
-    def export_key_time_control_points(self, fcurve):
+    def export_key_time_control_points(self, function_curve):
         """
-        :param fcurve:
-        :return: a list of Key DdlStructures
+        Export handles (/control points) of a time bezier curve. Each handle on the curve will be offset to the begin frame.
+        :param function_curve: the curve
+        :return: two Key DdlStructures in a list
         """
         return [
             Key(kind=B"-control",
                 data=[(point.handle_left[0] - self.container.beginFrame) * self.container.frameTime
-                      for point in fcurve.keyframe_points]),
+                      for point in function_curve.keyframe_points]),
             Key(kind=B"+control",
                 data=[(point.handle_right[0] - self.container.beginFrame) * self.container.frameTime
-                      for point in fcurve.keyframe_points])
+                      for point in function_curve.keyframe_points])
         ]
 
-    def export_key_values(self, fcurve):
+    @staticmethod
+    def export_key_values(function_curve):
         """
-        :param fcurve:
+        Export points of a value curve.
+        :param function_curve: the curve
         :return: a Key DdlStructure
         """
-        return Key(data=[p.co[1] for p in fcurve.keyframe_points])
+        return Key(data=[p.co[1] for p in function_curve.keyframe_points])
 
-    def export_key_value_control_points(self, fcurve):
+    @staticmethod
+    def export_key_value_control_points(function_curve):
         """
-        :param fcurve:
-        :return: a list of Key DdlStructures
+        Export handles (/control points) of a value bezier curve.
+        :param function_curve: the curve
+        :return: two Key DdlStructures in a list
         """
         return [
-            Key(kind=B"-control", data=[p.handle_left[1] for p in fcurve.keyframe_points]),
-            Key(kind=B"+control", data=[p.handle_right[1] for p in fcurve.keyframe_points])
+            Key(kind=B"-control", data=[p.handle_left[1] for p in function_curve.keyframe_points]),
+            Key(kind=B"+control", data=[p.handle_right[1] for p in function_curve.keyframe_points])
         ]
 
-    def export_animation_track(self, fcurve, kind, target):
-        # TODO doc
+    def export_animation_track(self, function_curve, kind, target):
         """
-        :param fcurve:
-        :param kind:
-        :param target:
-        :return: a Track DdlStructure
+        Export a function curve as a Track DDL structure.
+        :param function_curve: the curve
+        :param kind: Animation type (linear or bezier)
+        :param target: the structure that is being animated
+        :return: the Track DdlStructure
         """
         # This function exports a single animation track. The curve types for the
         # Time and Value structures are given by the kind parameter.
         track_struct = Track(target=target)
 
         if kind != k_animation_bezier:
-            # TODO simplify to one iteration over fcurve
             track_struct.children.extend([
-                Time(children=self.export_key_times(fcurve)),
-                Value(children=self.export_key_values(fcurve))
+                Time(children=self.export_key_times(function_curve)),
+                Value(children=self.export_key_values(function_curve))
             ])
         else:
             track_struct.children.extend([
-                Time(curve=B"bezier", children=[self.export_key_times(fcurve)] + self.export_key_time_control_points(fcurve)),
-                Value(curve=B"bezier", children=[self.export_key_values(fcurve)] + self.export_key_value_control_points(fcurve))
+                Time(curve=B"bezier",
+                     children=[self.export_key_times(function_curve)] + self.export_key_time_control_points(function_curve)),
+                Value(curve=B"bezier",
+                      children=[self.export_key_values(function_curve)] + self.export_key_value_control_points(function_curve))
             ])
 
         return track_struct
 
     def export_node_sampled_animation(self, nw, node, scene):
-        # This function exports animation as full 4x4 matrices for each frame.
+        """
+        Export animation as full 4x4 matrices for each frame.
+        :param nw: Node wrapper
+        :param node: the node to export the animated transforms for
+        :param scene: the current scene
+        :return: the created Animation DdlStructure
+        """
+        # Save frame settings to later restore
+        previous_frame = scene.frame_current
+        previous_subframe = scene.frame_subframe
 
-        current_frame = scene.frame_current
-        current_subframe = scene.frame_subframe
-
+        # if transform for frames is the same, there is no need for animation.
         has_animation = False
-        m1 = node.matrix_local.copy()
-
+        first_frame_transform = node.matrix_local.copy()
         for i in range(self.container.beginFrame, self.container.endFrame):
+            # matrix_local adapts to the current frame.
             scene.frame_set(i)
-            m2 = node.matrix_local
-            if OpenGexExporter.matrices_differ(m1, m2):
+            cur_frame_transform = node.matrix_local
+
+            if OpenGexExporter.matrices_differ(first_frame_transform, cur_frame_transform):
                 has_animation = True
                 break
 
+        # if there is an animation, assemble the Animation DdlStructure
         animation_struct = None
         if has_animation:
+            # helper to get local transformation matrix at a certain frame index
             def get_matrix_local_at_frame(i):
                 scene.frame_set(i)
-                return node.matrix_local
+                blender_matrix = self.handle_offset(node.matrix_local, nw.offset)
+                return itertools.chain(*zip(*blender_matrix))  # create list of all elements
+
+            begin_frame = self.container.beginFrame
+            end_frame = self.container.endFrame
+            frame_time = self.container.frameTime
 
             animation_struct = DdlStructure(B"Animation", children=[
                 Track(target=B"%transform", children=[
                     Time(children=[
-                        Key(data=[((i - self.container.beginFrame) * self.container.frameTime)
-                                  for i in range(self.container.beginFrame, self.container.endFrame + 1)])
+                        Key(data=[((i - begin_frame) * frame_time) for i in range(begin_frame, end_frame + 1)])
                     ]),
                     Value(children=[
-                        Key(vector_size=16, data=[itertools.chain(*zip(*self.handle_offset(get_matrix_local_at_frame(i),
-                                                                                           nw.offset)))
-                                  for i in range(self.container.beginFrame, self.container.endFrame + 1)])
+                        Key(data=[get_matrix_local_at_frame(i) for i in range(begin_frame, end_frame + 1)],
+                            vector_size=16)
                     ])
                 ])
             ])
 
-        scene.frame_set(current_frame, current_subframe)
+        # restore "current frame" settings
+        scene.frame_set(previous_frame, previous_subframe)
+
         return animation_struct
 
     def export_bone_sampled_animation(self, pose_bone, scene):
