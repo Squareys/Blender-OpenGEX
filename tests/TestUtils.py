@@ -11,13 +11,17 @@ class OgexExporterTest(unittest.TestCase):
 
     no_delete = False
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         io_scene_ogex.register()
+
+    @classmethod
+    def tearDownClass(cls):
+        io_scene_ogex.unregister()
 
     def tearDown(self):
         if os.path.isfile(self.filename) and not self.no_delete:
             os.remove(self.filename)
-        io_scene_ogex.unregister()
 
     def readContents(self, filename):
         """
