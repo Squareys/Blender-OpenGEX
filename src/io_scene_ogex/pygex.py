@@ -33,12 +33,15 @@ class Param(DdlStructure):
 class Track(DdlStructure):
     def __init__(self, children=[], target=None):
         props = dict() if target is None else {B"target": target}
-        super().__init__(B"Track", props=props, children=children)
+        super().__init__(B"Track", props=props, children=[])
+        self.children.extend(children)
 
 
 class Time(DdlStructure):
-    def __init__(self, children=[]):
-        super().__init__(B"Time", children=children)
+    def __init__(self, curve=B"linear", children=[]):
+        props = dict() if curve == B"linear" else {B"curve": curve}
+
+        super().__init__(B"Time", props=props, children=children)
 
 
 class Key(DdlStructure):
@@ -54,8 +57,10 @@ class Key(DdlStructure):
 
 
 class Value(DdlStructure):
-    def __init__(self, children=[]):
-        super().__init__(B"Value", children=children)
+    def __init__(self, curve=B"linear", children=[]):
+        props = dict() if curve == B"linear" else {B"curve": curve}
+
+        super().__init__(B"Value", props=props, children=children)
 
 
 class Metric(DdlStructure):

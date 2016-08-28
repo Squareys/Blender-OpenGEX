@@ -273,8 +273,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         """
         # This function exports a single animation track. The curve types for the
         # Time and Value structures are given by the kind parameter.
-
-        track_struct = Track(target=B"%" + target)  # TODO how to handle ref in parameter?
+        track_struct = Track(target=target)
 
         if kind != k_animation_bezier:
             # TODO simplify to one iteration over fcurve
@@ -284,17 +283,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             ])
         else:
             track_struct.children.extend([
-                Time(curve=B"bezier", children=[
-                    Key(data=[self.export_key_times(fcurve)] + self.export_key_time_control_points(fcurve))
-                ]),
-                Value(curve=B"bezier", children=[
-                    Key(data=[self.export_key_values(fcurve)] + self.export_key_value_control_points(fcurve))
-                ])
+                Time(curve=B"bezier", children=[self.export_key_times(fcurve)] + self.export_key_time_control_points(fcurve)),
+                Value(curve=B"bezier", children=[self.export_key_values(fcurve)] + self.export_key_value_control_points(fcurve))
             ])
 
         return track_struct
 
-    def export_node_sampled_animation(self, node, scene):
+    def export_node_sampled_animation(self, nw, node, scene):
         # This function exports animation as full 4x4 matrices for each frame.
 
         current_frame = scene.frame_current
@@ -323,7 +318,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                                   for i in range(self.container.beginFrame, self.container.endFrame + 1)])
                     ]),
                     Value(children=[
-                        Key(data=[get_matrix_local_at_frame(i)
+                        Key(vector_size=16, data=[itertools.chain(*zip(*self.handle_offset(get_matrix_local_at_frame(i),
+                                                                                           nw.offset)))
                                   for i in range(self.container.beginFrame, self.container.endFrame + 1)])
                     ])
                 ])
@@ -561,12 +557,17 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 transform_struct.name = B"transform"
                 transform_struct.name_is_global = False
 
-                animation_struct = self.export_node_sampled_animation(node, scene)
+                animation_struct = self.export_node_sampled_animation(nw, node, scene)
 
                 if animation_struct is not None:
                     structs.append(animation_struct)
 
         else:
+            animation_struct = DdlStructure(B"Animation", props=OrderedDict([
+                (B"begin", (action.frame_range[0] - self.container.beginFrame) * self.container.frameTime),
+                (B"end", (action.frame_range[1] - self.container.beginFrame) * self.container.frameTime)
+            ]))
+
             delta_translation = node.delta_location
             if delta_position_animated:
 
@@ -575,8 +576,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                 for i in range(3):
                     pos = delta_translation[i]
-                    if (delta_pos_animated[i]) or (math.fabs(pos) > k_export_epsilon):
+                    if delta_pos_animated[i] or (math.fabs(pos) > k_export_epsilon):
                         structs.append(Translation(name=B"d" + axis_name[i] + B"pos", kind=axis_name[i], value=pos))
+                    if delta_pos_animated[i]:
+                        animation_struct.children.append(
+                            self.export_animation_track(delta_pos_anim_curve[i], delta_pos_anim_kind[i], structs[-1])
+                        )
 
             elif ((math.fabs(delta_translation[0]) > k_export_epsilon) or (
                         math.fabs(delta_translation[1]) > k_export_epsilon) or (
@@ -591,6 +596,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     pos = translation[i]
                     if (pos_animated[i]) or (math.fabs(pos) > k_export_epsilon):
                         structs.append(Translation(name=axis_name[i] + B"pos", kind=axis_name[i], value=pos))
+                    if pos_animated[i]:
+                        animation_struct.children.append(
+                            self.export_animation_track(pos_anim_curve[i], pos_anim_kind[i], structs[-1])
+                        )
 
             elif ((math.fabs(translation[0]) > k_export_epsilon) or (math.fabs(translation[1]) > k_export_epsilon) or (
                         math.fabs(translation[2]) > k_export_epsilon)):
@@ -606,6 +615,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     angle = node.delta_rotation_euler[axis]
                     if (delta_rot_animated[axis]) or (math.fabs(angle) > k_export_epsilon):
                         structs.append(Rotation(name=B"d" + axis_name[axis] + B"rot", kind=axis_name[axis], value=angle))
+                    if delta_rot_animated[i]:
+                        animation_struct.children.append(
+                            self.export_animation_track(delta_rot_anim_curve[i], delta_rot_anim_kind[i], structs[-1])
+                        )
 
             else:
 
@@ -635,8 +648,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 for i in range(3):
                     axis = ord(mode[2 - i]) - 0x58
                     angle = node.rotation_euler[axis]
-                    if (rot_animated[axis]) or (math.fabs(angle) > k_export_epsilon):
+                    if rot_animated[axis] or (math.fabs(angle) > k_export_epsilon):
                         structs.append(Rotation(name=axis_name[axis] + B"rot", kind=axis_name[axis], value=angle))
+                    if rot_animated[i]:
+                        animation_struct.children.append(
+                            self.export_animation_track(rot_anim_curve[i], rot_anim_kind[i], structs[-1])
+                        )
 
             else:
 
@@ -670,8 +687,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                 for i in range(3):
                     scl = delta_scale[i]
-                    if (delta_scl_animated[i]) or (math.fabs(scl) > k_export_epsilon):
+                    if delta_scl_animated[i] or (math.fabs(scl) > k_export_epsilon):
                         structs.append(Scale(name=B"d" + axis_name[i] + B"scl", kind=axis_name[i], value=scl))
+                    if delta_scl_animated[i]:
+                        animation_struct.children.append(
+                            self.export_animation_track(delta_scale_anim_curve[i], delta_scale_anim_kind[i], structs[-1])
+                        )
 
             elif ((math.fabs(delta_scale[0] - 1.0) > k_export_epsilon) or (
                         math.fabs(delta_scale[1] - 1.0) > k_export_epsilon) or (
@@ -684,64 +705,19 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 # so they can be targeted by different tracks having different sets of keys.
                 for i in range(3):
                     scl = scale[i]
-                    if (scl_animated[i]) or (math.fabs(scl) > k_export_epsilon):
+                    if scl_animated[i] or (math.fabs(scl) > k_export_epsilon):
                         structs.append(Scale(name=axis_name[i] + B"scl", kind=axis_name[i], value=scl))
+                    if scl_animated[i]:
+                        animation_struct.children.append(
+                            self.export_animation_track(scale_anim_curve[i], scale_anim_kind[i], structs[-1])
+                        )
 
             elif ((math.fabs(scale[0] - 1.0) > k_export_epsilon) or (math.fabs(scale[1] - 1.0) > k_export_epsilon) or (
                         math.fabs(scale[2] - 1.0) > k_export_epsilon)):
                 structs.append(Scale(value=scl, vector_size=3))
 
-            # Export the animation tracks.
-            animation_struct = DdlStructure(B"Animation", props=OrderedDict([
-                (B"begin", (action.frame_range[0] - self.container.beginFrame) * self.container.frameTime),
-                (B"end", (action.frame_range[1] - self.container.beginFrame) * self.container.frameTime)
-            ]))
             structs.append(animation_struct)
 
-            if position_animated:
-                for i in range(3):
-                    if pos_animated[i]:
-                        animation_struct.children.append(
-                            self.export_animation_track(pos_anim_curve[i], pos_anim_kind[i], axis_name[i] + B"pos")
-                        )
-
-            if rotation_animated:
-                for i in range(3):
-                    if rot_animated[i]:
-                        animation_struct.children.append(
-                            self.export_animation_track(rot_anim_curve[i], rot_anim_kind[i], axis_name[i] + B"rot")
-                        )
-
-            if scale_animated:
-                for i in range(3):
-                    if scl_animated[i]:
-                        animation_struct.children.append(
-                            self.export_animation_track(scale_anim_curve[i], scale_anim_kind[i], axis_name[i] + B"scl")
-                        )
-
-            if delta_position_animated:
-                for i in range(3):
-                    if delta_pos_animated[i]:
-                        animation_struct.children.append(
-                            self.export_animation_track(delta_pos_anim_curve[i], delta_pos_anim_kind[i],
-                                                        B"d" + axis_name[i] + B"pos")
-                        )
-
-            if delta_rotation_animated:
-                for i in range(3):
-                    if delta_rot_animated[i]:
-                        animation_struct.children.append(
-                            self.export_animation_track(delta_rot_anim_curve[i], delta_rot_anim_kind[i],
-                                                        B"d" + axis_name[i] + B"rot")
-                        )
-
-            if delta_scale_animated:
-                for i in range(3):
-                    if delta_scl_animated[i]:
-                        animation_struct.children.append(
-                            self.export_animation_track(delta_scale_anim_curve[i], delta_scale_anim_kind[i],
-                                                        B"d" + axis_name[i] + B"scl")
-                        )
         return structs
 
     @staticmethod
