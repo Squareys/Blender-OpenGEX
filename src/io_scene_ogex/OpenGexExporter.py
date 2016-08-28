@@ -88,6 +88,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                                             description="Export world ambient color and material ambient factors as a"
                                                         "not officially specified Param.",
                                             default=False)
+    export_audio = bpy.props.BoolProperty(name="Export Audio Sources",
+                                          description="Export Speaker objects to an OGEX Extension structure.",
+                                          default=False)
+    audio_path_prefix = bpy.props.StringProperty(name="Audio Path Prefix", default='',
+                                                 description="Prefix relative to the exported scene file\n"
+                                                             "to set audio paths to.\n\nExample: audio/")
 
     # image texture export properties
     export_image_textures = bpy.props.BoolProperty(name="Export Image Textures",
@@ -943,6 +949,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         if self.export_physics and nw.item.game.physics_type != 'NO_COLLISION':
             struct.children.append(self.export_physics_properties(scene, nw.item))
 
+        if self.export_audio and nw.item.type == 'SPEAKER':
+            struct.children.append(self.export_audio_properties(nw.item.data))
+
         for subnode in nw.children:
             if subnode.parent.item.type != "BONE":
                 substructure = self.export_node(subnode, scene)
@@ -1019,6 +1028,70 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             struct.children.append(Extension(B"PM/shape", children=[
                 shape_struct
             ]))
+
+        return struct
+
+    def export_audio_properties(self, speaker):
+        struct = Extension(B"AudioSource", children=[])
+
+        if speaker.sound is not None:
+            import bpy
+            (_, path) = os.path.split(bpy.path.abspath(speaker.sound.filepath))
+            # prepend path prefix
+            path = os.path.relpath(self.audio_path_prefix + path).replace("\\", "/")
+            struct.children.append(DdlPrimitive(DataType.string, data=[path]))
+
+        if speaker.volume != 1.0:
+            struct.children.append(Extension(B"AS/gain", children=[
+                DdlPrimitive(DataType.float, data=[speaker.volume])
+            ]))
+
+        if speaker.pitch != 1.0:
+            struct.children.append(Extension(B"AS/pitch", children=[
+                DdlPrimitive(DataType.float, data=[speaker.pitch])
+            ]))
+
+        if speaker.volume_min != 0.0:
+            struct.children.append(Extension(B"AS/gain_min", children=[
+                DdlPrimitive(DataType.float, data=[speaker.volume_min])
+            ]))
+
+        if speaker.volume_max != 1.0:
+            struct.children.append(Extension(B"AS/gain_max", children=[
+                DdlPrimitive(DataType.float, data=[speaker.volume_max])
+            ]))
+
+        if speaker.attenuation != 1.0:
+            struct.children.append(Extension(B"AS/rolloff", children=[
+                DdlPrimitive(DataType.float, data=[speaker.attenuation])
+            ]))
+
+        if speaker.distance_max < 10000000.0:
+            struct.children.append(Extension(B"AS/dist_max", children=[
+                DdlPrimitive(DataType.float, data=[speaker.distance_max])
+            ]))
+
+        if speaker.distance_reference != 1.0:
+            struct.children.append(Extension(B"AS/dist_ref", children=[
+                DdlPrimitive(DataType.float, data=[speaker.distance_reference])
+            ]))
+
+        use_cone = False
+        cone_struct = Extension(B"AS/cone", children=[])
+        if speaker.cone_angle_outer != 360.0 or speaker.cone_angle_inner != 360.0:
+            cone_struct.children.append(DdlPrimitive(
+                DataType.float, vector_size=2, data=[(speaker.cone_angle_outer, speaker.cone_angle_inner)]
+            ))
+            use_cone = True
+
+        if speaker.cone_volume_outer != 1.0:
+            cone_struct.children.append(Extension(B"AS/gain_outer", children=[
+                DdlPrimitive(DataType.float, data=[speaker.cone_volume_outer])
+            ]))
+            use_cone = True
+
+        if use_cone:
+            struct.children.append(cone_struct)
 
         return struct
 
@@ -1633,6 +1706,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         col.prop(self, "export_custom_properties")
         col.prop(self, "export_physics")
         col.prop(self, "export_ambient")
+        col.prop(self, "export_audio")
+        if self.export_audio:
+            col.prop(self, "audio_path_prefix")
         col.separator()
 
         col.label("Advanced")
