@@ -10,7 +10,7 @@ Install instructions for all operating systems:
  Finally click `Install from File..` to close the file browser.
  3. Search for "OpenGEX" and enable the addon.
 
-# Differences from the original
+# Differences to the Official Exporter
 
 * Support for exporting linked objects and linked groups
 * Faster geometry export, but: \*
@@ -19,11 +19,10 @@ Install instructions for all operating systems:
 * Support for exporting object game physics as Extensions [=> documentation](https://github.com/Squareys/Blender-OpenGEX/wiki/PhysicsMaterial-Extension)
 * Support for exporting custom properties as Extensions [=> documentation](https://github.com/Squareys/Blender-OpenGEX/wiki/Property-Extension)
 * Support for exporting the worlds ambient color and material ambient factor [=> documentation](https://github.com/Squareys/Blender-OpenGEX/wiki/Ambient-Colors)
+* Support for exporting speakers and sound source properties as Extensions [=> documentation](https://github.com/Squareys/Blender-OpenGEX/wiki/AudioSource-Extension)
 * Option for rounding floating point number to n decimal places
 * Option to export only the first material slot of each object
-
-Bleeding-edge (on master, but not released):
-* Ability to specify prefix for exported texture paths
+* Option to specify prefix for exported texture paths
 * Image texture export
 * Export OpenGEX in an compressed text format (without whitespaces)
 
