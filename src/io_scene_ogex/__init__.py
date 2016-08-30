@@ -6,7 +6,7 @@
 #  Inofficial Export plugin for Blender by Jonathan Hale,
 #  based on the official Export plugin by Eric Lengyel
 #
-#  Version 1.1.2.0
+#  Version 1.1.2.1
 #
 # Copyright © 2015, 2016 Jonathan Hale
 # Copyright © 2015 Terathon Software LLC
@@ -29,13 +29,13 @@ import bpy
 
 from io_scene_ogex.OpenGexExporter import OpenGexExporter
 
-__author__ = 'Eric Lengyel, Jonathan Hale, Nicolas Wehrle'
+__author__ = ' Jonathan Hale, Eric Lengyel,Nicolas Wehrle'
 
 bl_info = {
     "name": "OpenGEX format (.ogex)",
     "description": "OpenGEX Exporter",
-    "author": "Eric Lengyel, Jonathan Hale, Nicolas Wehrle",
-    "version": (1, 1, 2, 0),
+    "author": "Jonathan Hale, Eric Lengyel, Nicolas Wehrle",
+    "version": (1, 1, 2, 1),
     "location": "File > Import-Export",
     "category": "Import-Export"}
 
