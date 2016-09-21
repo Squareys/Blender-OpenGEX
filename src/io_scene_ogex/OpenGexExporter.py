@@ -78,11 +78,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     # Extension settings
     export_custom_properties = bpy.props.BoolProperty(name="Export Custom Properties",
-                                                      description="Export object custom properties to an OGEX" +
+                                                      description="Export object custom properties to an OGEX"
                                                                   "Extension structure",
                                                       default=False)
     export_physics = bpy.props.BoolProperty(name="Export Game Physics",
-                                            description="Export game physics to an OGEX Extension structure",
+                                            description="Export game physics to an OGEX 'PhysicsMaterial' and"
+                                                        "'PhysicsConstraint' Extension structures.",
                                             default=False)
     export_ambient = bpy.props.BoolProperty(name="Export Ambient Color",
                                             description="Export world ambient color and material ambient factors as a"
@@ -109,6 +110,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         self.progress = ProgressLog()
         self.container = None
         self.document = None
+        self.unresolved_refs = []
 
     @staticmethod
     def get_shape_keys(mesh):
@@ -871,6 +873,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             bone_struct = DdlStructure(struct_identifiers[nw.nodeRef["nodeType"]], name=nw.nodeRef["structName"],
                                        children=[Name(name=bw.item.name)])
             structs.append(bone_struct)
+            nw.nodeRef["struct"] = bone_struct
 
             bone_struct.children.append(self.export_bone_transform(nw, bw, scene))
 
@@ -931,6 +934,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                               children=[],
                               use_custom_properties=self.export_custom_properties)
 
+            nw.nodeRef["struct"] = struct
+
             if node_type == NodeType.light:
                 struct.children.append(ObjectRef(ref_object=self.export_light(nw.item, obj)))
             elif node_type == NodeType.camera:
@@ -949,8 +954,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     self.export_bone(nw, bw, scene)  # TODO
 
         # export physics properties
-        if self.export_physics and nw.item.game.physics_type != 'NO_COLLISION':
-            struct.children.append(self.export_physics_properties(scene, nw.item))
+        if self.export_physics:
+            if nw.item.game.physics_type != 'NO_COLLISION':
+                struct.children.append(self.export_physics_properties(scene, nw.item))
+
+            for constraint in nw.item.constraints:
+                if constraint.type == 'RIGID_BODY_JOINT':
+                    struct.children.append(self.export_physics_constraint(constraint))
 
         if self.export_audio and nw.item.type == 'SPEAKER':
             struct.children.append(self.export_audio_properties(nw.item.data))
@@ -1100,6 +1110,87 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             struct.children.append(Extension(B"PM/shape", children=[
                 shape_struct
             ]))
+
+        return struct
+
+    def export_physics_constraint(self, constraint):
+        struct = Extension(B"PhysicsConstraint", children=[
+            Extension(B"PC/pivot_type", children=[
+                DdlPrimitive(DataType.string, data=[constraint.pivot_type])
+            ])
+        ])
+
+        if constraint.target is not None:
+            target_struct = Extension(B"PC/target", children=[
+                DdlPrimitive(DataType.ref, data=[constraint.target.name])
+            ])
+            struct.children.append(target_struct)
+            self.unresolved_refs.append(target_struct.children[0])
+
+        if constraint.use_linked_collision:
+            struct.children.append(Extension(B"PC/use_linked_collision", children=[
+                DdlPrimitive(DataType.bool, data=[constraint.use_linked_collision])
+            ]))
+
+        if constraint.pivot_x != 0.0 or constraint.pivot_y != 0.0 or constraint.pivot_z != 0.0:
+            struct.children.append(Extension(B"PC/pivot", children=[
+                DdlPrimitive(DataType.float,
+                             data=[constraint.pivot_x,
+                                   constraint.pivot_y,
+                                   constraint.pivot_z])
+            ]))
+
+        if constraint.axis_x != 0.0 or constraint.axis_y != 0.0 or constraint.axis_z != 0.0:
+            struct.children.append(Extension(B"PC/axis", children=[
+                DdlPrimitive(DataType.float,
+                             data=[constraint.axis_x,
+                                   constraint.axis_y,
+                                   constraint.axis_z])
+            ]))
+
+        if constraint.pivot_type in {'HINGE', 'CONE_TWIST', 'GENERIC_6_DOF'} \
+                and constraint.use_angular_limit_x:
+
+            struct.children.append(Extension(B"PC/limit_angle_x", children=[
+                DdlPrimitive(DataType.float,
+                             data=[constraint.limit_angle_min_x,
+                                   constraint.limit_angle_max_x])
+            ]))
+
+            if constraint.pivot_type in {'CONE_TWIST', 'GENERIC_6_DOF'}:
+
+                if constraint.use_angular_limit_y:
+                    struct.children.append(Extension(B"PC/limit_angle_y", children=[
+                        DdlPrimitive(DataType.float,
+                                     data=[constraint.limit_angle_min_y,
+                                           constraint.limit_angle_max_y])
+                    ]))
+                if constraint.use_angular_limit_z:
+                    struct.children.append(Extension(B"PC/limit_angle_z", children=[
+                        DdlPrimitive(DataType.float,
+                                     data=[constraint.limit_angle_min_z,
+                                           constraint.limit_angle_max_z])
+                    ]))
+
+        if constraint.pivot_type == 'GENERIC_6_DOF':
+            if constraint.use_limit_x:
+                struct.children.append(Extension(B"PC/limit_x", children=[
+                    DdlPrimitive(DataType.float,
+                                 data=[constraint.limit_min_x,
+                                       constraint.limit_max_x])
+                ]))
+            if constraint.use_limit_y:
+                struct.children.append(Extension(B"PC/limit_y", children=[
+                    DdlPrimitive(DataType.float,
+                                 data=[constraint.limit_min_y,
+                                       constraint.limit_max_y])
+                ]))
+            if constraint.use_limit_z:
+                struct.children.append(Extension(B"PC/limit_z", children=[
+                    DdlPrimitive(DataType.float,
+                                 data=[constraint.limit_min_z,
+                                       constraint.limit_max_z])
+                ]))
 
         return struct
 
@@ -1683,7 +1774,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def process_skinned_meshes(self):
 
-        for nw in self.container.nodes:
+        for nw in self.container.nodes.values():
             if nw.nodeRef["nodeType"] == NodeType.geometry:
                 armature = nw.item.find_armature()
                 if armature:
@@ -1692,6 +1783,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                         if bone_ref:
                             # If a node is used as a bone, then we force its type to be a bone.
                             bone_ref.dict["nodeType"] = NodeType.bone
+
+    def resolve_unresolved_refs(self):
+        for ref in self.unresolved_refs:
+            ref.data = [self.container.nodes[val].nodeRef["struct"] for val in ref.data]
+
+        self.unresolved_refs = []
 
     def execute(self, context):
 
@@ -1733,7 +1830,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         self.progress.end_task()
 
-        for obj in self.container.nodes:
+        for obj in self.container.nodes.values():
             if not obj.parent:
                 self.document.structures.append(self.export_node(obj, scene))
 
@@ -1743,6 +1840,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         restore_frame = False
         if restore_frame:
             scene.frame_set(original_frame, original_subframe)
+
+        self.resolve_unresolved_refs()
 
         self.progress.begin_task("Writing file...")
         if self.oddl_format == 'TEXT':

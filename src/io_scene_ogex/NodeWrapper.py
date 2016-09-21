@@ -20,6 +20,7 @@ class NodeWrapper(BaseWrapper):
 
         if node.dupli_type == 'GROUP' and node.dupli_group:
             offset = node.dupli_group.dupli_offset
+            # FIXME: Check whether children of object in a linked group are automatically in group
             self.create_children([o for o in node.dupli_group.objects if o.parent is None], offset)
 
     def create_children(self, children, offset=None):
