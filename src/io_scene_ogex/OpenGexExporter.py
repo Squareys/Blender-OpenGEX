@@ -433,7 +433,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             scene.frame_set(frame_index)
             return block.value
 
-        track_struct = Track(target=B"%" + target, children=[
+        track_struct = Track(target=target, children=[
             Time(children=[
                 Key(data=[(i - self.container.beginFrame) * self.container.frameTime
                           for i in range(self.container.beginFrame, self.container.endFrame + 1)])
@@ -850,7 +850,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             for a in range(len(curve_array)):
                 k = index_array[a]
-                target = bytes("mw" + str(k), "UTF-8")
+                target = bytes("%mw" + str(k), "UTF-8")
 
                 fcurve = curve_array[a]
                 kind = OpenGexExporter.classify_animation_curve(fcurve)
