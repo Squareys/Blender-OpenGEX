@@ -1,0 +1,162 @@
+Metric (key = "distance") {float {1.0}}
+Metric (key = "angle") {float {1.0}}
+Metric (key = "time") {float {1.0}}
+Metric (key = "up") {string {"z"}}
+
+GeometryNode $node1
+{
+	Name {string {"Cube.004"}}
+	ObjectRef {ref {$geometry1}}
+	MaterialRef (index = 0) {ref {$material1}}
+
+	Transform
+	{
+		float[16]
+		{
+			{1.0, 0.0, 0.0, 0.0,
+			 0.0, 1.0, 0.0, 0.0,
+			 0.0, 0.0, 1.0, 0.0,
+			 0.0, 0.0, 0.0, 1.0}
+		}
+	}
+
+	Extension (applic = "Blender", type = "PhysicsMaterial")
+	{
+		Extension (applic = "Blender", type = "PM/type")
+		{
+			string {"RIGID_BODY"}
+		}
+
+		Extension (applic = "Blender", type = "PM/mass")
+		{
+			float {0.1}
+		}
+
+		Extension (applic = "Blender", type = "PM/form_factor")
+		{
+			float {0.6}
+		}
+
+		Extension (applic = "Blender", type = "PM/linear_vel_min")
+		{
+			float {0.7}
+		}
+
+		Extension (applic = "Blender", type = "PM/linear_vel_max")
+		{
+			float {0.8}
+		}
+
+		Extension (applic = "Blender", type = "PM/angular_vel_min")
+		{
+			float {0.017}
+		}
+
+		Extension (applic = "Blender", type = "PM/angular_vel_max")
+		{
+			float {0.349}
+		}
+
+		Extension (applic = "Blender", type = "PM/damping")
+		{
+			float {0.4}
+		}
+
+		Extension (applic = "Blender", type = "PM/rot_damping")
+		{
+			float {0.5}
+		}
+
+		Extension (applic = "Blender", type = "PM/friction")
+		{
+			float {0.1}
+		}
+
+		Extension (applic = "Blender", type = "PM/elasticity")
+		{
+			float {0.2}
+		}
+
+		Extension (applic = "Blender", type = "PM/force")
+		{
+			float {0.3}
+		}
+
+		Extension (applic = "Blender", type = "PM/force_distance")
+		{
+			float {0.5}
+		}
+
+		Extension (applic = "Blender", type = "PM/force_damping")
+		{
+			float {0.4}
+		}
+
+		Extension (applic = "Blender", type = "PM/force_use_normal")
+		{
+			bool {true}
+		}
+
+		Extension (applic = "Blender", type = "PM/lock_location")
+		{
+			bool {true, false, true}
+		}
+
+		Extension (applic = "Blender", type = "PM/lock_rotation")
+		{
+			bool {false, true, false}
+		}
+
+		Extension (applic = "Blender", type = "PM/anisotropic_friction")
+		{
+			float {0.1, 0.2, 0.3}
+		}
+
+		Extension (applic = "Blender", type = "PM/collision_mask")
+		{
+			unsigned_int16 {65535}
+		}
+	}
+}
+
+GeometryObject $geometry1		// Cube.004
+{
+	Mesh (primitive = "triangles")
+	{
+		VertexArray (attrib = "position")
+		{
+			float[3]		// 24
+			{
+				{-1.0, -1.0, -1.0}, {-1.0, -1.0, 1.0}, {-1.0, 1.0, -1.0}, {-1.0, 1.0, 1.0}, {1.0, -1.0, -1.0}, {1.0, -1.0, 1.0}, {1.0, 1.0, -1.0}, {1.0, 1.0, 1.0},
+				{-1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}, {-1.0, -1.0, 1.0}, {1.0, -1.0, 1.0}, {-1.0, 1.0, -1.0}, {1.0, -1.0, -1.0}, {-1.0, -1.0, -1.0}, {1.0, 1.0, 1.0},
+				{-1.0, -1.0, 1.0}, {1.0, -1.0, 1.0}, {-1.0, 1.0, -1.0}, {1.0, 1.0, -1.0}, {1.0, -1.0, -1.0}, {-1.0, -1.0, -1.0}, {1.0, 1.0, -1.0}, {-1.0, 1.0, 1.0}
+			}
+		}
+
+		VertexArray (attrib = "normal")
+		{
+			float[3]		// 24
+			{
+				{-1.0, 0.0, 0.0}, {-1.0, 0.0, 0.0}, {-0.0, 1.0, 0.0}, {-1.0, 0.0, 0.0}, {-0.0, -1.0, -0.0}, {1.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {-0.0, 1.0, 0.0},
+				{-0.0, 1.0, 0.0}, {1.0, 0.0, 0.0}, {-0.0, -1.0, -0.0}, {-0.0, -1.0, -0.0}, {0.0, 0.0, -1.0}, {0.0, 0.0, -1.0}, {0.0, 0.0, -1.0}, {0.0, -0.0, 1.0},
+				{0.0, -0.0, 1.0}, {0.0, -0.0, 1.0}, {-1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {1.0, 0.0, -0.0}, {0.0, -1.0, 0.0}, {0.0, 0.0, -1.0}, {0.0, 0.0, 1.0}
+			}
+		}
+
+		IndexArray
+		{
+			unsigned_int32[3]		// 12
+			{
+				{3, 0, 1}, {7, 2, 8}, {5, 6, 9}, {10, 4, 11}, {12, 13, 14}, {15, 16, 17}, {3, 18, 0}, {7, 19, 2}, {5, 20, 6}, {10, 21, 4}, {12, 22, 13}, {15, 23, 16}
+			}
+		}
+	}
+}
+
+Material $material1		// Cube.004
+{
+	Name {string {"Material.004"}}
+	Color (attrib = "diffuse") {float[3] {{0.64, 0.64, 0.64}}}
+	Color (attrib = "specular") {float[3] {{0.5, 0.5, 0.5}}}
+	Param (attrib = "specular_power") {float {50}}
+}

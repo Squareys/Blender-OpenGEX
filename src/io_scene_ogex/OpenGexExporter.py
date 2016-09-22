@@ -963,6 +963,18 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         return struct
 
+    @staticmethod
+    def almost_equal(a, b, rtol=1.0000000000000001e-05, atol=1e-08):
+        """
+        Compares whether two floats are almost equal
+        :param a: first float
+        :param b: second float
+        :param rtol: relative tolearance
+        :param atol: absolute tolerance
+        :return: True if the floats are almost equal
+        """
+        return math.fabs(a - b) <= (atol + rtol * math.fabs(b))
+
     SHAPE_TYPE_TO_EXTENSION = {"BOX": B"BoxShape",
                                "SPHERE": B"SphereShape",
                                "CYLINDER": B"CylinderShape",
@@ -980,11 +992,67 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             ])
         ])
 
+        def create_float_property(name, value, default):
+            if not self.almost_equal(value, default):
+                struct.children.append(Extension(B"PM/" + name, children=[
+                    DdlPrimitive(DataType.float, data=[value])
+                ]))
+
         # export mass
-        if props.mass != 1.0:
-            struct.children.append(Extension(B"PM/mass", children=[
-                # physics collision type
-                DdlPrimitive(DataType.float, data=[props.mass])
+        create_float_property(b"mass", props.mass, default=1.0)
+        create_float_property(b"radius", props.radius, default=1.0)
+        create_float_property(b"form_factor", props.form_factor, default=0.4)
+
+        create_float_property(b"linear_vel_min", props.velocity_min, default=0.0)
+        create_float_property(b"linear_vel_max", props.velocity_max, default=0.0)
+        create_float_property(b"angular_vel_min", props.angular_velocity_min, default=0.0)
+        create_float_property(b"angular_vel_max", props.angular_velocity_max, default=0.0)
+
+        create_float_property(b"damping", props.damping, default=0.04)
+        create_float_property(b"rot_damping", props.rotation_damping, default=0.1)
+
+        # get physics material of object
+        if o.type == 'MESH':
+            if len(o.material_slots) != 0:
+                # blender game engine only uses the first, therefore only that will be exported.
+                slot = o.material_slots[0]
+                if slot.material.game_settings.physics:
+                    pmat = slot.material.physics
+
+                    create_float_property(b"friction", pmat.friction, default=0.5)
+                    create_float_property(b"elasticity", pmat.elasticity, default=0.0)
+
+                    # force field
+                    if props.use_material_physics_fh:
+                        create_float_property(b"force", pmat.fh_force, default=0.0)
+                        create_float_property(b"force_distance", pmat.fh_distance, default=0.0)
+                        create_float_property(b"force_damping", pmat.fh_damping, default=0.0)
+
+                        if pmat.use_fh_normal:
+                            struct.children.append(Extension(B"PM/force_use_normal", children=[
+                                DdlPrimitive(DataType.bool, data=[True])
+                            ]))
+
+        if props.lock_location_x or props.lock_location_y or props.lock_location_z:
+            struct.children.append(Extension(B"PM/lock_location", children=[
+                DdlPrimitive(DataType.bool,
+                             data=[props.lock_location_x,
+                                   props.lock_location_y,
+                                   props.lock_location_z])
+            ]))
+
+        if props.physics_type == 'RIGID_BODY' and (props.lock_rotation_x or props.lock_rotation_y or props.lock_rotation_z):
+            struct.children.append(Extension(B"PM/lock_rotation", children=[
+                DdlPrimitive(DataType.bool,
+                             data=[props.lock_rotation_x,
+                                   props.lock_rotation_y,
+                                   props.lock_rotation_z])
+            ]))
+
+        if props.use_anisotropic_friction:
+            struct.children.append(Extension(B"PM/anisotropic_friction", children=[
+                DdlPrimitive(DataType.float,
+                             data=props.friction_coefficients)
             ]))
 
         # calculate collision group and mask
@@ -1007,14 +1075,15 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 DdlPrimitive(DataType.unsigned_int16, data=[collision_mask])
             ]))
 
-        if props.use_collision_bounds and props.physics_type not in ['NAVMESH', 'OCCLUDER']:
+        if props.use_collision_bounds and props.physics_type not in {'NAVMESH', 'OCCLUDER'}:
             # export collision shape
             shape_type = props.collision_bounds_type
             shape_struct = Extension(self.SHAPE_TYPE_TO_EXTENSION[shape_type], children=[])
 
-            if shape_type not in ['CONVEX_HULL', 'TRIANGLE_MESH']:
+            if shape_type not in {'CONVEX_HULL', 'TRIANGLE_MESH'}:
                 if shape_type == 'SPHERE':
-                    # export radius
+                    # export radius of bounding sphere. Same as "radius" property.
+                    # TODO: Deprecated.
                     shape_struct.add_primitive(DataType.float, data=[props.radius])
                 else:
                     # export scale as half-extents
