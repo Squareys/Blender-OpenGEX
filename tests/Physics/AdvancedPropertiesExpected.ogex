@@ -97,14 +97,14 @@ GeometryNode $node1
 			bool {true}
 		}
 
-		Extension (applic = "Blender", type = "PM/lock_location")
+		Extension (applic = "Blender", type = "PM/linear_factor")
 		{
-			bool {true, false, true}
+			float {1.0, 0.0, 1.0}
 		}
 
-		Extension (applic = "Blender", type = "PM/lock_rotation")
+		Extension (applic = "Blender", type = "PM/angular_factor")
 		{
-			bool {false, true, false}
+			float {0.0, 1.0, 0.0}
 		}
 
 		Extension (applic = "Blender", type = "PM/anisotropic_friction")
