@@ -15,7 +15,7 @@ class NodeType(IntEnum):
 
 class ExporterState:
     def __init__(self, export_all, sample_animation, scene):
-        self.nodes = OrderedDict()
+        self.nodes = []
         self.exportAll = export_all
         self.sampleAnimation = sample_animation
         self.boneParentArray = {}

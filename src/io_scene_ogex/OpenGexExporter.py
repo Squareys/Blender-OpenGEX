@@ -959,7 +959,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 struct.children.append(self.export_physics_properties(scene, nw.item))
 
             for constraint in nw.item.constraints:
-                if constraint.type == 'RIGID_BODY_JOINT':
+                if constraint.type == 'RIGID_BODY_JOINT' and constraint.target is not None:
                     struct.children.append(self.export_physics_constraint(constraint))
 
         if self.export_audio and nw.item.type == 'SPEAKER':
@@ -1121,6 +1121,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         ])
 
         if constraint.target is not None:
+            # FIXME: Name is not unique! Because of linked objects there can be more that one object with the same name
             target_struct = Extension(B"PC/target", children=[
                 DdlPrimitive(DataType.ref, data=[constraint.target.name])
             ])
@@ -1786,7 +1787,8 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
     def resolve_unresolved_refs(self):
         for ref in self.unresolved_refs:
-            ref.data = [self.container.nodes[val].nodeRef["struct"] for val in ref.data]
+            # FIXME: Name is not unique! Because of linked objects there can be more that one object with the same name
+            ref.data = [self.container.find_node_wrapper_by_name(name).nodeRef["struct"] for name in ref.data]
 
         self.unresolved_refs = []
 
@@ -1830,7 +1832,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         self.progress.end_task()
 
-        for obj in self.container.nodes.values():
+        for obj in self.container.nodes:
             if not obj.parent:
                 self.document.structures.append(self.export_node(obj, scene))
 

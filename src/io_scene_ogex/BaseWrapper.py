@@ -11,6 +11,6 @@ class BaseWrapper:
         self.offset = offset
         self.nodeRef = {}
 
-        self.container.nodes[item.name] = self
+        self.container.nodes.append(self)
 
 

@@ -8,24 +8,23 @@ __author__ = 'Eric Lengyel, Jonathan Hale, Nicolas Wehrle'
 
 class NodeWrapper(BaseWrapper):
 
-    def __init__(self, node, container, parent=None, offset=None):
+    def __init__(self, node, container, parent=None, offset=None, add_children=True):
         super().__init__(node, container, parent, offset)
 
         self.bones = []
 
         self.process_node()
 
-        if len(node.children) != 0:
+        if len(node.children) != 0 and add_children:
             self.create_children(node.children)
 
         if node.dupli_type == 'GROUP' and node.dupli_group:
             offset = node.dupli_group.dupli_offset
-            # FIXME: Check whether children of object in a linked group are automatically in group
-            self.create_children([o for o in node.dupli_group.objects if o.parent is None], offset)
+            self.create_children([o for o in node.dupli_group.objects], offset, add_children=False)
 
-    def create_children(self, children, offset=None):
+    def create_children(self, children, offset=None, add_children=True):
         for obj in children:
-            self.children.append(NodeWrapper(obj, self.container, self, offset))
+            self.children.append(NodeWrapper(obj, self.container, self, offset, add_children=add_children))
 
     def process_node(self):
         if self.container.exportAll or self.item.select:
