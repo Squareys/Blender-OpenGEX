@@ -1,0 +1,89 @@
+Metric (key = "distance") {float {1.0}}
+Metric (key = "angle") {float {1.0}}
+Metric (key = "time") {float {1.0}}
+Metric (key = "up") {string {"z"}}
+
+Node $node1
+{
+	Name {string {"Empty"}}
+
+	Transform
+	{
+		float[16]
+		{
+			{1.0, 0.0, 0.0, 0.0,
+			 0.0, 1.0, 0.0, 0.0,
+			 0.0, 0.0, 1.0, 0.0,
+			 0.0, 0.0, 0.0, 1.0}
+		}
+	}
+
+	Extension (applic = "Blender", type = "PhysicsMaterial")
+	{
+		Extension (applic = "Blender", type = "PM/type")
+		{
+			string {"RIGID_BODY"}
+		}
+
+		Extension (applic = "Blender", type = "PM/collision_mask")
+		{
+			unsigned_int16 {65535}
+		}
+
+		Extension (applic = "Blender", type = "PM/shape")
+		{
+			Extension (applic = "Blender", type = "CompoundShape")
+			{
+				Extension (applic = "Blender", type = "CompoundChild")
+				{
+					Extension (applic = "Blender", type = "BoxShape")
+					{
+						float[3] {{1.0, 1.0, 1.0}}
+
+						Extension (applic = "Blender", type = "PM/margin")
+						{
+							float {0.0}
+						}
+					}
+				}
+
+				Extension (applic = "Blender", type = "CompoundChild")
+				{
+					float[16]
+					{
+						{1.0, 0.0, 0.0, 0.0,
+						 0.0, 1.0, 0.0, 0.0,
+						 0.0, 0.0, 1.0, 0.0,
+						 0.0, 0.0, 1.0, 1.0}
+					}
+
+					Extension (applic = "Blender", type = "SphereShape")
+					{
+						float {1.0}
+
+						Extension (applic = "Blender", type = "PM/margin")
+						{
+							float {0.0}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	Node $node2
+	{
+		Name {string {"Empty.001"}}
+
+		Transform
+		{
+			float[16]
+			{
+				{1.0, 0.0, 0.0, 0.0,
+				 0.0, 1.0, 0.0, 0.0,
+				 0.0, 0.0, 1.0, 0.0,
+				 0.0, 0.0, 1.0, 1.0}
+			}
+		}
+	}
+}

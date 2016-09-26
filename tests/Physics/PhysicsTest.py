@@ -26,5 +26,12 @@ class PhysicsTest(TestUtils.OgexExporterTest):
 
         self.assertFilesEqual(self.filename, self.base_dir + os.sep + "AdvancedPropertiesExpected.ogex")
 
+    def testCompoundShapes(self):
+        self.filename = self.base_dir + os.sep + "CompoundShapes.ogex"
+        bpy.ops.wm.open_mainfile(filepath=self.base_dir + os.sep + "CompoundShapes.blend")
+        bpy.ops.export_scene.ogex(filepath=self.filename, export_physics=True, rounding=3)
+
+        self.assertFilesEqual(self.filename, self.base_dir + os.sep + "CompoundShapesExpected.ogex")
+
 if __name__ == '__main__':
     unittest.main()
