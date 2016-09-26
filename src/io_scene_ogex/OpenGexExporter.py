@@ -955,12 +955,12 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         # export physics properties
         if self.export_physics:
-            if nw.item.game.physics_type != 'NO_COLLISION':
+            if nw.item.game.physics_type != 'NO_COLLISION' and (nw.item.parent is None or not nw.item.parent.game.use_collision_compound):
                 struct.children.append(self.export_physics_properties(scene, nw.item))
 
-            for constraint in nw.item.constraints:
-                if constraint.type == 'RIGID_BODY_JOINT' and constraint.target is not None:
-                    struct.children.append(self.export_physics_constraint(constraint))
+                for constraint in nw.item.constraints:
+                    if constraint.type == 'RIGID_BODY_JOINT' and constraint.target is not None:
+                        struct.children.append(self.export_physics_constraint(constraint))
 
         if self.export_audio and nw.item.type == 'SPEAKER':
             struct.children.append(self.export_audio_properties(nw.item.data))
@@ -1082,15 +1082,49 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             ]))
 
         if props.use_collision_bounds and props.physics_type not in {'NAVMESH', 'OCCLUDER'}:
+            shape_struct = self.export_collision_bounds(o, scene)
+
+            struct.children.append(Extension(B"PM/shape", children=[
+                shape_struct
+            ]))
+
+        return struct
+
+    def export_collision_bounds(self, o, scene, force_no_compound=False):
+        if o.game.use_collision_compound and not force_no_compound:
+            compound_struct = Extension(B"CompoundShape", children=[])
+
+            compound_struct.children.append(Extension(B"CompoundChild", children=[
+                self.export_collision_bounds(o, scene, True)
+            ]))
+
+            for child in o.children:
+                if self.matrices_differ(child.matrix_local, Matrix()):
+                    compound_struct.children.append(Extension(B"CompoundChild", children=[
+                        DdlTextWriter.set_max_elements_per_line(
+                            DdlPrimitive(DataType.float,
+                                         data=[tuple(itertools.chain(*zip(*child.matrix_local)))],
+                                         vector_size=16),
+                            elements=4),
+                        self.export_collision_bounds(child, scene)
+                    ]))
+                else:
+                    compound_struct.children.append(Extension(B"CompoundChild", children=[
+                        self.export_collision_bounds(child, scene)
+                    ]))
+
+            return compound_struct
+
+        else:
             # export collision shape
-            shape_type = props.collision_bounds_type
+            shape_type = o.game.collision_bounds_type
             shape_struct = Extension(self.SHAPE_TYPE_TO_EXTENSION[shape_type], children=[])
 
             if shape_type not in {'CONVEX_HULL', 'TRIANGLE_MESH'}:
                 if shape_type == 'SPHERE':
                     # export radius of bounding sphere. Same as "radius" property.
                     # TODO: Deprecated.
-                    shape_struct.add_primitive(DataType.float, data=[props.radius])
+                    shape_struct.add_primitive(DataType.float, data=[o.game.radius])
                 else:
                     # export scale as half-extents
                     shape_struct.add_primitive(DataType.float, data=[o.scale], vector_size=3)
@@ -1100,14 +1134,10 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             # collision shape margin
             shape_struct.children.append(Extension(B"PM/margin", children=[
-                DdlPrimitive(DataType.float, data=[props.collision_margin])
+                DdlPrimitive(DataType.float, data=[o.game.collision_margin])
             ]))
 
-            struct.children.append(Extension(B"PM/shape", children=[
-                shape_struct
-            ]))
-
-        return struct
+            return shape_struct
 
     def export_physics_constraint(self, constraint):
         struct = Extension(B"PhysicsConstraint", children=[
