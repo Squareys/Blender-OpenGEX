@@ -18,11 +18,10 @@ class NodeWrapper(BaseWrapper):
         if len(node.children) != 0:
             for obj in node.children:
                 if obj in dupli_group or len(dupli_group) == 0:
-                    self.children.append(NodeWrapper(obj, self.container, self, offset, dupli_group=dupli_group))
+                    self.children.append(NodeWrapper(obj, self.container, self, None, dupli_group=dupli_group))
 
         if node.dupli_type == 'GROUP' and node.dupli_group:
             offset = node.dupli_group.dupli_offset
-
             group = [o for o in node.dupli_group.objects]
 
             for o in group:
