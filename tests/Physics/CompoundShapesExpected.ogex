@@ -67,13 +67,34 @@ Node $node1
 						}
 					}
 				}
+
+				Extension (applic = "Blender", type = "CompoundChild")
+				{
+					float[16]
+					{
+						{1.0, 0.0, 0.0, 0.0,
+						 0.0, 1.0, 0.0, 0.0,
+						 0.0, 0.0, 1.0, 0.0,
+						 0.0, 0.0, 3.0, 1.0}
+					}
+
+					Extension (applic = "Blender", type = "BoxShape")
+					{
+						float[3] {{0.25, 0.25, 0.25}}
+
+						Extension (applic = "Blender", type = "PM/margin")
+						{
+							float {0.0}
+						}
+					}
+				}
 			}
 		}
 	}
 
 	Node $node2
 	{
-		Name {string {"Empty.001"}}
+		Name {string {"child_sphere"}}
 
 		Transform
 		{
@@ -83,6 +104,22 @@ Node $node1
 				 0.0, 1.0, 0.0, 0.0,
 				 0.0, 0.0, 1.0, 0.0,
 				 0.0, 0.0, 1.0, 1.0}
+			}
+		}
+	}
+
+	Node $node3
+	{
+		Name {string {"smaller_child_box"}}
+
+		Transform
+		{
+			float[16]
+			{
+				{1.0, 0.0, 0.0, 0.0,
+				 0.0, 1.0, 0.0, 0.0,
+				 0.0, 0.0, 1.0, 0.0,
+				 0.0, 0.0, 3.0, 1.0}
 			}
 		}
 	}

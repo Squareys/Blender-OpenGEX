@@ -1102,10 +1102,14 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
             parent_scaling = [x*y for (x, y) in zip(o.scale, parent_scaling)]
 
             for child in o.children:
-                transform = Matrix.Scale(parent_scaling[0], 4, [1, 0, 0]) * \
-                            Matrix.Scale(parent_scaling[1], 4, [0, 1, 0]) * \
-                            Matrix.Scale(parent_scaling[2], 4, [0, 0, 1]) * \
-                            child.matrix_local
+                if not child.game.use_collision_bounds:
+                    continue
+
+                # apply scale and reset scaling on matrix.
+                transform = child.matrix_local
+                scaled_translate = [x*y for (x, y) in zip(transform.translation, parent_scaling)]
+                transform = Matrix.Translation(scaled_translate) * transform.to_quaternion().to_matrix().to_4x4()
+
                 if self.matrices_differ(transform, Matrix()):
                     compound_struct.children.append(Extension(B"CompoundChild", children=[
                         DdlTextWriter.set_max_elements_per_line(
@@ -1113,11 +1117,11 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                                          data=[tuple(itertools.chain(*zip(*transform)))],
                                          vector_size=16),
                             elements=4),
-                        self.export_collision_bounds(child, scene, parent_scaling=child.scale)
+                        self.export_collision_bounds(child, scene, parent_scaling=parent_scaling)
                     ]))
                 else:
                     compound_struct.children.append(Extension(B"CompoundChild", children=[
-                        self.export_collision_bounds(child, scene, parent_scaling=child.scale)
+                        self.export_collision_bounds(child, scene, parent_scaling=parent_scaling)
                     ]))
 
             return compound_struct
@@ -1134,7 +1138,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     shape_struct.add_primitive(DataType.float, data=[o.game.radius])
                 else:
                     # export scale as half-extents
-                    shape_struct.add_primitive(DataType.float, data=[[x*y for (x, y) in zip(o.scale, parent_scaling)]], vector_size=3)
+                    shape_struct.add_primitive(DataType.float, data=[o.scale], vector_size=3)
             else:
                 # export geometry as triangle mesh
                 shape_struct.add_primitive(DataType.ref, [self.export_geometry(scene, node=o, mesh=o.data)])
