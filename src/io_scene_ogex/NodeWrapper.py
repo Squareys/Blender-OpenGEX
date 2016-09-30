@@ -8,23 +8,29 @@ __author__ = 'Eric Lengyel, Jonathan Hale, Nicolas Wehrle'
 
 class NodeWrapper(BaseWrapper):
 
-    def __init__(self, node, container, parent=None, offset=None, add_children=True):
+    def __init__(self, node, container, parent=None, offset=None, dupli_group=[]):
         super().__init__(node, container, parent, offset)
 
         self.bones = []
 
         self.process_node()
 
-        if len(node.children) != 0 and add_children:
-            self.create_children(node.children)
+        if len(node.children) != 0:
+            for obj in node.children:
+                if obj in dupli_group or len(dupli_group) == 0:
+                    self.children.append(NodeWrapper(obj, self.container, self, offset, dupli_group=dupli_group))
 
         if node.dupli_type == 'GROUP' and node.dupli_group:
             offset = node.dupli_group.dupli_offset
-            self.create_children([o for o in node.dupli_group.objects], offset, add_children=False)
 
-    def create_children(self, children, offset=None, add_children=True):
-        for obj in children:
-            self.children.append(NodeWrapper(obj, self.container, self, offset, add_children=add_children))
+            group = [o for o in node.dupli_group.objects]
+
+            for o in group:
+                # Only add the object, if it is toplevel in the group, otherwise it will be added in one of the children
+                # instead to retain parent-relationships.
+                if o.parent not in group:
+                    self.children.append(
+                        NodeWrapper(o, self.container, self, offset, dupli_group=dupli_group + group))
 
     def process_node(self):
         if self.container.exportAll or self.item.select:
