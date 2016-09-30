@@ -1134,7 +1134,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                     shape_struct.add_primitive(DataType.float, data=[o.game.radius])
                 else:
                     # export scale as half-extents
-                    shape_struct.add_primitive(DataType.float, data=[o.scale], vector_size=3)
+                    shape_struct.add_primitive(DataType.float, data=[[x*y for (x, y) in zip(o.scale, parent_scaling)]], vector_size=3)
             else:
                 # export geometry as triangle mesh
                 shape_struct.add_primitive(DataType.ref, [self.export_geometry(scene, node=o, mesh=o.data)])
