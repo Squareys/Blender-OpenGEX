@@ -1090,7 +1090,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
         return struct
 
-    def export_collision_bounds(self, o, scene, force_no_compound=False):
+    def export_collision_bounds(self, o, scene, force_no_compound=False, parent_scaling=[1.0, 1.0, 1.0]):
         if o.game.use_collision_compound and not force_no_compound:
             compound_struct = Extension(B"CompoundShape", children=[])
 
@@ -1098,19 +1098,26 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
                 self.export_collision_bounds(o, scene, True)
             ]))
 
+            # Blender does not seem to provide component-wise multiplication. '*' is dot product.
+            parent_scaling = [x*y for (x, y) in zip(o.scale, parent_scaling)]
+
             for child in o.children:
-                if self.matrices_differ(child.matrix_local, Matrix()):
+                transform = Matrix.Scale(parent_scaling[0], 4, [1, 0, 0]) * \
+                            Matrix.Scale(parent_scaling[1], 4, [0, 1, 0]) * \
+                            Matrix.Scale(parent_scaling[2], 4, [0, 0, 1]) * \
+                            child.matrix_local
+                if self.matrices_differ(transform, Matrix()):
                     compound_struct.children.append(Extension(B"CompoundChild", children=[
                         DdlTextWriter.set_max_elements_per_line(
                             DdlPrimitive(DataType.float,
-                                         data=[tuple(itertools.chain(*zip(*child.matrix_local)))],
+                                         data=[tuple(itertools.chain(*zip(*transform)))],
                                          vector_size=16),
                             elements=4),
-                        self.export_collision_bounds(child, scene)
+                        self.export_collision_bounds(child, scene, parent_scaling=child.scale)
                     ]))
                 else:
                     compound_struct.children.append(Extension(B"CompoundChild", children=[
-                        self.export_collision_bounds(child, scene)
+                        self.export_collision_bounds(child, scene, parent_scaling=child.scale)
                     ]))
 
             return compound_struct
