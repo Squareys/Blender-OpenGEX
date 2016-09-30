@@ -37,6 +37,86 @@ Node $node1
 
 Node $node3
 {
+	Name {string {"EmptyWithChild"}}
+
+	Transform
+	{
+		float[16]
+		{
+			{1.0, 0.0, 0.0, 0.0,
+			 0.0, 1.0, 0.0, 0.0,
+			 0.0, 0.0, 1.0, 0.0,
+			 5.0, -1.0, 1.0, 1.0}
+		}
+	}
+
+	Node $node4
+	{
+		Name {string {"Child"}}
+
+		Transform
+		{
+			float[16]
+			{
+				{1.0, 0.0, 0.0, 0.0,
+				 0.0, 1.0, 0.0, 0.0,
+				 0.0, 0.0, 1.0, 0.0,
+				 0.0, 0.0, 2.0, 1.0}
+			}
+		}
+	}
+}
+
+Node $node5
+{
+	Name {string {"DupliInstance.001"}}
+
+	Transform
+	{
+		float[16]
+		{
+			{1.0, 0.0, 0.0, 0.0,
+			 0.0, 1.0, 0.0, 0.0,
+			 0.0, 0.0, 1.0, 0.0,
+			 5.0, 1.0, 0.0, 1.0}
+		}
+	}
+
+	Node $node6
+	{
+		Name {string {"EmptyWithChild"}}
+
+		Transform
+		{
+			float[16]
+			{
+				{1.0, 0.0, 0.0, 0.0,
+				 0.0, 1.0, 0.0, 0.0,
+				 0.0, 0.0, 1.0, 0.0,
+				 0.0, 0.0, 1.0, 1.0}
+			}
+		}
+
+		Node $node7
+		{
+			Name {string {"Child"}}
+
+			Transform
+			{
+				float[16]
+				{
+					{1.0, 0.0, 0.0, 0.0,
+					 0.0, 1.0, 0.0, 0.0,
+					 0.0, 0.0, 1.0, 0.0,
+					 -5.0, 1.0, 2.0, 1.0}
+				}
+			}
+		}
+	}
+}
+
+Node $node8
+{
 	Name {string {"DupliInstance"}}
 
 	Transform
@@ -50,7 +130,7 @@ Node $node3
 		}
 	}
 
-	Node $node4
+	Node $node9
 	{
 		Name {string {"Empty"}}
 
