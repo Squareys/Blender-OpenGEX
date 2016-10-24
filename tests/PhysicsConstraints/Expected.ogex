@@ -145,9 +145,9 @@ GeometryNode $node4
 	{
 		float[16]
 		{
-			{1.0, 0.0, 0.0, 0.0,
-			 0.0, 1.0, 0.0, 0.0,
-			 0.0, 0.0, 1.0, 0.0,
+			{0.5, 0.0, 0.0, 0.0,
+			 0.0, 0.5, 0.0, 0.0,
+			 0.0, 0.0, 0.5, 0.0,
 			 0.0, 5.0, 5.0, 1.0}
 		}
 	}
@@ -179,7 +179,7 @@ GeometryNode $node4
 
 		Extension (applic = "Blender", type = "PC/pivot")
 		{
-			float {-1.1, -1.2, -1.3}
+			float {-0.55, -0.6, -0.65}
 		}
 
 		Extension (applic = "Blender", type = "PC/axis")
