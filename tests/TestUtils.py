@@ -30,7 +30,7 @@ class OgexExporterTest(unittest.TestCase):
         :return: Contents of the file with given filename
         """
         file = open(filename)
-        contents = file.read()
+        contents = file.readlines()
         file.close()
 
         return contents
