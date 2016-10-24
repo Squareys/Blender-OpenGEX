@@ -960,7 +960,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
                 for constraint in nw.item.constraints:
                     if constraint.type == 'RIGID_BODY_JOINT' and constraint.target is not None:
-                        struct.children.append(self.export_physics_constraint(constraint))
+                        struct.children.append(self.export_physics_constraint(constraint, nw.item.scale))
 
         if self.export_audio and nw.item.type == 'SPEAKER':
             struct.children.append(self.export_audio_properties(nw.item.data))
@@ -1150,7 +1150,7 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
 
             return shape_struct
 
-    def export_physics_constraint(self, constraint):
+    def export_physics_constraint(self, constraint, scale):
         struct = Extension(B"PhysicsConstraint", children=[
             Extension(B"PC/pivot_type", children=[
                 DdlPrimitive(DataType.string, data=[constraint.pivot_type])
@@ -1173,9 +1173,9 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         if constraint.pivot_x != 0.0 or constraint.pivot_y != 0.0 or constraint.pivot_z != 0.0:
             struct.children.append(Extension(B"PC/pivot", children=[
                 DdlPrimitive(DataType.float,
-                             data=[constraint.pivot_x,
-                                   constraint.pivot_y,
-                                   constraint.pivot_z])
+                             data=[constraint.pivot_x*scale.x,
+                                   constraint.pivot_y*scale.y,
+                                   constraint.pivot_z*scale.z])
             ]))
 
         if constraint.axis_x != 0.0 or constraint.axis_y != 0.0 or constraint.axis_z != 0.0:
