@@ -200,6 +200,17 @@ class Material(DdlStructure):
                 DdlPrimitive(DataType.bool, data=[True])
             ]))
 
+        # export shadow receive flag
+        if material.use_shadows:
+            self.children.append(Extension(type=B"Shadow/receive", children=[
+                DdlPrimitive(DataType.bool, data=[True])
+            ]))
+
+        # export shadow cast flag
+        if material.use_cast_shadows:
+            self.children.append(Extension(type=B"Shadow/cast", children=[
+                DdlPrimitive(DataType.bool, data=[True])
+            ]))
         self.children.extend(textures)
 
 
