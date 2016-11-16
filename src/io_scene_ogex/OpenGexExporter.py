@@ -1046,13 +1046,13 @@ class OpenGexExporter(bpy.types.Operator, ExportHelper):
         if props.lock_location_x or props.lock_location_y or props.lock_location_z:
             lock_vector = [props.lock_location_x, props.lock_location_y, props.lock_location_z]
             struct.children.append(Extension(B"PM/linear_factor", children=[
-                DdlPrimitive(DataType.float, data=[1.0 if b else 0.0 for b in lock_vector])
+                DdlPrimitive(DataType.float, data=[0.0 if b else 1.0 for b in lock_vector])
             ]))
 
         if props.physics_type == 'RIGID_BODY' and (props.lock_rotation_x or props.lock_rotation_y or props.lock_rotation_z):
             lock_vector = [props.lock_rotation_x, props.lock_rotation_y, props.lock_rotation_z]
             struct.children.append(Extension(B"PM/angular_factor", children=[
-                DdlPrimitive(DataType.float, data=[1.0 if b else 0.0 for b in lock_vector])
+                DdlPrimitive(DataType.float, data=[0.0 if b else 1.0 for b in lock_vector])
             ]))
 
         if props.use_anisotropic_friction:
